@@ -1,5 +1,134 @@
 # 📋 更新日志
 
+## v0.5.1 - 2026-04-06
+
+### ✨ 新功能
+
+#### 取消生成功能
+- 为"一键生成全流程"添加取消功能
+- 用户可以在生成过程中随时中断执行
+- 点击右上角"取消"按钮立即停止
+- 状态自动重置，可重新开始
+- 提升用户控制感和操作灵活性
+
+### 🎨 UI/UX 改进
+
+**取消按钮设计**:
+- 位置: 执行进度标题右上角
+- 样式: Ghost variant（不抢焦点）
+- 图标: XCircle（取消图标）
+- 尺寸: sm（紧凑）
+
+**操作反馈**:
+- 点击取消后立即停止执行
+- 显示 Toast 提示："已取消，可以重新开始"
+- 所有步骤状态重置为 pending
+- 组件状态重置为 idle
+
+**用户场景**:
+1. 发现上传了错误文件 → 取消 → 重新上传 → 重新生成
+2. 等待时间过长 → 取消 → 稍后重试
+3. 改变主意不想生成 → 取消 → 做其他操作
+
+### 🔧 技术实现
+
+**修改文件**: `src/components/workbench/AutoGeneratePanel.tsx`
+
+**新增状态管理**:
+```typescript
+const [abortController, setAbortController] = useState<AbortController | null>(null)
+const cancelledRef = useRef(false)
+```
+
+**新增方法**:
+- `resetState()`: 重置所有状态到初始值
+- `handleCancel()`: 处理取消操作
+
+**取消机制**:
+```typescript
+// 1. 创建AbortController
+const controller = new AbortController()
+setAbortController(controller)
+cancelledRef.current = false
+
+// 2. 每步开始前检查
+if (cancelledRef.current) return
+
+// 3. 取消时中断
+cancelledRef.current = true
+abortController?.abort()
+resetState()
+```
+
+**错误处理优化**:
+```typescript
+catch (error) {
+  // 判断是否是取消操作
+  if (error.name === 'AbortError') {
+    return // 已由handleCancel处理
+  }
+  
+  // 不显示取消操作的错误
+  if (cancelledRef.current) {
+    return
+  }
+  
+  // 正常错误处理...
+}
+```
+
+### 💡 设计决策
+
+**为什么用 useRef 而不是 useState？**
+- ✅ useRef 不触发重新渲染
+- ✅ 在 async 函数中读取最新值
+- ✅ 避免闭包陷阱
+
+**为什么每个步骤都检查 cancelledRef？**
+- ✅ 每个步骤耗时较长（几十秒）
+- ✅ 及时响应取消操作
+- ✅ 避免执行不必要的步骤
+
+**为什么不支持"暂停"？**
+- ❌ 暂停需要保存执行进度（复杂）
+- ❌ SSE 流式请求无法真正暂停
+- ✅ 取消 + 重新开始更简单直接
+- ✅ 执行时间短（3-5分钟），重新执行成本低
+
+**为什么取消后重置为 idle？**
+- ✅ 状态清晰，避免不一致
+- ✅ 用户心智模型简单（"取消" = "全部重来"）
+- ✅ 重新开始更可靠
+- ❌ 保留进度可能导致数据不一致
+
+### 🎯 用户价值
+
+**控制感提升**:
+- ✅ 不再被动等待，可主动中断
+- ✅ 发现问题可立即停止
+- ✅ 改变主意可随时取消
+
+**操作灵活性**:
+- ✅ 错误文件可快速纠正
+- ✅ 长时间等待可选择取消
+- ✅ 取消后可立即重新操作
+
+**心理负担降低**:
+- ✅ 不担心"点错了必须等完成"
+- ✅ 更愿意尝试（可以取消）
+- ✅ 操作更自信
+
+### 📝 代码统计
+
+- **修改文件**: 1 个（AutoGeneratePanel.tsx）
+- **新增代码**: ~40 行
+- **删除代码**: ~15 行（重构状态重置）
+- **净增代码**: ~25 行
+- **新增方法**: 2 个（resetState, handleCancel）
+- **新增状态**: 2 个（abortController, cancelledRef）
+
+---
+
 ## v0.5.0 - 2026-04-06
 
 ### 🎉 重大更新
