@@ -1,11 +1,7 @@
 import { readFileSync } from 'fs'
-import { createRequire } from 'module'
+import { PDFParse } from 'pdf-parse'
 import { getAnthropicClient } from '../claude/client.js'
 import { config } from '../../config.js'
-
-// pdf-parse is CommonJS, use createRequire to import it
-const require = createRequire(import.meta.url)
-const pdfParse = require('pdf-parse')
 
 export interface PDFParseResult {
   type: 'pdf'
@@ -27,9 +23,8 @@ export async function parsePDF(filePath: string): Promise<PDFParseResult> {
   let pageCount: number
 
   try {
-    const pdfData = await pdfParse(buffer, {
-      max: 0 // 提取所有页面
-    })
+    const parser = new PDFParse(buffer)
+    const pdfData = await parser.parse()
 
     extractedText = pdfData.text.trim()
     pageCount = pdfData.numpages

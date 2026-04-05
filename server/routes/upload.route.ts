@@ -75,18 +75,25 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
       const ext = req.file.originalname.toLowerCase().split('.').pop() || ''
       const mime = req.file.mimetype
 
+      console.log(`[upload] 开始解析文件：${decodedName} (${ext})`)
+
       if (mime.includes('sheet') || mime.includes('excel') || mime === 'text/csv' || ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+        console.log('[upload] 调用Excel解析器...')
         parsedData = await parseExcel(filePath)
       } else if (mime === 'application/pdf' || ext === 'pdf') {
+        console.log('[upload] 调用PDF解析器...')
         parsedData = await parsePDF(filePath)
       } else if (mime.startsWith('video/') || ['mp4', 'mov', 'webm'].includes(ext)) {
+        console.log('[upload] 调用视频解析器...')
         parsedData = await parseVideo(filePath)
       } else if (mime.startsWith('image/') || ['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+        console.log('[upload] 调用图片解析器...')
         parsedData = await parseImage(filePath)
       } else {
         throw new Error(`Unsupported type: ${mime} (${ext})`)
       }
 
+      console.log(`[upload] ✅ 文件解析成功：${decodedName}`)
       uploadRepo.updateStatus(upload.id, 'ready', parsedData)
 
       // Log parse success with file type
@@ -94,6 +101,7 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
       logRepo.create(projectId, 'parse', `解析完成（${typeName}）：${decodedName}`)
     } catch (parseErr) {
       const msg = parseErr instanceof Error ? parseErr.message : String(parseErr)
+      console.error(`[upload] ❌ 文件解析失败：${decodedName}`, msg)
       uploadRepo.updateStatus(upload.id, 'error', undefined, msg)
     }
   } catch (err) {
