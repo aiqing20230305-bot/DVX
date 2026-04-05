@@ -1,5 +1,107 @@
 # 📋 更新日志
 
+## v0.4.1 - 2026-04-06
+
+### ✨ 新功能
+
+#### 专业打印样式系统
+- 创建专用打印样式文件 `print.css`
+- 使用 `@media print` 媒体查询优化PDF输出
+- 打印时自动隐藏所有UI元素（侧边栏、按钮、导航等）
+- 只显示报告内容，提供专业的PDF输出效果
+- 无需用户任何额外操作，开箱即用
+
+### 🎨 UI/UX 改进
+
+- 打印输出全宽显示，充分利用纸张空间
+- 去除所有边框、圆角、背景等装饰元素
+- 自动优化分页效果：
+  - 标题后不分页（避免孤立标题）
+  - 表格内不分页（保持完整性）
+  - 图片内不分页（避免截断）
+- 颜色保真渲染（color-adjust: exact）
+- 链接自动显示URL（便于纸质版参考）
+- 表格样式优化（边框、间距）
+
+### 🔧 技术实现
+
+**新增文件**:
+- `src/styles/print.css` - 打印样式文件（200+ 行）
+  - UI元素隐藏规则
+  - 布局优化规则
+  - 分页优化规则
+  - 颜色和排版优化
+
+**修改文件**:
+- `src/pages/Report.tsx` - 添加7个CSS类名标识各区域
+- `src/components/report/ReportPreview.tsx` - 添加2个CSS类名
+- `src/App.tsx` - 导入 print.css 全局生效
+
+**类名映射**:
+```
+report-header          → 页面标题区域
+report-controls        → 控制按钮区域
+report-error           → 错误提示区域
+report-preview-container → 预览容器
+export-panel           → 导出面板
+tips-panel             → 使用提示
+report-preview         → 预览组件容器
+report-preview-header  → 预览header（交通灯装饰）
+```
+
+### 💡 设计决策
+
+**为什么创建独立的 print.css？**
+1. 打印样式与屏幕样式分离，易于维护
+2. 避免 Tailwind 的 !important 冲突
+3. 便于调试和优化
+4. 符合关注点分离原则
+
+**为什么使用 CSS 类名而不是 Tailwind？**
+1. 打印样式需要精确控制，CSS 更灵活
+2. `@media print` 与 Tailwind 结合不够优雅
+3. 可读性更好，维护成本更低
+4. 打印样式独立于组件逻辑
+
+**打印优化策略**:
+```css
+/* 隐藏UI */
+.report-header, .report-controls { display: none !important; }
+
+/* 全宽显示 */
+.report-preview-container { grid-column: 1 / -1 !important; }
+
+/* 分页优化 */
+h1, h2, h3 { page-break-after: avoid !important; }
+
+/* 颜色保真 */
+* { color-adjust: exact !important; }
+```
+
+### 🎯 用户价值
+
+- ✅ 打印PDF时自动隐藏UI，无需手动调整
+- ✅ 输出更专业，适合正式汇报和归档
+- ✅ 充分利用纸张空间，信息密度更高
+- ✅ 分页合理，避免内容被截断
+- ✅ 颜色准确，视觉效果更好
+- ✅ 零学习成本，点击打印即可
+
+### 测试建议
+
+测试打印效果：
+1. 生成战略报告
+2. 点击"打印为 PDF"按钮
+3. 在打印预览中检查：
+   - ✅ 无侧边栏、按钮等UI元素
+   - ✅ 报告内容全宽显示
+   - ✅ 分页效果合理
+   - ✅ 颜色和样式正确
+4. 保存为PDF文件
+5. 打开PDF检查最终效果
+
+---
+
 ## v0.4.0 - 2026-04-06
 
 ### 🎉 版本升级
