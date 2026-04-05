@@ -26,12 +26,15 @@ function requireEnv(key: string): string {
   return val
 }
 
+// Support persistent storage for deployment platforms
+const dataDir = process.env['DATA_DIR'] || process.cwd()
+
 export const config = {
   anthropicApiKey: requireEnv('ANTHROPIC_API_KEY'),
   anthropicBaseUrl: process.env['ANTHROPIC_BASE_URL'] || undefined,
   anthropicModel: process.env['ANTHROPIC_MODEL'] || 'claude-sonnet-4-5-20250929',
   port: parseInt(process.env['PORT'] ?? '3001', 10),
-  uploadsDir: resolve(process.cwd(), 'uploads'),
-  kbDataDir: resolve(process.cwd(), 'kb-data'),
-  dbPath: resolve(process.cwd(), 'data.db'),
+  uploadsDir: resolve(dataDir, 'uploads'),
+  kbDataDir: resolve(dataDir, 'kb-data'),
+  dbPath: resolve(dataDir, 'data.db'),
 }
