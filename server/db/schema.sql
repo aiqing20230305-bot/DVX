@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS uploads (
   original_name TEXT NOT NULL,
   mime_type TEXT NOT NULL,
   size INTEGER NOT NULL,
-  file_type TEXT NOT NULL DEFAULT 'competitor_data',
+  file_type TEXT NOT NULL DEFAULT 'market_data',
   status TEXT NOT NULL DEFAULT 'uploading',
   parsed_data TEXT,
   error_message TEXT,

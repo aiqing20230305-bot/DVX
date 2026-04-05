@@ -11,14 +11,15 @@ function buildDataContext(uploads: ReturnType<typeof uploadRepo.findByProject>):
   const parts: string[] = []
 
   // Group uploads by file type
-  const competitorData = uploads.filter(u => u.status === 'ready' && u.file_type === 'competitor_data')
+  const marketData = uploads.filter(u => u.status === 'ready' && u.file_type === 'market_data')
   const productInfo = uploads.filter(u => u.status === 'ready' && u.file_type === 'product_info')
   const productFeatures = uploads.filter(u => u.status === 'ready' && u.file_type === 'product_features')
 
-  // Add competitor data section
-  if (competitorData.length > 0) {
-    parts.push('\n\n========== 竞品数据 ==========\n')
-    for (const upload of competitorData) {
+  // Add market data section
+  if (marketData.length > 0) {
+    parts.push('\n\n========== 市场数据 ==========\n')
+    parts.push('（包含竞品数据、自有品牌数据、行业数据等）\n')
+    for (const upload of marketData) {
       if (!upload.parsed_data) continue
       parts.push(`\n=== 文件：${upload.original_name} ===`)
       parts.push(parseUploadData(upload))

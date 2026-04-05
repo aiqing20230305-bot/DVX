@@ -72,7 +72,7 @@ export function FileCard({ file, onDelete, progress }: FileCardProps) {
   const parsedData = file.parsed_data ? JSON.parse(file.parsed_data) : null
 
   const fileTypeLabels = {
-    competitor_data: { label: '竞品数据', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
+    market_data: { label: '市场数据', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
     product_info: { label: '产品信息', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
     product_features: { label: '产品卖点', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' }
   }

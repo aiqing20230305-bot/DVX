@@ -3,7 +3,7 @@ import { Upload, FileSpreadsheet, FileText, Image, Film, X } from 'lucide-react'
 import { Button } from '../shared/Button.js'
 
 interface DropZoneProps {
-  onFiles: (files: File[], fileType: 'competitor_data' | 'product_info' | 'product_features') => void
+  onFiles: (files: File[], fileType: 'market_data' | 'product_info' | 'product_features') => void
   disabled?: boolean
   uploading?: boolean
 }
@@ -34,7 +34,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
-  const [fileType, setFileType] = useState<'competitor_data' | 'product_info' | 'product_features'>('competitor_data')
+  const [fileType, setFileType] = useState<'market_data' | 'product_info' | 'product_features'>('market_data')
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -81,7 +81,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
   }
 
   const fileTypeOptions = [
-    { value: 'competitor_data' as const, label: '竞品数据', description: '竞品视频、爆款数据等' },
+    { value: 'market_data' as const, label: '市场数据', description: '竞品数据、自有品牌数据、行业数据等' },
     { value: 'product_info' as const, label: '产品信息', description: '产品介绍、规格参数等' },
     { value: 'product_features' as const, label: '产品卖点', description: '核心卖点、差异化优势等' }
   ]

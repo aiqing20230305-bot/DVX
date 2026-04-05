@@ -17,7 +17,7 @@ export const videoApi = {
 export async function uploadFile(
   file: File,
   projectId: string,
-  fileType?: 'competitor_data' | 'product_info' | 'product_features',
+  fileType?: 'market_data' | 'product_info' | 'product_features',
   onProgress?: (pct: number) => void
 ): Promise<{ upload: UploadedFile }> {
   return new Promise((resolve, reject) => {

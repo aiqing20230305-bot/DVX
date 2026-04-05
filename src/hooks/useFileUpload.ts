@@ -15,7 +15,7 @@ export function useFileUpload() {
   const upload = useCallback(async (
     file: File,
     projectId: string,
-    fileType?: 'competitor_data' | 'product_info' | 'product_features'
+    fileType?: 'market_data' | 'product_info' | 'product_features'
   ): Promise<UploadedFile | null> => {
     const key = `${file.name}-${file.size}-${Date.now()}`
 
@@ -52,7 +52,7 @@ export function useFileUpload() {
   const uploadMany = useCallback(async (
     files: File[],
     projectId: string,
-    fileType?: 'competitor_data' | 'product_info' | 'product_features'
+    fileType?: 'market_data' | 'product_info' | 'product_features'
   ): Promise<UploadedFile[]> => {
     const results = await Promise.allSettled(files.map(f => upload(f, projectId, fileType)))
     return results

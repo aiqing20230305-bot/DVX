@@ -66,7 +66,7 @@ export function Workbench() {
     }
   }, [files, fetchFiles])
 
-  const handleFiles = async (fileList: File[], fileType: 'competitor_data' | 'product_info' | 'product_features') => {
+  const handleFiles = async (fileList: File[], fileType: 'market_data' | 'product_info' | 'product_features') => {
     if (!activeProjectId) {
       // Create default project
       await addProject('默认项目')

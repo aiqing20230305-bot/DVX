@@ -25,24 +25,36 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
     }
 
     // Validate and default fileType
-    const validFileTypes = ['competitor_data', 'product_info', 'product_features']
-    const safeFileType = fileType && validFileTypes.includes(fileType) ? fileType : 'competitor_data'
+    const validFileTypes = ['market_data', 'product_info', 'product_features']
+    const safeFileType = fileType && validFileTypes.includes(fileType) ? fileType : 'market_data'
 
     // File type display names
     const fileTypeNames: Record<string, string> = {
-      competitor_data: '竞品数据',
+      market_data: '市场数据',
       product_info: '产品信息',
       product_features: '产品卖点'
+    }
+
+    // Decode original filename (fix for UTF-8 encoding issue)
+    let decodedName = req.file.originalname
+    try {
+      // If filename contains garbled characters, try to decode from latin1 to utf8
+      if (/[\u0080-\u00FF]/.test(decodedName)) {
+        decodedName = Buffer.from(decodedName, 'latin1').toString('utf8')
+      }
+    } catch (err) {
+      // If decode fails, use original name
+      console.warn('Failed to decode filename:', err)
     }
 
     // Create upload record
     const upload = uploadRepo.create({
       project_id: projectId,
       filename: req.file.filename,
-      original_name: req.file.originalname,
+      original_name: decodedName,
       mime_type: req.file.mimetype,
       size: req.file.size,
-      file_type: safeFileType as 'competitor_data' | 'product_info' | 'product_features',
+      file_type: safeFileType as 'market_data' | 'product_info' | 'product_features',
       status: 'parsing',
       parsed_data: null,
       error_message: null
@@ -50,7 +62,7 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
 
     // Log upload action with file type
     const typeName = fileTypeNames[safeFileType] || '数据'
-    logRepo.create(projectId, 'upload', `上传${typeName}：${req.file.originalname}`)
+    logRepo.create(projectId, 'upload', `上传${typeName}：${decodedName}`)
 
     // Return immediately, parse async
     res.json({ upload })
@@ -79,7 +91,7 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
 
       // Log parse success with file type
       const typeName = fileTypeNames[safeFileType] || '数据'
-      logRepo.create(projectId, 'parse', `解析完成（${typeName}）：${req.file.originalname}`)
+      logRepo.create(projectId, 'parse', `解析完成（${typeName}）：${decodedName}`)
     } catch (parseErr) {
       const msg = parseErr instanceof Error ? parseErr.message : String(parseErr)
       uploadRepo.updateStatus(upload.id, 'error', undefined, msg)
