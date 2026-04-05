@@ -1,0 +1,44 @@
+import { Router, Request, Response } from 'express'
+import { topicRepo } from '../db/repositories/topic.repo.js'
+import { generateTopicsStream } from '../services/topic.service.js'
+
+const router = Router()
+
+router.post('/generate', async (req: Request, res: Response) => {
+  const { projectId, insightIds = [] } = req.body as { projectId: string; insightIds?: string[] }
+  if (!projectId) {
+    res.status(400).json({ error: '缺少 projectId' })
+    return
+  }
+  await generateTopicsStream(projectId, insightIds, res)
+})
+
+router.get('/:projectId', (req: Request, res: Response) => {
+  try {
+    const projectId = req.params.projectId as string
+    const topics = topicRepo.findByProject(projectId)
+    const parsed = topics.map(t => ({
+      ...t,
+      insight_ref: JSON.parse(t.insight_ref) as string[],
+      selected: t.selected === 1
+    }))
+    res.json({ topics: parsed })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+router.patch('/:id', (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string
+    const { selected, priority } = req.body as { selected?: boolean; priority?: number }
+    topicRepo.update(id, { selected, priority })
+    res.json({ success: true })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+export { router as topicRouter }

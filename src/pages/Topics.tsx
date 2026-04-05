@@ -1,0 +1,147 @@
+import React, { useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { FileText, Zap, ArrowRight, RotateCcw } from 'lucide-react'
+import { useProjectStore } from '../store/project.store.js'
+import { useInsightStore } from '../store/insight.store.js'
+import { useTopicStore } from '../store/topic.store.js'
+import { topicApi } from '../api/topic.api.js'
+import { insightApi } from '../api/insight.api.js'
+import { Button } from '../components/shared/Button.js'
+import { TopicGrid } from '../components/topics/TopicGrid.js'
+import { useSSEStream } from '../hooks/useSSEStream.js'
+import { TopicCard } from '../types/index.js'
+
+export function Topics() {
+  const navigate = useNavigate()
+  const { activeProjectId } = useProjectStore()
+  const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
+  const {
+    topics, selectedIds, status,
+    setTopics, addTopic, toggleSelection, updatePriority, setStatus, reset
+  } = useTopicStore()
+
+  const { start: startStream } = useSSEStream<TopicCard & { message?: string }>({
+    onEvent: (event, data) => {
+      if (event === 'topic') {
+        addTopic(data as TopicCard)
+      } else if (event === 'complete') {
+        setStatus('success')
+      } else if (event === 'error') {
+        setStatus('error', (data as { message: string }).message)
+      }
+    },
+    onDone: () => {
+      setStatus('success')
+    }
+  })
+
+  // Load existing data
+  useEffect(() => {
+    if (!activeProjectId) return
+    Promise.all([
+      topicApi.listByProject(activeProjectId),
+      insightApi.listByProject(activeProjectId)
+    ]).then(([{ topics }, { insights }]) => {
+      if (topics.length > 0) {
+        setTopics(topics)
+        setStatus('success')
+      }
+      setInsights(insights)
+    }).catch(console.error)
+  }, [activeProjectId])
+
+  const handleGenerate = useCallback(async () => {
+    if (!activeProjectId) return
+    reset()
+    setStatus('streaming')
+    const insightIds = Array.from(insightSelectedIds)
+    await startStream(topicApi.generateStream(activeProjectId, insightIds))
+  }, [activeProjectId, insightSelectedIds, startStream, reset, setStatus])
+
+  const handlePriorityChange = async (id: string, priority: number) => {
+    updatePriority(id, priority)
+    await topicApi.update(id, { priority }).catch(console.error)
+  }
+
+  const handleToggleSelect = async (id: string) => {
+    toggleSelection(id)
+    const isSelected = !selectedIds.has(id)
+    await topicApi.update(id, { selected: isSelected }).catch(console.error)
+  }
+
+  const isGenerating = status === 'streaming' || status === 'loading'
+  const selectedCount = selectedIds.size
+
+  return (
+    <div className="p-6 md:p-8 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
+            <FileText size={18} className="text-indigo-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-100">选题策划</h1>
+        </div>
+        <p className="text-slate-500 text-sm ml-12">基于洞察生成高转化视频选题，覆盖抖音、快手、小红书</p>
+      </div>
+
+      {/* Selected insights summary */}
+      {insights.length > 0 && (
+        <div className="mb-4 px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl flex items-center justify-between">
+          <span className="text-xs text-slate-500">
+            已选洞察：{insightSelectedIds.size > 0 ? insightSelectedIds.size : '全部'} 条
+          </span>
+          <button
+            onClick={() => navigate('/insights')}
+            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            返回修改 →
+          </button>
+        </div>
+      )}
+
+      {/* Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleGenerate}
+            loading={isGenerating}
+            disabled={!activeProjectId}
+            icon={<Zap size={15} />}
+          >
+            {isGenerating ? '生成中...' : topics.length > 0 ? '重新生成' : '生成选题'}
+          </Button>
+
+          {topics.length > 0 && !isGenerating && (
+            <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
+          )}
+        </div>
+
+        {selectedCount > 0 && (
+          <Button
+            onClick={() => navigate('/scripts')}
+            iconRight={<ArrowRight size={15} />}
+          >
+            选中 {selectedCount} 个选题 · 生成脚本
+          </Button>
+        )}
+      </div>
+
+      {/* Selection tip */}
+      {status === 'success' && topics.length > 0 && (
+        <div className="mb-4 px-4 py-2.5 bg-indigo-900/20 border border-indigo-700/30 rounded-xl text-xs text-indigo-300">
+          点击选题卡片选择，调整优先级（五星），然后点击「生成脚本」进入脚本创作
+        </div>
+      )}
+
+      {/* Topics grid */}
+      <TopicGrid
+        topics={topics}
+        selectedIds={selectedIds}
+        status={status}
+        onToggleSelect={handleToggleSelect}
+        onPriorityChange={handlePriorityChange}
+      />
+    </div>
+  )
+}

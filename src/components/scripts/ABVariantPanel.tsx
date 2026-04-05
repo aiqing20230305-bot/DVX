@@ -1,0 +1,63 @@
+import React from 'react'
+import { Script } from '../../types/index.js'
+import { ScriptEditor } from './ScriptEditor.js'
+import { Loader2, PenTool } from 'lucide-react'
+
+interface ABVariantPanelProps {
+  scripts: Script[]
+  loading?: boolean
+  onSave?: (id: string, data: { segments: Script['segments']; fullText: string; wordCount: number }) => void
+}
+
+export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPanelProps) {
+  const scriptA = scripts.find(s => s.variant === 'A')
+  const scriptB = scripts.find(s => s.variant === 'B')
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={32} className="text-indigo-500 animate-spin" />
+          <p className="text-slate-400 text-sm">AI 正在创作脚本，请稍候...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!scriptA && !scriptB) {
+    return (
+      <div className="text-center py-20">
+        <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
+          <PenTool size={28} className="text-slate-600" />
+        </div>
+        <h3 className="text-slate-400 font-medium mb-2">等待生成脚本</h3>
+        <p className="text-slate-600 text-sm">选择选题后，点击「生成脚本」开始创作 A/B 对照版本</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div>
+        {scriptA
+          ? <ScriptEditor script={scriptA} onSave={onSave} />
+          : (
+            <div className="flex items-center justify-center h-40 border border-slate-700 rounded-xl">
+              <Loader2 size={24} className="text-indigo-500 animate-spin" />
+            </div>
+          )
+        }
+      </div>
+      <div>
+        {scriptB
+          ? <ScriptEditor script={scriptB} onSave={onSave} />
+          : (
+            <div className="flex items-center justify-center h-40 border border-slate-700 rounded-xl">
+              <Loader2 size={24} className="text-indigo-500 animate-spin" />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  )
+}
