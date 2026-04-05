@@ -4,6 +4,7 @@ import { Database, RefreshCw, ArrowRight, AlertCircle, Film, Link, Loader2 } fro
 import { useProjectStore } from '../store/project.store.js'
 import { DropZone } from '../components/workbench/DropZone.js'
 import { FileCard } from '../components/workbench/FileCard.js'
+import { FileCardSkeletonList } from '../components/workbench/FileCardSkeleton.js'
 import { Button } from '../components/shared/Button.js'
 import { Input } from '../components/shared/Input.js'
 import { uploadApi, videoApi } from '../api/upload.api.js'
@@ -16,6 +17,7 @@ export function Workbench() {
   const { projects, activeProjectId, addProject } = useProjectStore()
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { uploads, upload } = useFileUpload()
   const [uploadingCount, setUploadingCount] = useState(0)
@@ -31,12 +33,14 @@ export function Workbench() {
     try {
       const { uploads } = await uploadApi.listByProject(activeProjectId)
       setFiles(uploads)
+      setInitialLoading(false)
       // Clear error on successful fetch
       if (error && error.includes('获取文件列表')) {
         setError(null)
       }
     } catch (err) {
       console.error('Failed to fetch files:', err)
+      setInitialLoading(false)
       // Only show error if it persists (don't spam on polling failures)
       const errMsg = err instanceof Error ? err.message : String(err)
       if (!errMsg.includes('fetch') && !errMsg.includes('Network')) {
@@ -245,7 +249,16 @@ export function Workbench() {
       )}
 
       {/* Files list */}
-      {files.length > 0 && (
+      {initialLoading ? (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-slate-200">
+              加载中...
+            </h2>
+          </div>
+          <FileCardSkeletonList count={3} />
+        </div>
+      ) : files.length > 0 ? (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-slate-200">
@@ -265,7 +278,7 @@ export function Workbench() {
             ))}
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* CTA */}
       {canGenerateInsights && (
