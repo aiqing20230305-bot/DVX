@@ -1,5 +1,165 @@
 # 📋 更新日志
 
+## v0.6.3 - 2026-04-06
+
+### ✨ 新功能
+
+#### 批量删除功能
+- 支持批量删除洞察、选题、脚本数据
+- 智能确认对话框，防止误操作
+- 一键清理，提升数据管理效率
+
+### 🗑️ 删除能力
+
+| 页面 | 删除方式 | 确认提示 |
+|------|----------|----------|
+| Insights | 批量删除已选洞察 | 显示删除数量 |
+| Topics | 批量删除已选选题 | 显示删除数量 |
+| Scripts | 删除选题的所有脚本（A/B版本） | 显示选题标题和脚本数量 |
+
+### 🎨 UI/UX 改进
+
+**Insights & Topics 页面**:
+- 删除按钮仅在有选择时显示
+- 红色警告样式（text-red-400）
+- 显示删除数量：`删除 (3)`
+- 确认对话框：`确定要删除选中的 N 条/个吗？`
+- 操作不可撤销提示
+
+**Scripts 页面**:
+- 每个选题卡片上显示删除图标（Trash2）
+- 删除该选题的所有脚本（A版+B版）
+- 确认对话框包含选题标题和脚本数量
+- 红色图标，hover变亮
+
+**交互流程**:
+1. 选择要删除的数据（Insights/Topics）或找到目标选题（Scripts）
+2. 点击删除按钮/图标
+3. 弹出确认对话框（包含数量和警告）
+4. 确认后执行删除
+5. 自动更新列表
+6. 清空选择状态
+7. 显示成功Toast提示
+
+**用户价值**:
+- 快速清理：批量删除无用数据，提升工作效率
+- 数据管理：精准控制数据留存，避免冗余
+- 防误操作：双重确认机制，降低误删风险
+- 即时反馈：Toast提示删除结果，操作透明
+
+### 🔧 技术实现
+
+**后端API**:
+
+新增批量删除路由：
+- `DELETE /api/insight/batch` - 批量删除洞察
+- `DELETE /api/topic/batch` - 批量删除选题
+- `DELETE /api/script/batch` - 批量删除脚本
+
+**请求格式**:
+```json
+{
+  "ids": ["id1", "id2", "id3"]
+}
+```
+
+**响应格式**:
+```json
+{
+  "success": true,
+  "count": 3
+}
+```
+
+**Repository层**:
+
+所有repo添加`deleteMany`方法：
+```typescript
+deleteMany(ids: string[]): void {
+  const db = getDb()
+  const placeholders = ids.map(() => '?').join(',')
+  db.prepare(`DELETE FROM table WHERE id IN (${placeholders})`).run(...ids)
+}
+```
+
+**前端API**:
+
+所有API添加`deleteMany`方法：
+```typescript
+deleteMany: (ids: string[]) =>
+  api.delete<{ success: boolean; count: number }>('/resource/batch', { ids })
+```
+
+**页面集成**:
+
+Insights/Topics页面：
+```typescript
+const handleBatchDelete = async () => {
+  // 1. 检查选择
+  if (selectedCount === 0) return
+  
+  // 2. 确认对话框
+  const confirmed = window.confirm(...)
+  if (!confirmed) return
+  
+  // 3. 调用API
+  await api.deleteMany(Array.from(selectedIds))
+  
+  // 4. 更新状态
+  setData(data.filter(item => !selectedIds.has(item.id)))
+  clearSelection()
+  
+  // 5. Toast提示
+  toast.success('删除成功', `已删除 ${count} 条`)
+}
+```
+
+Scripts页面：
+```typescript
+const handleDeleteTopicScripts = async (topicId: string, topicTitle: string) => {
+  const topicScripts = scripts.filter(s => s.topic_id === topicId)
+  const confirmed = window.confirm(`确定要删除「${topicTitle}」的所有脚本吗？`)
+  if (!confirmed) return
+  
+  await scriptApi.deleteMany(topicScripts.map(s => s.id))
+  setScripts(scripts.filter(s => s.topic_id !== topicId))
+  toast.success('删除成功', `已删除 ${count} 个脚本`)
+}
+```
+
+### 🔒 安全性
+
+**SQL注入防护**:
+- 使用参数化查询（prepared statements）
+- 动态生成占位符：`ids.map(() => '?').join(',')`
+- 参数展开传递：`.run(...ids)`
+
+**输入验证**:
+- 检查ids是否为数组
+- 检查数组是否为空
+- 类型验证：`Array.isArray(ids)`
+
+**错误处理**:
+- 空数组返回400错误
+- 数据库错误返回500错误
+- 前端显示具体错误信息
+
+### 📝 使用场景
+
+- **数据清理**: 删除测试数据或无效洞察
+- **重新生成**: 删除旧版本选题，重新生成
+- **精简内容**: 删除不满意的脚本，重新创作
+- **项目管理**: 定期清理过期或无用数据
+
+### 🐛 错误处理
+
+- 未选择数据时显示错误提示
+- 删除失败时显示具体错误信息
+- 所有操作都有Toast反馈
+- 确认对话框防止误操作
+
+---
+
 ## v0.6.2 - 2026-04-06
 
 ### ✨ 新功能
