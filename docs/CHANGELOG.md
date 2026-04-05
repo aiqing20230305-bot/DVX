@@ -1,5 +1,179 @@
 # 📋 更新日志
 
+## v0.7.1 - 2026-04-06
+
+### ✨ 新功能
+
+#### 批量设置优先级
+- 支持批量修改选题优先级
+- 提升批量操作效率
+- 与批量删除功能一致的交互体验
+
+### 🎯 功能详情
+
+**批量设置优先级**（Topics页面）:
+- 选中多个选题后，显示"设置优先级 (N)"按钮
+- 点击按钮弹出输入对话框
+- 输入1-5之间的数字（1=最低，5=最高）
+- 确认后批量更新所有选中选题的优先级
+- 立即刷新UI显示新的优先级
+- Toast提示操作结果
+
+### 🎨 UI/UX 改进
+
+**按钮样式**:
+- 黄色星星图标（Star）
+- 黄色文字（text-yellow-400）
+- hover时变亮（hover:text-yellow-300）
+- 显示选中数量："设置优先级 (3)"
+
+**输入对话框**:
+- 显示当前选中数量
+- 列出优先级说明（1-5星）
+- 默认值为3（中等优先级）
+- 输入验证：必须是1-5的数字
+
+**交互流程**:
+1. 选中多个选题（勾选复选框）
+2. 点击"设置优先级"按钮
+3. 在对话框中输入优先级（1-5）
+4. 确认后批量更新
+5. UI立即刷新显示新的星星数量
+6. Toast提示"已将 N 个选题的优先级设为 X 星"
+
+**用户价值**:
+- 批量操作：一次设置多个选题，节省时间
+- 快速调整：根据需求快速调整优先级分布
+- 一致性：与批量删除功能一致的交互模式
+- 即时反馈：操作后立即看到结果
+
+### 🔧 技术实现
+
+**后端API**:
+
+新增批量更新优先级路由：
+- `PATCH /api/topic/batch-priority`
+
+**请求格式**:
+```json
+{
+  "ids": ["id1", "id2", "id3"],
+  "priority": 4
+}
+```
+
+**响应格式**:
+```json
+{
+  "success": true,
+  "count": 3
+}
+```
+
+**Repository层**:
+
+添加`updatePriorityBatch`方法：
+```typescript
+updatePriorityBatch(ids: string[], priority: number): void {
+  const db = getDb()
+  const now = Date.now()
+  const placeholders = ids.map(() => '?').join(',')
+  db.prepare(`UPDATE topics SET priority = ?, updated_at = ? WHERE id IN (${placeholders})`)
+    .run(priority, now, ...ids)
+}
+```
+
+**前端API**:
+
+添加批量更新方法：
+```typescript
+updatePriorityBatch: (ids: string[], priority: number) =>
+  api.patch<{ success: boolean; count: number }>('/topic/batch-priority', { ids, priority })
+```
+
+**页面集成**:
+
+Topics页面添加处理函数：
+```typescript
+const handleBatchSetPriority = async () => {
+  // 1. 检查选择
+  if (selectedCount === 0) return
+  
+  // 2. 弹出输入对话框
+  const priorityStr = window.prompt(
+    `为选中的 ${selectedCount} 个选题设置优先级（1-5星）：\n\n1 = 最低\n2 = 低\n3 = 中\n4 = 高\n5 = 最高`,
+    '3'
+  )
+  if (priorityStr === null) return
+  
+  // 3. 验证输入
+  const priority = parseInt(priorityStr)
+  if (isNaN(priority) || priority < 1 || priority > 5) {
+    toast.error('优先级必须是 1-5 的数字')
+    return
+  }
+  
+  // 4. 调用API
+  await topicApi.updatePriorityBatch(Array.from(selectedIds), priority)
+  
+  // 5. 更新状态
+  setTopics(topics.map(t =>
+    selectedIds.has(t.id) ? { ...t, priority } : t
+  ))
+  
+  // 6. Toast提示
+  toast.success('设置成功', `已将 ${selectedCount} 个选题的优先级设为 ${priority} 星`)
+}
+```
+
+### 🔒 安全性
+
+**输入验证**:
+- 前端验证：检查1-5范围
+- 后端验证：检查类型和范围
+- 返回明确的错误信息
+
+**SQL注入防护**:
+- 使用参数化查询
+- 动态占位符：`ids.map(() => '?').join(',')`
+- 参数展开：`.run(priority, now, ...ids)`
+
+**错误处理**:
+- 空数组返回400错误
+- 优先级超出范围返回400错误
+- 前端显示具体错误信息
+
+### 📝 使用场景
+
+**场景1: 批量标记重点**
+- 选中5个重要选题
+- 统一设为5星优先级
+- 优先安排制作
+
+**场景2: 降低优先级**
+- 选中过时的选题
+- 统一降为1星
+- 后续清理
+
+**场景3: 平衡优先级**
+- 选中中等质量选题
+- 统一设为3星
+- 合理分配资源
+
+**场景4: 快速调整**
+- 根据新的业务需求
+- 批量调整优先级分布
+- 快速响应变化
+
+### 🐛 错误处理
+
+- 未选择选题时显示错误提示
+- 输入非法值时显示错误提示
+- 更新失败时显示具体错误信息
+- 所有操作都有Toast反馈
+
+---
+
 ## v0.7.0 - 2026-04-06
 
 ### 🎉 重大更新
