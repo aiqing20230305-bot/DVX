@@ -1,5 +1,34 @@
 # 📋 更新日志
 
+## v0.2.5 - 2026-04-06
+
+### ✨ 新功能
+
+#### Topics 页面初始加载骨架屏
+- 首次进入 Topics 页面时显示加载状态
+- 显示 6 个骨架屏占位卡片
+- 加载提示文案："加载已有选题..."
+- 数据加载完成后平滑过渡到真实内容
+- 复用现有 SkeletonList 组件
+
+### 🎨 UI/UX 改进
+
+- 首次进入 Topics 页面有明确的加载反馈
+- 减少空白等待时间，提升感知性能
+- 视觉连续性增强，符合现代 Web 标准
+- 与 Insights/Workbench 页面加载体验保持一致
+- Loading 优化系列基本完成
+
+### 🔧 技术实现
+
+- Topics.tsx 添加 `initialLoading` 状态管理
+- useEffect 中在 Promise.all API 调用前后设置加载状态
+- TopicGrid 组件新增 `initialLoading` 可选属性
+- 优先检查 initialLoading，然后检查 status 状态
+- 错误处理完整（catch 中清除加载状态）
+
+---
+
 ## v0.2.4 - 2026-04-06
 
 ### ✨ 新功能
