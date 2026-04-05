@@ -8,6 +8,7 @@ import { scriptApi } from '../api/script.api.js'
 import { topicApi } from '../api/topic.api.js'
 import { Button } from '../components/shared/Button.js'
 import { ABVariantPanel } from '../components/scripts/ABVariantPanel.js'
+import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { Script, ScriptSegment, TopicCard } from '../types/index.js'
 import { PlatformBadge } from '../components/shared/Badge.js'
@@ -15,6 +16,7 @@ import { PlatformBadge } from '../components/shared/Badge.js'
 export function Scripts() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
+  const [initialLoading, setInitialLoading] = useState(true)
   const { topics, selectedIds: topicSelectedIds, setTopics } = useTopicStore()
   const {
     scripts, activeTopicId,
@@ -37,15 +39,26 @@ export function Scripts() {
 
   // Load data
   useEffect(() => {
-    if (!activeProjectId) return
+    if (!activeProjectId) {
+      setInitialLoading(false)
+      return
+    }
+
+    setInitialLoading(true)
     Promise.all([
       scriptApi.listByProject(activeProjectId),
       topicApi.listByProject(activeProjectId)
-    ]).then(([{ scripts }, { topics }]) => {
-      setScripts(scripts)
-      setTopics(topics)
-      if (scripts.length > 0) setStatus('success')
-    }).catch(console.error)
+    ])
+      .then(([{ scripts }, { topics }]) => {
+        setScripts(scripts)
+        setTopics(topics)
+        if (scripts.length > 0) setStatus('success')
+        setInitialLoading(false)
+      })
+      .catch((err) => {
+        console.error('Failed to load scripts:', err)
+        setInitialLoading(false)
+      })
   }, [activeProjectId])
 
   const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id) || t.selected)
@@ -87,8 +100,16 @@ export function Scripts() {
         <p className="text-slate-500 text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
-      {/* No topics selected */}
-      {selectedTopics.length === 0 && (
+      {/* Initial loading */}
+      {initialLoading ? (
+        <div>
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
+            <span className="text-sm text-slate-500">加载已有脚本和选题...</span>
+          </div>
+          <CardSkeleton count={3} />
+        </div>
+      ) : selectedTopics.length === 0 ? (
         <div className="text-center py-20">
           <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
             <PenTool size={28} className="text-slate-600" />
@@ -99,11 +120,12 @@ export function Scripts() {
             前往选题策划
           </Button>
         </div>
-      )}
+      ) : null}
 
       {/* Topic script sections */}
-      <div className="space-y-6">
-        {selectedTopics.map((topic: TopicCard) => {
+      {!initialLoading && selectedTopics.length > 0 && (
+        <div className="space-y-6">
+          {selectedTopics.map((topic: TopicCard) => {
           const topicScripts = scripts.filter(s => s.topic_id === topic.id)
           const isExpanded = expandedTopics.has(topic.id)
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id
@@ -166,7 +188,8 @@ export function Scripts() {
             </div>
           )
         })}
-      </div>
+        </div>
+      )}
 
       {/* CTA */}
       {scripts.length > 0 && (
