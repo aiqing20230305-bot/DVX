@@ -29,10 +29,19 @@ export function Workbench() {
     try {
       const { uploads } = await uploadApi.listByProject(activeProjectId)
       setFiles(uploads)
+      // Clear error on successful fetch
+      if (error && error.includes('获取文件列表')) {
+        setError(null)
+      }
     } catch (err) {
       console.error('Failed to fetch files:', err)
+      // Only show error if it persists (don't spam on polling failures)
+      const errMsg = err instanceof Error ? err.message : String(err)
+      if (!errMsg.includes('fetch') && !errMsg.includes('Network')) {
+        setError(`获取文件列表失败: ${errMsg}`)
+      }
     }
-  }, [activeProjectId])
+  }, [activeProjectId, error])
 
   useEffect(() => {
     fetchFiles()

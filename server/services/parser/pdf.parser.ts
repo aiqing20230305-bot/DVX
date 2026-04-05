@@ -14,6 +14,13 @@ export interface PDFParseResult {
 export async function parsePDF(filePath: string): Promise<PDFParseResult> {
   const client = getAnthropicClient()
   const buffer = readFileSync(filePath)
+
+  // Check file size (warn if > 10MB)
+  const sizeInMB = buffer.length / (1024 * 1024)
+  if (sizeInMB > 15) {
+    throw new Error(`PDF文件过大 (${sizeInMB.toFixed(1)}MB)，建议不超过15MB`)
+  }
+
   const base64 = buffer.toString('base64')
 
   const content: Anthropic.MessageParam['content'] = [
@@ -37,26 +44,45 @@ export async function parsePDF(filePath: string): Promise<PDFParseResult> {
     }
   ]
 
-  const response = await client.messages.create({
-    model: config.anthropicModel,
-    max_tokens: 4096,
-    messages: [{ role: 'user', content }]
-  })
-
-  const textBlock = response.content.find(b => b.type === 'text')
-  const rawText = textBlock?.type === 'text' ? textBlock.text : '{}'
-
   try {
-    const cleanJson = rawText.replace(/```json\n?|\n?```/g, '').trim()
-    const parsed = JSON.parse(cleanJson) as Omit<PDFParseResult, 'type'>
-    return { type: 'pdf', ...parsed }
-  } catch {
-    return {
-      type: 'pdf',
-      text: rawText,
-      sections: [],
-      summary: rawText.slice(0, 200),
-      pageEstimate: 1
+    // Add timeout handling (60 seconds)
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('PDF解析超时（60秒），文件可能过大或内容复杂')), 60000)
+    })
+
+    const response = await Promise.race([
+      client.messages.create({
+        model: config.anthropicModel,
+        max_tokens: 4096,
+        messages: [{ role: 'user', content }]
+      }),
+      timeoutPromise
+    ])
+
+    const textBlock = response.content.find(b => b.type === 'text')
+    const rawText = textBlock?.type === 'text' ? textBlock.text : '{}'
+
+    try {
+      const cleanJson = rawText.replace(/```json\n?|\n?```/g, '').trim()
+      const parsed = JSON.parse(cleanJson) as Omit<PDFParseResult, 'type'>
+      return { type: 'pdf', ...parsed }
+    } catch {
+      return {
+        type: 'pdf',
+        text: rawText,
+        sections: [],
+        summary: rawText.slice(0, 200),
+        pageEstimate: 1
+      }
     }
+  } catch (err) {
+    // Better error messages
+    if (err instanceof Error) {
+      if (err.message.includes('timeout') || err.message.includes('超时')) {
+        throw err
+      }
+      throw new Error(`PDF解析失败: ${err.message}`)
+    }
+    throw new Error('PDF解析失败: 未知错误')
   }
 }
