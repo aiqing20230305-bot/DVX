@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Lightbulb, Zap, ArrowRight, Check, RotateCcw } from 'lucide-react'
+import { Lightbulb, Zap, ArrowRight, Check, RotateCcw, Download } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { insightApi } from '../api/insight.api.js'
@@ -9,6 +9,8 @@ import { SearchBar } from '../components/shared/SearchBar.js'
 import { InsightStream } from '../components/insights/InsightStream.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { Insight } from '../types/index.js'
+import { exportInsightsToExcel } from '../utils/export.utils.js'
+import { toast } from '../store/toast.store.js'
 
 export function Insights() {
   const navigate = useNavigate()
@@ -79,6 +81,33 @@ export function Insights() {
     navigate('/topics')
   }
 
+  const handleExport = () => {
+    if (insights.length === 0) {
+      toast.error('没有可导出的数据')
+      return
+    }
+
+    try {
+      // 如果有已选数据，提示用户选择导出范围
+      if (selectedCount > 0) {
+        const exportSelected = window.confirm(
+          `检测到您选择了 ${selectedCount} 条洞察。\n\n点击"确定"仅导出已选数据\n点击"取消"导出全部数据`
+        )
+        const dataToExport = exportSelected
+          ? insights.filter(i => selectedIds.has(i.id))
+          : insights
+
+        exportInsightsToExcel(dataToExport)
+        toast.success('导出成功', `已导出 ${dataToExport.length} 条洞察`)
+      } else {
+        exportInsightsToExcel(insights)
+        toast.success('导出成功', `已导出 ${insights.length} 条洞察`)
+      }
+    } catch (err) {
+      toast.error('导出失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -119,6 +148,7 @@ export function Insights() {
             <>
               <Button variant="secondary" size="sm" icon={<Check size={13} />} onClick={selectAll}>全选</Button>
               <Button variant="ghost" size="sm" onClick={clearSelection}>清除选择</Button>
+              <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
               <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
             </>
           )}

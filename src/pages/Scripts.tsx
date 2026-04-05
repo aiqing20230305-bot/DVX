@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useTopicStore } from '../store/topic.store.js'
 import { useScriptStore } from '../store/script.store.js'
@@ -13,6 +13,8 @@ import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { Script, ScriptSegment, TopicCard } from '../types/index.js'
 import { PlatformBadge } from '../components/shared/Badge.js'
+import { exportScriptsToExcel } from '../utils/export.utils.js'
+import { toast } from '../store/toast.store.js'
 
 export function Scripts() {
   const navigate = useNavigate()
@@ -85,6 +87,20 @@ export function Scripts() {
     updateScript(id, data)
   }
 
+  const handleExport = () => {
+    if (scripts.length === 0) {
+      toast.error('没有可导出的数据')
+      return
+    }
+
+    try {
+      exportScriptsToExcel(scripts, topics)
+      toast.success('导出成功', `已导出 ${scripts.length} 个脚本`)
+    } catch (err) {
+      toast.error('导出失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const toggleTopicExpand = (id: string) => {
     setExpandedTopics(prev => {
       const next = new Set(prev)
@@ -142,6 +158,20 @@ export function Scripts() {
           </Button>
         </div>
       ) : null}
+
+      {/* Export button */}
+      {!initialLoading && scripts.length > 0 && (
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<Download size={13} />}
+            onClick={handleExport}
+          >
+            导出脚本
+          </Button>
+        </div>
+      )}
 
       {/* Topic script sections */}
       {!initialLoading && selectedTopics.length > 0 && (

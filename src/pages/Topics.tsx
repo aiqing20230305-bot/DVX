@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Zap, ArrowRight, RotateCcw } from 'lucide-react'
+import { FileText, Zap, ArrowRight, RotateCcw, Download } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { useTopicStore } from '../store/topic.store.js'
@@ -11,6 +11,8 @@ import { SearchBar } from '../components/shared/SearchBar.js'
 import { TopicGrid } from '../components/topics/TopicGrid.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { TopicCard } from '../types/index.js'
+import { exportTopicsToExcel } from '../utils/export.utils.js'
+import { toast } from '../store/toast.store.js'
 
 export function Topics() {
   const navigate = useNavigate()
@@ -83,6 +85,32 @@ export function Topics() {
     await topicApi.update(id, { selected: isSelected }).catch(console.error)
   }
 
+  const handleExport = () => {
+    if (topics.length === 0) {
+      toast.error('没有可导出的数据')
+      return
+    }
+
+    try {
+      if (selectedCount > 0) {
+        const exportSelected = window.confirm(
+          `检测到您选择了 ${selectedCount} 个选题。\n\n点击"确定"仅导出已选数据\n点击"取消"导出全部数据`
+        )
+        const dataToExport = exportSelected
+          ? topics.filter(t => selectedIds.has(t.id))
+          : topics
+
+        exportTopicsToExcel(dataToExport)
+        toast.success('导出成功', `已导出 ${dataToExport.length} 个选题`)
+      } else {
+        exportTopicsToExcel(topics)
+        toast.success('导出成功', `已导出 ${topics.length} 个选题`)
+      }
+    } catch (err) {
+      toast.error('导出失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -134,7 +162,10 @@ export function Topics() {
           </Button>
 
           {topics.length > 0 && !isGenerating && (
-            <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
+            <>
+              <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
+              <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
+            </>
           )}
         </div>
 
