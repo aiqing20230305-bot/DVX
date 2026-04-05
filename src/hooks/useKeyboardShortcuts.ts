@@ -74,9 +74,25 @@ export function useKeyboardShortcuts() {
 }
 
 function showShortcutsHelp() {
-  toast.info(
-    '键盘快捷键',
-    `1-6: 切换页面  |  Esc: 返回  |  ?: 查看此帮助`,
-    6000 // Show for 6 seconds
-  )
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+  const modKey = isMac ? 'Cmd' : 'Ctrl'
+
+  const helpText = `
+📍 页面导航
+• 1 → 数据工作台
+• 2 → 洞察引擎
+• 3 → 选题策划
+• 4 → 脚本创作
+• 5 → 战略报告
+• 6 → 知识库
+
+⚡ 快捷操作
+• Esc → 返回上一页
+• ${modKey}+P → 打印/导出PDF
+• ? → 显示此帮助
+
+💡 提示：在输入框中快捷键会被禁用
+  `.trim()
+
+  toast.info('键盘快捷键', helpText, 10000)
 }
