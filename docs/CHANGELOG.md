@@ -1,5 +1,69 @@
 # 📋 更新日志
 
+## v0.3.2 - 2026-04-06
+
+### ✨ 新功能
+
+#### API 请求重试和错误处理机制
+- 自动重试失败的网络请求（默认3次）
+- 请求超时控制（默认30秒）
+- 网络离线检测（navigator.onLine）
+- 与 Toast 集成的用户友好错误提示
+- 智能重试策略（仅对5xx和网络错误重试）
+- 可配置的请求选项（RequestConfig）
+
+### 🎨 UI/UX 改进
+
+- 网络请求失败时自动重试，减少用户手动重试
+- 友好的错误提示（Toast），清晰说明错误原因
+- 网络离线时立即提示："网络连接已断开，请检查网络设置"
+- 请求超时提示："请求超时，请稍后重试"
+- 减少因临时网络问题导致的操作失败
+
+### 🔧 技术实现
+
+- **RequestConfig 接口**：retry, retries, retryDelay, timeout, showErrorToast
+- **DEFAULT_CONFIG**：默认配置（retry: true, retries: 3, retryDelay: 1000ms, timeout: 30000ms）
+- **isOnline()**：检测网络连接状态
+- **isRetryableError()**：判断错误是否应该重试（5xx 或 status 0）
+- **sleep()**：重试延迟工具函数
+- **AbortController**：实现请求超时控制
+
+### 重试逻辑
+
+| 错误类型 | 状态码 | 是否重试 | 说明 |
+|---------|--------|---------|------|
+| 网络错误 | 0 | ✅ 是 | 网络中断、DNS失败等 |
+| 服务器错误 | 5xx | ✅ 是 | 服务器临时故障 |
+| 客户端错误 | 4xx | ❌ 否 | 请求参数错误、权限不足等 |
+| 超时错误 | - | ✅ 是 | 请求超过30秒 |
+
+### 🛡️ 稳定性提升
+
+- 提升应用对网络波动的容忍度
+- 减少用户因临时网络问题导致的操作失败
+- 智能重试策略，避免过度重试
+- 完整的错误处理和日志记录
+- 向后兼容：不传config使用默认配置
+
+### 配置示例
+
+```typescript
+// 使用默认配置（自动重试）
+await api.get('/data')
+
+// 禁用重试
+await api.post('/data', body, { retry: false })
+
+// 自定义重试次数和延迟
+await api.get('/data', { retries: 5, retryDelay: 2000 })
+
+// 禁用错误提示Toast
+await api.get('/data', { showErrorToast: false })
+```
+
+---
+
 ## v0.3.1 - 2026-04-06
 
 ### ✨ 新功能
