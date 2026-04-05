@@ -1,11 +1,18 @@
 import React, { useRef, useState, useCallback } from 'react'
-import { Upload, FileSpreadsheet, FileText, Image, Film, X } from 'lucide-react'
+import { Upload, FileSpreadsheet, FileText, Image, Film, X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { Button } from '../shared/Button.js'
+
+interface FileUploadState {
+  progress: number
+  status: 'idle' | 'uploading' | 'done' | 'error'
+  error: string | null
+}
 
 interface DropZoneProps {
   onFiles: (files: File[], fileType: 'market_data' | 'product_info' | 'product_features') => void
   disabled?: boolean
   uploading?: boolean
+  uploads?: Map<string, FileUploadState>
 }
 
 function getFileIcon(file: File) {
@@ -30,11 +37,23 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export function DropZone({ onFiles, disabled = false, uploading = false }: DropZoneProps) {
+export function DropZone({ onFiles, disabled = false, uploading = false, uploads }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const [fileType, setFileType] = useState<'market_data' | 'product_info' | 'product_features'>('market_data')
+
+  // Get upload state for a file
+  const getFileUploadState = (file: File): FileUploadState | null => {
+    if (!uploads) return null
+    // Try to find upload state by matching file name and size
+    for (const [key, state] of uploads.entries()) {
+      if (key.startsWith(`${file.name}-${file.size}`)) {
+        return state
+      }
+    }
+    return null
+  }
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -174,21 +193,56 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
         <div className="space-y-2">
           <div className="text-sm text-slate-400 font-medium">待上传文件 ({pendingFiles.length})</div>
           <div className="space-y-2">
-            {pendingFiles.map((file, idx) => (
-              <div key={idx} className="flex items-center gap-3 px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg">
-                {getFileIcon(file)}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-slate-200 truncate">{file.name}</div>
-                  <div className="text-xs text-slate-500">{formatSize(file.size)}</div>
+            {pendingFiles.map((file, idx) => {
+              const uploadState = getFileUploadState(file)
+              const isUploading = uploadState?.status === 'uploading'
+              const isDone = uploadState?.status === 'done'
+              const hasError = uploadState?.status === 'error'
+
+              return (
+                <div key={idx} className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-3 px-3 py-2.5">
+                    {getFileIcon(file)}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm text-slate-200 truncate">{file.name}</div>
+                        {isUploading && <Loader2 size={12} className="text-indigo-400 animate-spin flex-shrink-0" />}
+                        {isDone && <CheckCircle2 size={12} className="text-emerald-400 flex-shrink-0" />}
+                        {hasError && <AlertCircle size={12} className="text-red-400 flex-shrink-0" />}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-slate-500">{formatSize(file.size)}</div>
+                        {isUploading && uploadState && (
+                          <div className="text-xs text-indigo-400">{uploadState.progress}%</div>
+                        )}
+                        {isDone && <div className="text-xs text-emerald-400">上传完成</div>}
+                        {hasError && uploadState?.error && (
+                          <div className="text-xs text-red-400 truncate">{uploadState.error}</div>
+                        )}
+                      </div>
+                    </div>
+                    {!isUploading && !isDone && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeFile(idx) }}
+                        className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Progress bar */}
+                  {isUploading && uploadState && (
+                    <div className="h-1 bg-slate-700">
+                      <div
+                        className="h-full bg-indigo-500 transition-all duration-300"
+                        style={{ width: `${uploadState.progress}%` }}
+                      />
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); removeFile(idx) }}
-                  className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
           <Button
             onClick={handleUpload}

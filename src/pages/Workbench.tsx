@@ -17,7 +17,7 @@ export function Workbench() {
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { upload } = useFileUpload()
+  const { uploads, upload } = useFileUpload()
   const [uploadingCount, setUploadingCount] = useState(0)
   const [pollingInterval, setPollingInterval] = useState<ReturnType<typeof setInterval> | null>(null)
   const [videoUrl, setVideoUrl] = useState('')
@@ -193,6 +193,7 @@ export function Workbench() {
           onFiles={handleFiles}
           disabled={!activeProjectId}
           uploading={uploadingCount > 0}
+          uploads={uploads}
         />
       </div>
 
