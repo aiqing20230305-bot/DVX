@@ -56,4 +56,23 @@ router.delete('/batch', (req: Request, res: Response) => {
   }
 })
 
+router.patch('/batch-priority', (req: Request, res: Response) => {
+  try {
+    const { ids, priority } = req.body as { ids: string[]; priority: number }
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ error: '缺少有效的 ids 数组' })
+      return
+    }
+    if (typeof priority !== 'number' || priority < 0 || priority > 5) {
+      res.status(400).json({ error: '优先级必须是 0-5 的数字' })
+      return
+    }
+    topicRepo.updatePriorityBatch(ids, priority)
+    res.json({ success: true, count: ids.length })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
 export { router as topicRouter }

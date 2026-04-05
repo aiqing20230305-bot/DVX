@@ -11,6 +11,9 @@ export const topicApi = {
   deleteMany: (ids: string[]) =>
     api.delete<{ success: boolean; count: number }>('/topic/batch', { ids }),
 
+  updatePriorityBatch: (ids: string[], priority: number) =>
+    api.patch<{ success: boolean; count: number }>('/topic/batch-priority', { ids, priority }),
+
   generateStream: (projectId: string, insightIds: string[]) =>
     fetch('/api/topic/generate', {
       method: 'POST',

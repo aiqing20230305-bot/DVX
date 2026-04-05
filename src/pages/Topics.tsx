@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2 } from 'lucide-react'
+import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2, Star } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { useTopicStore } from '../store/topic.store.js'
@@ -141,6 +141,40 @@ export function Topics() {
     }
   }
 
+  const handleBatchSetPriority = async () => {
+    if (selectedCount === 0) {
+      toast.error('请先选择要设置优先级的选题')
+      return
+    }
+
+    const priorityStr = window.prompt(
+      `为选中的 ${selectedCount} 个选题设置优先级（1-5星）：\n\n1 = 最低\n2 = 低\n3 = 中\n4 = 高\n5 = 最高`,
+      '3'
+    )
+
+    if (priorityStr === null) return // 用户取消
+
+    const priority = parseInt(priorityStr)
+    if (isNaN(priority) || priority < 1 || priority > 5) {
+      toast.error('优先级必须是 1-5 的数字')
+      return
+    }
+
+    try {
+      const idsToUpdate = Array.from(selectedIds)
+      await topicApi.updatePriorityBatch(idsToUpdate, priority)
+
+      // 更新本地状态
+      setTopics(topics.map(t =>
+        selectedIds.has(t.id) ? { ...t, priority } : t
+      ))
+
+      toast.success('设置成功', `已将 ${selectedCount} 个选题的优先级设为 ${priority} 星`)
+    } catch (err) {
+      toast.error('设置失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -215,9 +249,14 @@ export function Topics() {
             <>
               <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
               {selectedCount > 0 && (
-                <Button variant="ghost" size="sm" icon={<Trash2 size={13} />} onClick={handleBatchDelete} className="text-red-400 hover:text-red-300">
-                  删除 ({selectedCount})
-                </Button>
+                <>
+                  <Button variant="ghost" size="sm" icon={<Star size={13} />} onClick={handleBatchSetPriority} className="text-yellow-400 hover:text-yellow-300">
+                    设置优先级 ({selectedCount})
+                  </Button>
+                  <Button variant="ghost" size="sm" icon={<Trash2 size={13} />} onClick={handleBatchDelete} className="text-red-400 hover:text-red-300">
+                    删除 ({selectedCount})
+                  </Button>
+                </>
               )}
               <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
             </>

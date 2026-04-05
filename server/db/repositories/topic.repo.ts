@@ -113,5 +113,13 @@ export const topicRepo = {
     const db = getDb()
     const placeholders = ids.map(() => '?').join(',')
     db.prepare(`DELETE FROM topics WHERE id IN (${placeholders})`).run(...ids)
+  },
+
+  updatePriorityBatch(ids: string[], priority: number): void {
+    const db = getDb()
+    const now = Date.now()
+    const placeholders = ids.map(() => '?').join(',')
+    db.prepare(`UPDATE topics SET priority = ?, updated_at = ? WHERE id IN (${placeholders})`)
+      .run(priority, now, ...ids)
   }
 }
