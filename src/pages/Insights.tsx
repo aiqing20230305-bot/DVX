@@ -6,6 +6,7 @@ import { useInsightStore } from '../store/insight.store.js'
 import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
 import { SearchBar } from '../components/shared/SearchBar.js'
+import { SortDropdown, SortOption } from '../components/shared/SortDropdown.js'
 import { InsightStream } from '../components/insights/InsightStream.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { Insight } from '../types/index.js'
@@ -17,6 +18,8 @@ export function Insights() {
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortAscending, setSortAscending] = useState(false)
   const {
     insights, selectedIds, status, streamBuffer,
     setInsights, addInsight, toggleSelection, selectAll, clearSelection,
@@ -137,6 +140,12 @@ export function Insights() {
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
+  // Sort options
+  const sortOptions: SortOption[] = [
+    { value: 'created_at', label: '创建时间' },
+    { value: 'title', label: '标题' }
+  ]
+
   // Filter insights based on search query
   const filteredInsights = searchQuery
     ? insights.filter(insight =>
@@ -144,6 +153,17 @@ export function Insights() {
         insight.summary.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : insights
+
+  // Sort insights
+  const sortedInsights = [...filteredInsights].sort((a, b) => {
+    let comparison = 0
+    if (sortBy === 'created_at') {
+      comparison = a.created_at - b.created_at
+    } else if (sortBy === 'title') {
+      comparison = a.title.localeCompare(b.title, 'zh-CN')
+    }
+    return sortAscending ? comparison : -comparison
+  })
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
@@ -196,14 +216,25 @@ export function Insights() {
         )}
       </div>
 
-      {/* Search */}
+      {/* Search and Sort */}
       {insights.length > 0 && !isGenerating && (
-        <div className="mb-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="搜索洞察标题或摘要..."
-            resultCount={searchQuery ? filteredInsights.length : undefined}
+        <div className="mb-4 flex gap-3">
+          <div className="flex-1">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="搜索洞察标题或摘要..."
+              resultCount={searchQuery ? filteredInsights.length : undefined}
+            />
+          </div>
+          <SortDropdown
+            options={sortOptions}
+            value={sortBy}
+            ascending={sortAscending}
+            onChange={(value, ascending) => {
+              setSortBy(value)
+              setSortAscending(ascending)
+            }}
           />
         </div>
       )}
@@ -218,7 +249,7 @@ export function Insights() {
       {/* Content */}
       <InsightStream
         status={status}
-        insights={filteredInsights}
+        insights={sortedInsights}
         selectedIds={selectedIds}
         streamBuffer={streamBuffer}
         onToggleSelect={toggleSelection}

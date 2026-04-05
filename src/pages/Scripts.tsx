@@ -8,6 +8,7 @@ import { scriptApi } from '../api/script.api.js'
 import { topicApi } from '../api/topic.api.js'
 import { Button } from '../components/shared/Button.js'
 import { SearchBar } from '../components/shared/SearchBar.js'
+import { SortDropdown, SortOption } from '../components/shared/SortDropdown.js'
 import { ABVariantPanel } from '../components/scripts/ABVariantPanel.js'
 import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
@@ -21,6 +22,8 @@ export function Scripts() {
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortAscending, setSortAscending] = useState(false)
   const { topics, selectedIds: topicSelectedIds, setTopics } = useTopicStore()
   const {
     scripts, activeTopicId,
@@ -67,12 +70,34 @@ export function Scripts() {
 
   const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id) || t.selected)
 
+  // Sort options
+  const sortOptions: SortOption[] = [
+    { value: 'created_at', label: '创建时间' },
+    { value: 'word_count', label: '字数' }
+  ]
+
   // Filter selected topics based on search query
   const filteredSelectedTopics = searchQuery
     ? selectedTopics.filter(topic =>
         topic.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : selectedTopics
+
+  // Sort selected topics
+  const sortedSelectedTopics = [...filteredSelectedTopics].sort((a, b) => {
+    let comparison = 0
+    if (sortBy === 'created_at') {
+      comparison = a.created_at - b.created_at
+    } else if (sortBy === 'word_count') {
+      // Sort by total word count of scripts for this topic
+      const aScripts = scripts.filter(s => s.topic_id === a.id)
+      const bScripts = scripts.filter(s => s.topic_id === b.id)
+      const aWordCount = aScripts.reduce((sum, s) => sum + (s.word_count || 0), 0)
+      const bWordCount = bScripts.reduce((sum, s) => sum + (s.word_count || 0), 0)
+      comparison = aWordCount - bWordCount
+    }
+    return sortAscending ? comparison : -comparison
+  })
 
   const handleGenerate = useCallback(async (topicId: string) => {
     if (!activeProjectId) return
@@ -148,14 +173,25 @@ export function Scripts() {
         <p className="text-slate-500 text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
-      {/* Search */}
+      {/* Search and Sort */}
       {selectedTopics.length > 0 && !initialLoading && (
-        <div className="mb-6">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="搜索选题标题..."
-            resultCount={searchQuery ? filteredSelectedTopics.length : undefined}
+        <div className="mb-6 flex gap-3">
+          <div className="flex-1">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="搜索选题标题..."
+              resultCount={searchQuery ? filteredSelectedTopics.length : undefined}
+            />
+          </div>
+          <SortDropdown
+            options={sortOptions}
+            value={sortBy}
+            ascending={sortAscending}
+            onChange={(value, ascending) => {
+              setSortBy(value)
+              setSortAscending(ascending)
+            }}
           />
         </div>
       )}
@@ -199,7 +235,7 @@ export function Scripts() {
       {/* Topic script sections */}
       {!initialLoading && selectedTopics.length > 0 && (
         <div className="space-y-6">
-          {filteredSelectedTopics.map((topic: TopicCard) => {
+          {sortedSelectedTopics.map((topic: TopicCard) => {
           const topicScripts = scripts.filter(s => s.topic_id === topic.id)
           const isExpanded = expandedTopics.has(topic.id)
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id

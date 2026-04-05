@@ -8,6 +8,7 @@ import { topicApi } from '../api/topic.api.js'
 import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
 import { SearchBar } from '../components/shared/SearchBar.js'
+import { SortDropdown, SortOption } from '../components/shared/SortDropdown.js'
 import { TopicGrid } from '../components/topics/TopicGrid.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { TopicCard } from '../types/index.js'
@@ -19,6 +20,8 @@ export function Topics() {
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('priority')
+  const [sortAscending, setSortAscending] = useState(false)
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
   const {
     topics, selectedIds, status,
@@ -141,12 +144,32 @@ export function Topics() {
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
+  // Sort options
+  const sortOptions: SortOption[] = [
+    { value: 'priority', label: '优先级' },
+    { value: 'created_at', label: '创建时间' },
+    { value: 'title', label: '标题' }
+  ]
+
   // Filter topics based on search query
   const filteredTopics = searchQuery
     ? topics.filter(topic =>
         topic.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : topics
+
+  // Sort topics
+  const sortedTopics = [...filteredTopics].sort((a, b) => {
+    let comparison = 0
+    if (sortBy === 'priority') {
+      comparison = (a.priority || 0) - (b.priority || 0)
+    } else if (sortBy === 'created_at') {
+      comparison = a.created_at - b.created_at
+    } else if (sortBy === 'title') {
+      comparison = a.title.localeCompare(b.title, 'zh-CN')
+    }
+    return sortAscending ? comparison : -comparison
+  })
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
@@ -211,14 +234,25 @@ export function Topics() {
         )}
       </div>
 
-      {/* Search */}
+      {/* Search and Sort */}
       {topics.length > 0 && !isGenerating && (
-        <div className="mb-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="搜索选题标题..."
-            resultCount={searchQuery ? filteredTopics.length : undefined}
+        <div className="mb-4 flex gap-3">
+          <div className="flex-1">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="搜索选题标题..."
+              resultCount={searchQuery ? filteredTopics.length : undefined}
+            />
+          </div>
+          <SortDropdown
+            options={sortOptions}
+            value={sortBy}
+            ascending={sortAscending}
+            onChange={(value, ascending) => {
+              setSortBy(value)
+              setSortAscending(ascending)
+            }}
           />
         </div>
       )}
@@ -232,7 +266,7 @@ export function Topics() {
 
       {/* Topics grid */}
       <TopicGrid
-        topics={filteredTopics}
+        topics={sortedTopics}
         selectedIds={selectedIds}
         status={status}
         onToggleSelect={handleToggleSelect}
