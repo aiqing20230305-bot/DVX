@@ -195,4 +195,89 @@ describe('useFileUpload', () => {
     expect(uploadState.status).toBe('error')
     expect(uploadState.error).toBe('String error')
   })
+
+  it('handles large file upload', async () => {
+    vi.mocked(uploadApi.uploadFile).mockResolvedValue({ upload: mockUploadedFile })
+
+    const { result } = renderHook(() => useFileUpload())
+    // Create a 10MB file
+    const largeFile = new File([new ArrayBuffer(10 * 1024 * 1024)], 'large-file.xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
+
+    let uploadResult: UploadedFile | null = null
+
+    await act(async () => {
+      uploadResult = await result.current.upload(largeFile, 'project-1', 'market_data')
+    })
+
+    expect(uploadResult).toEqual(mockUploadedFile)
+    expect(uploadApi.uploadFile).toHaveBeenCalledWith(
+      largeFile,
+      'project-1',
+      'market_data',
+      expect.any(Function)
+    )
+  })
+
+  it('handles empty file', async () => {
+    vi.mocked(uploadApi.uploadFile).mockResolvedValue({ upload: mockUploadedFile })
+
+    const { result } = renderHook(() => useFileUpload())
+    const emptyFile = new File([], 'empty.xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
+
+    let uploadResult: UploadedFile | null = null
+
+    await act(async () => {
+      uploadResult = await result.current.upload(emptyFile, 'project-1')
+    })
+
+    expect(uploadResult).toEqual(mockUploadedFile)
+  })
+
+  it('handles filename with special characters', async () => {
+    vi.mocked(uploadApi.uploadFile).mockResolvedValue({ upload: mockUploadedFile })
+
+    const { result } = renderHook(() => useFileUpload())
+    const fileWithSpecialChars = new File(['content'], '测试文件 (1) [副本].xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
+
+    let uploadResult: UploadedFile | null = null
+
+    await act(async () => {
+      uploadResult = await result.current.upload(fileWithSpecialChars, 'project-1', 'market_data')
+    })
+
+    expect(uploadResult).toEqual(mockUploadedFile)
+    expect(uploadApi.uploadFile).toHaveBeenCalledWith(
+      fileWithSpecialChars,
+      'project-1',
+      'market_data',
+      expect.any(Function)
+    )
+  })
+
+  it('handles unsupported file type', async () => {
+    const errorMessage = 'Unsupported file type'
+    vi.mocked(uploadApi.uploadFile).mockRejectedValue(new Error(errorMessage))
+
+    const { result } = renderHook(() => useFileUpload())
+    const unsupportedFile = new File(['content'], 'test.exe', {
+      type: 'application/x-msdownload'
+    })
+
+    let uploadResult: UploadedFile | null = null
+
+    await act(async () => {
+      uploadResult = await result.current.upload(unsupportedFile, 'project-1')
+    })
+
+    expect(uploadResult).toBeNull()
+    const uploadState = Array.from(result.current.uploads.values())[0]
+    expect(uploadState.status).toBe('error')
+    expect(uploadState.error).toBe(errorMessage)
+  })
 })
