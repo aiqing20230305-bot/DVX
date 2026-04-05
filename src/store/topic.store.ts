@@ -9,7 +9,11 @@ interface TopicStore {
   setTopics: (topics: TopicCard[]) => void
   addTopic: (topic: TopicCard) => void
   toggleSelection: (id: string) => void
+  selectAll: () => void
+  clearSelection: () => void
   updatePriority: (id: string, priority: number) => void
+  batchUpdateSelected: (ids: string[], selected: boolean) => Promise<void>
+  batchDelete: (ids: string[]) => Promise<void>
   setStatus: (status: AsyncStatus, error?: string) => void
   reset: () => void
 }
@@ -38,10 +42,57 @@ export const useTopicStore = create<TopicStore>((set) => ({
     })
   },
 
+  selectAll: () => {
+    set(state => ({ selectedIds: new Set(state.topics.map(t => t.id)) }))
+  },
+
+  clearSelection: () => {
+    set({ selectedIds: new Set() })
+  },
+
   updatePriority: (id, priority) => {
     set(state => ({
       topics: state.topics.map(t => t.id === id ? { ...t, priority } : t)
     }))
+  },
+
+  batchUpdateSelected: async (ids, selected) => {
+    try {
+      const res = await fetch('/api/topic/batch', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids, selected })
+      })
+      if (!res.ok) throw new Error('批量更新失败')
+
+      set(state => ({
+        topics: state.topics.map(t =>
+          ids.includes(t.id) ? { ...t, selected } : t
+        )
+      }))
+    } catch (err) {
+      console.error('Batch update failed:', err)
+      throw err
+    }
+  },
+
+  batchDelete: async (ids) => {
+    try {
+      const res = await fetch('/api/topic/batch', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids })
+      })
+      if (!res.ok) throw new Error('批量删除失败')
+
+      set(state => ({
+        topics: state.topics.filter(t => !ids.includes(t.id)),
+        selectedIds: new Set([...state.selectedIds].filter(id => !ids.includes(id)))
+      }))
+    } catch (err) {
+      console.error('Batch delete failed:', err)
+      throw err
+    }
   },
 
   setStatus: (status, error) => set({ status, error: error ?? null }),

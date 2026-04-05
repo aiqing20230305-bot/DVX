@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2, Star } from 'lucide-react'
+import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2, Star, CheckCircle, XCircle, FileDown } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { useTopicStore } from '../store/topic.store.js'
@@ -11,10 +11,15 @@ import { SearchBar } from '../components/shared/SearchBar.js'
 import { SortDropdown, SortOption } from '../components/shared/SortDropdown.js'
 import { FilterBar } from '../components/shared/FilterBar.js'
 import { TopicGrid } from '../components/topics/TopicGrid.js'
+import { BatchToolbar } from '../components/shared/BatchToolbar.js'
+import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
+import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
+import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { TopicCard } from '../types/index.js'
 import { exportTopicsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
+import { persistFilters } from '../utils/storage.js'
 
 export function Topics() {
   const navigate = useNavigate()
@@ -26,10 +31,13 @@ export function Topics() {
   const [filterPlatform, setFilterPlatform] = useState('all')
   const [filterPriority, setFilterPriority] = useState('all')
   const [filterSelected, setFilterSelected] = useState('all')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
   const {
     topics, selectedIds, status,
-    setTopics, addTopic, toggleSelection, updatePriority, setStatus, reset
+    setTopics, addTopic, toggleSelection, selectAll, clearSelection, updatePriority,
+    batchUpdateSelected, batchDelete, setStatus, reset
   } = useTopicStore()
 
   const { start: startStream } = useSSEStream<TopicCard & { message?: string }>({
@@ -46,6 +54,31 @@ export function Topics() {
       setStatus('success')
     }
   })
+
+  // Load persisted filters on mount
+  useEffect(() => {
+    const saved = persistFilters.load('topics')
+    if (saved) {
+      if (saved.search) setSearchQuery(saved.search)
+      if (saved.sortBy) setSortBy(saved.sortBy)
+      if (saved.sortOrder) setSortAscending(saved.sortOrder === 'asc')
+      if (saved.platform) setFilterPlatform(saved.platform)
+      if (saved.priority) setFilterPriority(saved.priority)
+      if (saved.status) setFilterSelected(saved.status)
+    }
+  }, [])
+
+  // Persist filters when they change
+  useEffect(() => {
+    persistFilters.save('topics', {
+      search: searchQuery,
+      sortBy,
+      sortOrder: sortAscending ? 'asc' : 'desc',
+      platform: filterPlatform,
+      priority: filterPriority,
+      status: filterSelected
+    })
+  }, [searchQuery, sortBy, sortAscending, filterPlatform, filterPriority, filterSelected])
 
   // Load existing data
   useEffect(() => {
@@ -118,28 +151,43 @@ export function Topics() {
     }
   }
 
-  const handleBatchDelete = async () => {
+  const handleBatchMarkSelected = async () => {
     if (selectedCount === 0) {
-      toast.error('请先选择要删除的选题')
+      toast.error('请先选择要标记的选题')
       return
     }
 
-    const confirmed = window.confirm(
-      `确定要删除选中的 ${selectedCount} 个选题吗？\n\n此操作不可撤销！`
-    )
+    try {
+      const idsToUpdate = Array.from(selectedIds)
+      await batchUpdateSelected(idsToUpdate, true)
+      toast.success('标记成功', `已标记 ${selectedCount} 个选题`)
+    } catch (err) {
+      toast.error('标记失败', err instanceof Error ? err.message : String(err))
+    }
+  }
 
-    if (!confirmed) return
+  const handleBatchUnselect = async () => {
+    if (selectedCount === 0) {
+      toast.error('请先选择要取消的选题')
+      return
+    }
 
     try {
+      const idsToUpdate = Array.from(selectedIds)
+      await batchUpdateSelected(idsToUpdate, false)
+      clearSelection()
+      toast.success('取消成功', `已取消 ${selectedCount} 个选题`)
+    } catch (err) {
+      toast.error('取消失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  const handleBatchDeleteConfirm = async () => {
+    try {
       const idsToDelete = Array.from(selectedIds)
-      await topicApi.deleteMany(idsToDelete)
-
-      // 从本地状态中移除
-      setTopics(topics.filter(t => !selectedIds.has(t.id)))
-      toggleSelection // Clear selection via store
-      selectedIds.forEach(id => toggleSelection(id))
-
-      toast.success('删除成功', `已删除 ${selectedCount} 个选题`)
+      await batchDelete(idsToDelete)
+      setDeleteDialogOpen(false)
+      toast.success('删除成功', `已删除 ${idsToDelete.length} 个选题`)
     } catch (err) {
       toast.error('删除失败', err instanceof Error ? err.message : String(err))
     }
@@ -179,8 +227,65 @@ export function Topics() {
     }
   }
 
+  const handleBatchExportSelected = () => {
+    const count = selectedIds.size
+    if (count === 0) {
+      toast.error('请先选择要导出的选题')
+      return
+    }
+
+    try {
+      const selectedItems = topics.filter(t => selectedIds.has(t.id))
+      exportTopicsToExcel(selectedItems)
+      toast.success('导出成功', `已导出 ${count} 个选题`)
+    } catch (err) {
+      toast.error('导出失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
+
+  // Keyboard shortcuts configuration
+  const keyboardShortcuts: PageKeyboardShortcut[] = [
+    {
+      key: 'a',
+      ctrl: true,
+      handler: selectAll,
+      description: '全选所有选题'
+    },
+    {
+      key: 'd',
+      ctrl: true,
+      handler: clearSelection,
+      description: '取消选择'
+    },
+    {
+      key: 'Delete',
+      handler: () => selectedIds.size > 0 && setDeleteDialogOpen(true),
+      description: '删除已选'
+    },
+    {
+      key: 'Escape',
+      handler: clearSelection,
+      description: '取消选择'
+    },
+    {
+      key: 'e',
+      ctrl: true,
+      handler: handleBatchExportSelected,
+      description: '导出已选'
+    },
+    {
+      key: '/',
+      ctrl: true,
+      handler: () => setShortcutsHelpOpen(true),
+      description: '显示快捷键帮助'
+    }
+  ]
+
+  // Enable keyboard shortcuts (except when generating)
+  usePageKeyboardShortcuts(keyboardShortcuts, { enabled: !isGenerating })
 
   // Sort options
   const sortOptions: SortOption[] = [
@@ -258,8 +363,8 @@ export function Topics() {
       )}
 
       {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-2">
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
           <Button
             onClick={handleGenerate}
             loading={isGenerating}
@@ -272,28 +377,57 @@ export function Topics() {
           {topics.length > 0 && !isGenerating && (
             <>
               <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
-              {selectedCount > 0 && (
-                <>
-                  <Button variant="ghost" size="sm" icon={<Star size={13} />} onClick={handleBatchSetPriority} className="text-yellow-400 hover:text-yellow-300">
-                    设置优先级 ({selectedCount})
-                  </Button>
-                  <Button variant="ghost" size="sm" icon={<Trash2 size={13} />} onClick={handleBatchDelete} className="text-red-400 hover:text-red-300">
-                    删除 ({selectedCount})
-                  </Button>
-                </>
-              )}
               <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
             </>
           )}
+
+          {selectedCount > 0 && (
+            <Button
+              onClick={() => navigate('/scripts')}
+              iconRight={<ArrowRight size={15} />}
+              className="ml-auto"
+            >
+              选中 {selectedCount} 个选题 · 生成脚本
+            </Button>
+          )}
         </div>
 
-        {selectedCount > 0 && (
-          <Button
-            onClick={() => navigate('/scripts')}
-            iconRight={<ArrowRight size={15} />}
-          >
-            选中 {selectedCount} 个选题 · 生成脚本
-          </Button>
+        {/* Batch Toolbar */}
+        {topics.length > 0 && !isGenerating && (
+          <BatchToolbar
+            selectedCount={selectedCount}
+            totalCount={topics.length}
+            onSelectAll={selectAll}
+            onClearSelection={clearSelection}
+            actions={[
+              {
+                label: '导出已选',
+                onClick: handleBatchExportSelected,
+                icon: <FileDown size={14} />
+              },
+              {
+                label: '标记为已选',
+                onClick: handleBatchMarkSelected,
+                icon: <CheckCircle size={14} />
+              },
+              {
+                label: '取消选中',
+                onClick: handleBatchUnselect,
+                icon: <XCircle size={14} />
+              },
+              {
+                label: '设置优先级',
+                onClick: handleBatchSetPriority,
+                icon: <Star size={14} />
+              },
+              {
+                label: '删除',
+                onClick: () => setDeleteDialogOpen(true),
+                danger: true,
+                icon: <Trash2 size={14} />
+              }
+            ]}
+          />
         )}
       </div>
 
@@ -385,6 +519,24 @@ export function Topics() {
         onToggleSelect={handleToggleSelect}
         onPriorityChange={handlePriorityChange}
         initialLoading={initialLoading}
+      />
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        title="确认批量删除"
+        message={`您即将删除 ${selectedCount} 个选题，此操作不可撤销。`}
+        onConfirm={handleBatchDeleteConfirm}
+        onCancel={() => setDeleteDialogOpen(false)}
+        danger
+      />
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp
+        open={shortcutsHelpOpen}
+        onClose={() => setShortcutsHelpOpen(false)}
+        shortcuts={keyboardShortcuts}
+        title="选题页面快捷键"
       />
     </div>
   )

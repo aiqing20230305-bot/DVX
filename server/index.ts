@@ -14,7 +14,13 @@ import { topicRouter } from './routes/topic.route.js'
 import { scriptRouter } from './routes/script.route.js'
 import { reportRouter } from './routes/report.route.js'
 import { kbRouter } from './routes/kb.route.js'
+import { testingRouter } from './routes/testing.route.js'
+import { questionnaireRouter } from './routes/questionnaire.route.js'
 import { errorMiddleware } from './middleware/error.middleware.js'
+import { performanceMonitor } from './middleware/performanceMonitor.js'
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
+import { logger } from './utils/logger.js'
+import { validateEnv } from './utils/validateEnv.js'
 import { projectRepo } from './db/repositories/project.repo.js'
 import { logRepo } from './db/repositories/log.repo.js'
 import { kbRepo } from './db/repositories/kb.repo.js'
@@ -27,9 +33,34 @@ mkdirSync(config.kbDataDir, { recursive: true })
 
 const app = express()
 
-app.use(cors({ origin: '*' }))
+// CORS configuration with origin whitelist
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || [
+  'http://localhost:5173', // Development
+  'http://localhost:3001', // Production (same domain)
+]
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true)
+
+    // Check if origin is in whitelist
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      logger.warn(`CORS blocked request from origin: ${origin}`)
+      callback(new Error(`Origin ${origin} not allowed by CORS`))
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+
+// Performance monitoring
+app.use(performanceMonitor)
 
 // Project routes (inline for simplicity)
 const projectRouter = Router()
@@ -118,9 +149,10 @@ projectRouter.post('/', (req: Request, res: Response) => {
 
     // Apply template defaults if specified
     let projectData: any = { name, description, brand, category, target_audience, campaign, start_date, end_date, tags }
+    let template: any = null
 
     if (templateId) {
-      const template = getTemplateById(templateId)
+      template = getTemplateById(templateId)
       if (template) {
         // Merge template defaults with provided data
         projectData = {
@@ -135,24 +167,24 @@ projectRouter.post('/', (req: Request, res: Response) => {
     const project = projectRepo.create(projectData)
 
     // Create knowledge base items from template
-    if (templateId) {
-      const template = getTemplateById(templateId)
-      if (template && template.knowledgeBase.length > 0) {
-        for (const kbItem of template.knowledgeBase) {
-          kbRepo.create({
-            type: kbItem.type,
-            title: kbItem.title,
-            content: kbItem.content,
-            tags: '[]',
-            project_id: project.id
-          })
-        }
+    if (template && template.knowledgeBase.length > 0) {
+      for (const kbItem of template.knowledgeBase) {
+        kbRepo.create({
+          type: kbItem.type,
+          title: kbItem.title,
+          content: kbItem.content,
+          tags: '[]',
+          project_id: project.id
+        })
       }
+    }
 
-      // Log project creation with template
-      logRepo.create(project.id, 'create', `创建项目：${project.name}（使用${template.name}模板）`)
+    // Log project creation
+    if (template) {
+      logRepo.create(project.id, 'create', `创建项目：${project.name}（使用${template.name}）`)
+    } else if (templateId) {
+      logRepo.create(project.id, 'create', `创建项目：${project.name}（模板未找到）`)
     } else {
-      // Log project creation without template
       logRepo.create(project.id, 'create', `创建项目：${project.name}`)
     }
 
@@ -223,6 +255,8 @@ app.use('/api/topic', topicRouter)
 app.use('/api/script', scriptRouter)
 app.use('/api/report', reportRouter)
 app.use('/api/kb', kbRouter)
+app.use('/api/testing', testingRouter)
+app.use('/api/questionnaire', questionnaireRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() })
@@ -237,10 +271,21 @@ if (existsSync(clientPath)) {
   })
 }
 
-app.use(errorMiddleware)
+// Error handling
+app.use(notFoundHandler) // 404 handler
+app.use(errorHandler) // Global error handler
+app.use(errorMiddleware) // Legacy error handler (fallback)
+
+// Validate environment variables before starting server
+validateEnv()
 
 const isProduction = process.env.NODE_ENV === 'production'
 app.listen(config.port, () => {
+  logger.info('🚀 超级洞察 API 服务已启动', {
+    port: config.port,
+    environment: isProduction ? 'production' : 'development',
+    nodeVersion: process.version
+  })
   console.log(`\n🚀 超级洞察 API 服务已启动`)
   console.log(`   地址: http://localhost:${config.port}`)
   console.log(`   环境: ${isProduction ? 'production' : 'development'}\n`)

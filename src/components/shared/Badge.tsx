@@ -4,7 +4,7 @@ type BadgeVariant =
   | 'trend' | 'competitor' | 'gap' | 'attribution' | 'anomaly'
   | 'high' | 'medium' | 'low'
   | 'douyin' | 'kuaishou' | 'xiaohongshu'
-  | 'default' | 'info' | 'success' | 'warning' | 'error'
+  | 'default' | 'info' | 'success' | 'warning' | 'error' | 'secondary'
 
 interface BadgeProps {
   variant?: BadgeVariant
@@ -29,6 +29,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   xiaohongshu: 'bg-red-900/50 text-red-300 ring-1 ring-red-700/50',
   // Generic
   default: 'bg-slate-700 text-slate-300 ring-1 ring-slate-600',
+  secondary: 'bg-slate-600 text-slate-200 ring-1 ring-slate-500',
   info: 'bg-blue-900/50 text-blue-300 ring-1 ring-blue-700/50',
   success: 'bg-emerald-900/50 text-emerald-300 ring-1 ring-emerald-700/50',
   warning: 'bg-yellow-900/50 text-yellow-300 ring-1 ring-yellow-700/50',

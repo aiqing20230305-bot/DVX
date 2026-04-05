@@ -9,7 +9,7 @@ export function exportInsightsToExcel(insights: Insight[], filename?: string) {
   const data = insights.map(insight => ({
     '标题': insight.title,
     '摘要': insight.summary,
-    '分类': insight.category || '-',
+    '类型': insight.type,
     '创建时间': new Date(insight.created_at).toLocaleString('zh-CN')
   }))
 

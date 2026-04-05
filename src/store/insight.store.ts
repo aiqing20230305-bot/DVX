@@ -12,6 +12,8 @@ interface InsightStore {
   toggleSelection: (id: string) => void
   selectAll: () => void
   clearSelection: () => void
+  batchUpdateSelected: (ids: string[], selected: boolean) => Promise<void>
+  batchDelete: (ids: string[]) => Promise<void>
   appendStream: (text: string) => void
   setStatus: (status: AsyncStatus, error?: string) => void
   reset: () => void
@@ -48,6 +50,45 @@ export const useInsightStore = create<InsightStore>((set, get) => ({
 
   clearSelection: () => {
     set({ selectedIds: new Set() })
+  },
+
+  batchUpdateSelected: async (ids, selected) => {
+    try {
+      const res = await fetch('/api/insight/batch', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids, selected })
+      })
+      if (!res.ok) throw new Error('批量更新失败')
+
+      set(state => ({
+        insights: state.insights.map(i =>
+          ids.includes(i.id) ? { ...i, selected } : i
+        )
+      }))
+    } catch (err) {
+      console.error('Batch update failed:', err)
+      throw err
+    }
+  },
+
+  batchDelete: async (ids) => {
+    try {
+      const res = await fetch('/api/insight/batch', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids })
+      })
+      if (!res.ok) throw new Error('批量删除失败')
+
+      set(state => ({
+        insights: state.insights.filter(i => !ids.includes(i.id)),
+        selectedIds: new Set([...state.selectedIds].filter(id => !ids.includes(id)))
+      }))
+    } catch (err) {
+      console.error('Batch delete failed:', err)
+      throw err
+    }
   },
 
   appendStream: (text) => {

@@ -142,6 +142,6 @@ export const api = {
     request<T>(path, { method: 'PUT', body: JSON.stringify(body) }, config),
   patch: <T>(path: string, body?: unknown, config?: RequestConfig) =>
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }, config),
-  delete: <T>(path: string, config?: RequestConfig) =>
-    request<T>(path, { method: 'DELETE' }, config),
+  delete: <T>(path: string, body?: unknown, config?: RequestConfig) =>
+    request<T>(path, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined }, config),
 }

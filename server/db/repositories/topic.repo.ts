@@ -121,5 +121,19 @@ export const topicRepo = {
     const placeholders = ids.map(() => '?').join(',')
     db.prepare(`UPDATE topics SET priority = ?, updated_at = ? WHERE id IN (${placeholders})`)
       .run(priority, now, ...ids)
+  },
+
+  updateBatch(ids: string[], data: { selected?: boolean }): void {
+    const db = getDb()
+    const now = Date.now()
+    if (ids.length === 0) return
+
+    const placeholders = ids.map(() => '?').join(',')
+    const selected = data.selected !== undefined ? (data.selected ? 1 : 0) : undefined
+
+    if (selected !== undefined) {
+      db.prepare(`UPDATE topics SET selected = ?, updated_at = ? WHERE id IN (${placeholders})`)
+        .run(selected, now, ...ids)
+    }
   }
 }

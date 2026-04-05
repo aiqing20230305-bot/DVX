@@ -34,6 +34,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
       original_name: url.split('/').pop()?.split('?')[0] || 'video-from-url.mp4',
       mime_type: 'video/mp4',
       size: 0,
+      file_type: 'market_data',
       status: 'parsing',
       parsed_data: null,
       error_message: null,

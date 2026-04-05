@@ -11,11 +11,14 @@ import { SearchBar } from '../components/shared/SearchBar.js'
 import { SortDropdown, SortOption } from '../components/shared/SortDropdown.js'
 import { ABVariantPanel } from '../components/scripts/ABVariantPanel.js'
 import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
+import { BatchToolbar } from '../components/shared/BatchToolbar.js'
+import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { Script, ScriptSegment, TopicCard } from '../types/index.js'
 import { PlatformBadge } from '../components/shared/Badge.js'
 import { exportScriptsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
+import { persistFilters } from '../utils/storage.js'
 
 export function Scripts() {
   const navigate = useNavigate()
@@ -24,10 +27,12 @@ export function Scripts() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('created_at')
   const [sortAscending, setSortAscending] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const { topics, selectedIds: topicSelectedIds, setTopics } = useTopicStore()
   const {
-    scripts, activeTopicId,
-    setScripts, addScript, setActiveTopicId, updateScript, setStatus, status
+    scripts, selectedIds, activeTopicId,
+    setScripts, addScript, toggleSelection, selectAll, clearSelection,
+    setActiveTopicId, updateScript, batchDelete, setStatus, status
   } = useScriptStore()
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set())
 
@@ -43,6 +48,25 @@ export function Scripts() {
     },
     onDone: () => setStatus('success')
   })
+
+  // Load persisted filters on mount
+  useEffect(() => {
+    const saved = persistFilters.load('scripts')
+    if (saved) {
+      if (saved.search) setSearchQuery(saved.search)
+      if (saved.sortBy) setSortBy(saved.sortBy)
+      if (saved.sortOrder) setSortAscending(saved.sortOrder === 'asc')
+    }
+  }, [])
+
+  // Persist filters when they change
+  useEffect(() => {
+    persistFilters.save('scripts', {
+      search: searchQuery,
+      sortBy,
+      sortOrder: sortAscending ? 'asc' : 'desc'
+    })
+  }, [searchQuery, sortBy, sortAscending])
 
   // Load data
   useEffect(() => {
@@ -69,6 +93,7 @@ export function Scripts() {
   }, [activeProjectId])
 
   const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id) || t.selected)
+  const selectedCount = selectedIds.size
 
   // Sort options
   const sortOptions: SortOption[] = [
@@ -149,6 +174,17 @@ export function Scripts() {
     }
   }
 
+  const handleBatchDeleteConfirm = async () => {
+    try {
+      const idsToDelete = Array.from(selectedIds)
+      await batchDelete(idsToDelete)
+      setDeleteDialogOpen(false)
+      toast.success('删除成功', `已删除 ${idsToDelete.length} 个脚本`)
+    } catch (err) {
+      toast.error('删除失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const toggleTopicExpand = (id: string) => {
     setExpandedTopics(prev => {
       const next = new Set(prev)
@@ -172,6 +208,26 @@ export function Scripts() {
         </div>
         <p className="text-slate-500 text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
+
+      {/* Batch Toolbar */}
+      {scripts.length > 0 && !initialLoading && (
+        <div className="mb-6">
+          <BatchToolbar
+            selectedCount={selectedCount}
+            totalCount={scripts.length}
+            onSelectAll={selectAll}
+            onClearSelection={clearSelection}
+            actions={[
+              {
+                label: '删除',
+                onClick: () => setDeleteDialogOpen(true),
+                danger: true,
+                icon: <Trash2 size={14} />
+              }
+            ]}
+          />
+        </div>
+      )}
 
       {/* Search and Sort */}
       {selectedTopics.length > 0 && !initialLoading && (
@@ -322,6 +378,16 @@ export function Scripts() {
           </Button>
         </div>
       )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        title="确认批量删除"
+        message={`您即将删除 ${selectedCount} 个脚本，此操作不可撤销。`}
+        onConfirm={handleBatchDeleteConfirm}
+        onCancel={() => setDeleteDialogOpen(false)}
+        danger
+      />
     </div>
   )
 }

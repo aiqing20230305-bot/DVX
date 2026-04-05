@@ -526,3 +526,111 @@ body { font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Noto Sans
 </body>
 </html>`
 }
+
+// ============================================
+// Testing Report Excel Generation
+// ============================================
+
+import XLSX from 'xlsx'
+
+export function generateTestingReportExcel(report: any): Buffer {
+  const workbook = XLSX.utils.book_new()
+
+  // Sheet1: 测试概览
+  const overviewData = [
+    { '指标': '总会话数', '数值': report.overview.total_sessions },
+    { '指标': '活跃会话', '数值': report.overview.active_sessions },
+    { '指标': '已完成会话', '数值': report.overview.completed_sessions },
+    { '指标': '平均时长（秒）', '数值': report.overview.avg_duration },
+    { '指标': '总操作数', '数值': report.overview.total_actions },
+    { '指标': '总反馈数', '数值': report.overview.total_feedback },
+    { '指标': '总问卷数', '数值': report.overview.total_questionnaires },
+    { '指标': '问卷回答率', '数值': `${report.overview.questionnaire_answer_rate}%` }
+  ]
+  const overviewSheet = XLSX.utils.json_to_sheet(overviewData)
+  XLSX.utils.book_append_sheet(workbook, overviewSheet, '测试概览')
+
+  // Sheet2: 会话列表
+  const sessionsData = report.sessions.map((s: any) => ({
+    '会话ID': s.id.slice(0, 8),
+    '用户名': s.user_name,
+    '角色': s.user_role,
+    '场景': s.scenario,
+    '状态': s.status === 'active' ? '进行中' : s.status === 'completed' ? '已完成' : '已放弃',
+    '开始时间': new Date(s.start_time).toLocaleString('zh-CN'),
+    '结束时间': s.end_time ? new Date(s.end_time).toLocaleString('zh-CN') : '进行中',
+    '时长（秒）': s.duration || 0,
+    '操作数': s.action_count,
+    '反馈数': s.feedback_count
+  }))
+  const sessionsSheet = XLSX.utils.json_to_sheet(sessionsData.length > 0 ? sessionsData : [{ '会话ID': '暂无数据' }])
+  XLSX.utils.book_append_sheet(workbook, sessionsSheet, '会话列表')
+
+  // Sheet3: 问卷数据
+  const questionnaireData: any[] = []
+  report.questionnaires.forEach((q: any) => {
+    q.questions.forEach((question: any) => {
+      if (question.answer_distribution) {
+        const total = Object.values(question.answer_distribution).reduce((a: any, b: any) => a + b, 0) as number
+        Object.entries(question.answer_distribution).forEach(([option, count]: [string, any]) => {
+          questionnaireData.push({
+            '问卷标题': q.title,
+            '问题文本': question.question_text,
+            '问题类型': question.question_type === 'radio' ? '单选' : question.question_type === 'checkbox' ? '多选' : '其他',
+            '选项': option,
+            '回答数': count,
+            '百分比': `${Math.round((count / total) * 100)}%`
+          })
+        })
+      } else if (question.average_rating !== undefined) {
+        questionnaireData.push({
+          '问卷标题': q.title,
+          '问题文本': question.question_text,
+          '问题类型': '评分',
+          '选项': '平均评分',
+          '回答数': '',
+          '百分比': question.average_rating.toFixed(1)
+        })
+      } else if (question.text_answers) {
+        question.text_answers.forEach((answer: string, i: number) => {
+          questionnaireData.push({
+            '问卷标题': q.title,
+            '问题文本': question.question_text,
+            '问题类型': '文本',
+            '选项': `回答${i + 1}`,
+            '回答数': '',
+            '百分比': answer.slice(0, 50)
+          })
+        })
+      }
+    })
+  })
+  const questionnaireSheet = XLSX.utils.json_to_sheet(questionnaireData.length > 0 ? questionnaireData : [{ '问卷标题': '暂无数据' }])
+  XLSX.utils.book_append_sheet(workbook, questionnaireSheet, '问卷数据')
+
+  // Sheet4: 行为数据
+  const actionsData = report.actions.map((a: any) => ({
+    '会话ID': a.session_id.slice(0, 8),
+    '用户名': a.user_name,
+    '操作类型': a.action_type,
+    '页面': a.page,
+    '目标': a.target || '',
+    '详情': a.details || '',
+    '时间戳': new Date(a.timestamp).toLocaleString('zh-CN')
+  }))
+  const actionsSheet = XLSX.utils.json_to_sheet(actionsData.length > 0 ? actionsData : [{ '会话ID': '暂无数据' }])
+  XLSX.utils.book_append_sheet(workbook, actionsSheet, '行为数据')
+
+  // Sheet5: 反馈汇总
+  const feedbackData = report.feedback.map((f: any) => ({
+    '会话ID': f.session_id.slice(0, 8),
+    '用户名': f.user_name,
+    '问题': f.question_text,
+    '回答': f.answer,
+    '时间': new Date(f.created_at).toLocaleString('zh-CN')
+  }))
+  const feedbackSheet = XLSX.utils.json_to_sheet(feedbackData.length > 0 ? feedbackData : [{ '会话ID': '暂无数据' }])
+  XLSX.utils.book_append_sheet(workbook, feedbackSheet, '反馈汇总')
+
+  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer
+}

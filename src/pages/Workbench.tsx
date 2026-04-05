@@ -78,7 +78,7 @@ export function Workbench() {
   const handleFiles = async (fileList: File[], fileType: 'market_data' | 'product_info' | 'product_features') => {
     if (!activeProjectId) {
       // Create default project
-      await addProject('默认项目')
+      await addProject({ name: '默认项目', description: '自动创建的项目' })
       return
     }
 

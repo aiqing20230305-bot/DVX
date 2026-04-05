@@ -54,7 +54,7 @@ export function Sidebar() {
       await addProject({
         name: newProjectName.trim(),
         description: newProjectDesc.trim(),
-        templateId: selectedTemplate
+        templateId: selectedTemplate ?? undefined
       })
       setNewProjectModal(false)
       setNewProjectStep('template')

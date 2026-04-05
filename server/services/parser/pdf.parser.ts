@@ -24,14 +24,16 @@ export async function parsePDF(filePath: string): Promise<PDFParseResult> {
 
   try {
     const parser = new PDFParse(buffer)
-    const pdfData = await parser.parse()
+    const textResult = await parser.getText()
 
-    extractedText = pdfData.text.trim()
-    pageCount = pdfData.numpages
+    extractedText = textResult.text.trim()
+    pageCount = textResult.pages.length
 
     if (!extractedText || extractedText.length < 10) {
       throw new Error('PDF文本提取失败或内容为空，可能是扫描版PDF')
     }
+
+    await parser.destroy()
   } catch (err) {
     throw new Error(`PDF文本提取失败: ${err instanceof Error ? err.message : '未知错误'}`)
   }
