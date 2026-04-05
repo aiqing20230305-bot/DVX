@@ -1,9 +1,11 @@
 import React from 'react'
-import { Zap } from 'lucide-react'
+import { Zap, ArrowRight } from 'lucide-react'
 import { StreamingText } from '../shared/StreamingText.js'
 import { InsightCard } from './InsightCard.js'
 import { SkeletonList } from '../shared/Skeleton.js'
+import { EmptyState } from '../shared/EmptyState.js'
 import { Insight, AsyncStatus } from '../../types/index.js'
+import { useNavigate } from 'react-router-dom'
 
 interface InsightStreamProps {
   status: AsyncStatus
@@ -15,6 +17,8 @@ interface InsightStreamProps {
 }
 
 export function InsightStream({ status, insights, selectedIds, streamBuffer, onToggleSelect, initialLoading = false }: InsightStreamProps) {
+  const navigate = useNavigate()
+
   // Show skeleton during initial load
   if (initialLoading) {
     return (
@@ -30,13 +34,22 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
 
   if (status === 'idle') {
     return (
-      <div className="text-center py-20">
-        <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
-          <Zap size={28} className="text-slate-600" />
-        </div>
-        <h3 className="text-slate-400 font-medium mb-2">洞察引擎待命</h3>
-        <p className="text-slate-600 text-sm">上传数据文件后，点击「生成洞察」开始 AI 分析</p>
-      </div>
+      <EmptyState
+        icon={Zap}
+        title="洞察引擎待命"
+        description="上传电商数据文件，AI 会深度分析并挖掘内容机会"
+        steps={[
+          '返回数据工作台，上传数据文件（Excel/PDF）',
+          '等待 AI 自动解析文件内容',
+          '回到此页面，点击「生成洞察」按钮',
+          'AI 实时分析数据，生成洞察卡片'
+        ]}
+        action={{
+          label: '前往上传数据',
+          onClick: () => navigate('/'),
+          icon: <ArrowRight size={16} />
+        }}
+      />
     )
   }
 

@@ -11,9 +11,10 @@ interface EmptyStateProps {
     onClick: () => void
     icon?: React.ReactNode
   }
+  steps?: string[]
 }
 
-export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, action, steps }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 animate-fade-in-scale">
       {/* Icon */}
@@ -35,6 +36,25 @@ export function EmptyState({ icon: Icon, title, description, action }: EmptyStat
           <p className="text-sm text-slate-500 max-w-md">{description}</p>
         )}
       </div>
+
+      {/* Steps */}
+      {steps && steps.length > 0 && (
+        <div className="mb-6 w-full max-w-sm">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-left">
+            <div className="text-xs font-medium text-slate-400 mb-3">🚀 快速开始</div>
+            <ol className="space-y-2">
+              {steps.map((step, index) => (
+                <li key={index} className="flex items-start gap-2 text-sm text-slate-400">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-xs font-medium mt-0.5">
+                    {index + 1}
+                  </span>
+                  <span className="leading-relaxed">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      )}
 
       {/* Action */}
       {action && (
