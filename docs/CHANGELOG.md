@@ -1,5 +1,149 @@
 # 📋 更新日志
 
+## v0.6.4 - 2026-04-06
+
+### ✨ 新功能
+
+#### 数据排序功能
+- 支持按多维度对洞察、选题、脚本进行排序
+- 升序/降序快速切换
+- 排序与搜索协同工作，精准定位数据
+
+### 📊 排序能力
+
+| 页面 | 排序维度 | 默认排序 |
+|------|----------|----------|
+| Insights | 创建时间、标题 | 创建时间降序 |
+| Topics | 创建时间、优先级、标题 | 优先级降序 |
+| Scripts | 创建时间、字数 | 创建时间降序 |
+
+### 🎨 UI/UX 改进
+
+**排序组件**:
+- 紧凑的下拉按钮设计
+- 显示当前排序字段和方向
+- 图标化：升序(↑)、降序(↓)
+- 选中项带对勾标记
+- 点击外部自动关闭
+
+**布局调整**:
+- 搜索框和排序按钮并排显示
+- 搜索框占据弹性空间
+- 排序按钮固定宽度，右对齐
+
+**交互流程**:
+1. 点击排序按钮打开下拉菜单
+2. 上半部分：选择排序字段（创建时间/标题/优先级/字数）
+3. 下半部分：切换升序/降序
+4. 选择后立即生效，下拉菜单自动关闭
+5. 数据实时重新排序
+
+**用户价值**:
+- 快速定位：找到最新、最老、优先级最高的内容
+- 灵活浏览：按字母顺序浏览标题
+- 效率提升：排序+搜索组合，精准查找
+- 数据洞察：按字数排序脚本，快速了解长短分布
+
+### 🔧 技术实现
+
+**新增组件**: `src/components/shared/SortDropdown.tsx` (~88行)
+
+**组件Props**:
+```typescript
+interface SortDropdownProps {
+  options: SortOption[]      // 排序选项列表
+  value: string               // 当前排序字段
+  ascending: boolean          // 是否升序
+  onChange: (value, ascending) => void  // 排序变化回调
+}
+
+interface SortOption {
+  value: string   // 字段名
+  label: string   // 显示文本
+}
+```
+
+**排序逻辑**（Insights示例）:
+```typescript
+const sortedInsights = [...filteredInsights].sort((a, b) => {
+  let comparison = 0
+  if (sortBy === 'created_at') {
+    comparison = a.created_at - b.created_at
+  } else if (sortBy === 'title') {
+    comparison = a.title.localeCompare(b.title, 'zh-CN')
+  }
+  return sortAscending ? comparison : -comparison
+})
+```
+
+**关键实现**:
+
+1. **中文排序支持**:
+   ```typescript
+   a.title.localeCompare(b.title, 'zh-CN')
+   ```
+
+2. **字数计算**（Scripts页面）:
+   ```typescript
+   const aWordCount = aScripts.reduce((sum, s) => sum + (s.word_count || 0), 0)
+   ```
+
+3. **点击外部关闭**:
+   ```typescript
+   useEffect(() => {
+     const handleClickOutside = (event) => {
+       if (!dropdownRef.current?.contains(event.target)) {
+         setIsOpen(false)
+       }
+     }
+     document.addEventListener('mousedown', handleClickOutside)
+     return () => document.removeEventListener('mousedown', handleClickOutside)
+   }, [isOpen])
+   ```
+
+4. **排序与搜索协同**:
+   ```typescript
+   // 先搜索，后排序
+   const filtered = search(data)
+   const sorted = sort(filtered)
+   ```
+
+### 📝 使用场景
+
+**Insights页面**:
+- 按时间：查看最新或最早的洞察
+- 按标题：字母顺序浏览，快速定位特定洞察
+
+**Topics页面**:
+- 按优先级：聚焦高优先级选题
+- 按时间：回顾选题生成顺序
+- 按标题：字母顺序查找
+
+**Scripts页面**:
+- 按时间：查看最近生成的脚本
+- 按字数：找到最长或最短的脚本
+
+**组合场景**:
+- 搜索"美妆" + 按优先级降序 = 快速找到高优美妆选题
+- 搜索"新品" + 按时间降序 = 找到最新的新品相关洞察
+- 按字数升序 = 找到最简短的脚本（适合短视频）
+
+### 🎯 设计亮点
+
+1. **一致性**: 三个页面使用统一的排序组件和交互
+2. **性能**: 前端排序，无需网络请求
+3. **可扩展**: 轻松添加新的排序维度
+4. **用户友好**: 直观的图标和即时反馈
+5. **协同性**: 与搜索、批量操作等功能无缝协同
+
+### 🐛 错误处理
+
+- 排序字段不存在时使用默认值
+- 空数组排序不报错
+- 排序状态独立，不影响原始数据
+
+---
+
 ## v0.6.3 - 2026-04-06
 
 ### ✨ 新功能
