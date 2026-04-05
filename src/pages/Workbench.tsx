@@ -5,6 +5,7 @@ import { useProjectStore } from '../store/project.store.js'
 import { DropZone } from '../components/workbench/DropZone.js'
 import { FileCard } from '../components/workbench/FileCard.js'
 import { Button } from '../components/shared/Button.js'
+import { Input } from '../components/shared/Input.js'
 import { uploadApi, videoApi } from '../api/upload.api.js'
 import { useFileUpload } from '../hooks/useFileUpload.js'
 import { UploadedFile } from '../types/index.js'
@@ -204,15 +205,15 @@ export function Workbench() {
             <span className="text-xs text-slate-500">输入视频链接，AI自动提取关键帧并分析</span>
           </div>
           <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Link size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input
+            <div className="flex-1">
+              <Input
                 type="url"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="粘贴视频URL（支持直链MP4等格式）"
-                className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                leftIcon={Link}
                 disabled={videoAnalyzing}
+                error={videoError || undefined}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleVideoUrlAnalyze()
                 }}

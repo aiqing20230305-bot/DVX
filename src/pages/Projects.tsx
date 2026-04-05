@@ -6,6 +6,7 @@ import {
   Calendar, Tag, TrendingUp, Folder
 } from 'lucide-react'
 import { Button } from '../components/shared/Button.js'
+import { Input } from '../components/shared/Input.js'
 import { Badge } from '../components/shared/Badge.js'
 import { formatDate } from '../utils/date.js'
 
@@ -67,14 +68,13 @@ export function Projects() {
         {/* Filters */}
         <div className="flex items-center gap-3 flex-wrap">
           {/* Search */}
-          <div className="relative flex-1 min-w-64">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
+          <div className="flex-1 min-w-64">
+            <Input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="搜索项目..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm"
+              leftIcon={Search}
             />
           </div>
 
