@@ -7,6 +7,7 @@ import { FileCard } from '../components/workbench/FileCard.js'
 import { FileCardSkeletonList } from '../components/workbench/FileCardSkeleton.js'
 import { AutoGeneratePanel } from '../components/workbench/AutoGeneratePanel.js'
 import { ProjectStatsPanel } from '../components/workbench/ProjectStatsPanel.js'
+import { DataChartsPanel } from '../components/workbench/DataChartsPanel.js'
 import { Button } from '../components/shared/Button.js'
 import { Input } from '../components/shared/Input.js'
 import { uploadApi, videoApi } from '../api/upload.api.js'
@@ -195,6 +196,9 @@ export function Workbench() {
 
       {/* Project stats panel */}
       {activeProjectId && <ProjectStatsPanel />}
+
+      {/* Data charts panel */}
+      {activeProjectId && <DataChartsPanel />}
 
       {/* Drop zone */}
       <div className="mb-8">
