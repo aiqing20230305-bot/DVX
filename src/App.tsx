@@ -13,6 +13,7 @@ import { ToastContainer } from './components/shared/ToastContainer.js'
 import { ErrorBoundary } from './components/shared/ErrorBoundary.js'
 import { useProjectStore } from './store/project.store.js'
 import { useUIStore } from './store/ui.store.js'
+import './styles/print.css'
 
 export function App() {
   const { fetchProjects } = useProjectStore()

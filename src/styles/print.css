@@ -1,0 +1,185 @@
+/**
+ * Print Styles for Strategic Report
+ * Optimizes PDF export by hiding UI elements and formatting content for print
+ */
+
+@media print {
+  /* ========================================
+     HIDE UI ELEMENTS
+     ======================================== */
+
+  /* Hide sidebar and navigation */
+  aside,
+  nav,
+  [class*="sidebar"],
+  [class*="Sidebar"] {
+    display: none !important;
+  }
+
+  /* Hide mobile backdrop */
+  [class*="backdrop"],
+  [class*="Backdrop"] {
+    display: none !important;
+  }
+
+  /* Hide Report page UI sections */
+  .report-header,
+  .report-controls,
+  .report-error,
+  .export-panel,
+  .tips-panel {
+    display: none !important;
+  }
+
+  /* Hide all buttons and interactive elements */
+  button,
+  [role="button"],
+  .btn,
+  [class*="Button"] {
+    display: none !important;
+  }
+
+  /* ========================================
+     OPTIMIZE REPORT PREVIEW LAYOUT
+     ======================================== */
+
+  /* Make preview container full width */
+  .report-preview-container {
+    grid-column: 1 / -1 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Remove iframe container decorations */
+  .report-preview {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* Hide iframe preview header (traffic lights) */
+  .report-preview-header {
+    display: none !important;
+  }
+
+  /* Make iframe full width */
+  iframe {
+    width: 100% !important;
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* ========================================
+     GLOBAL LAYOUT OPTIMIZATION
+     ======================================== */
+
+  /* Remove backgrounds and reset spacing */
+  body,
+  main,
+  #root {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Remove flex layout constraints */
+  body,
+  #root {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* ========================================
+     PAGE BREAK OPTIMIZATION
+     ======================================== */
+
+  /* Avoid breaking after headings */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Avoid breaking inside elements */
+  table,
+  figure,
+  img,
+  svg,
+  pre,
+  blockquote {
+    page-break-inside: avoid !important;
+  }
+
+  /* Encourage breaks before major sections */
+  h1 {
+    page-break-before: always !important;
+  }
+
+  h1:first-child {
+    page-break-before: avoid !important;
+  }
+
+  /* ========================================
+     COLOR AND STYLING PRESERVATION
+     ======================================== */
+
+  /* Ensure colors are preserved in print */
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ensure links are visible */
+  a {
+    text-decoration: underline !important;
+  }
+
+  a[href^="http"]:after {
+    content: " (" attr(href) ")" !important;
+    font-size: 0.8em !important;
+    color: #666 !important;
+  }
+
+  /* ========================================
+     TYPOGRAPHY OPTIMIZATION
+     ======================================== */
+
+  /* Adjust font sizes for print readability */
+  body {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+
+  h1 { font-size: 24pt !important; }
+  h2 { font-size: 20pt !important; }
+  h3 { font-size: 16pt !important; }
+  h4 { font-size: 14pt !important; }
+
+  /* ========================================
+     TABLE OPTIMIZATION
+     ======================================== */
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    padding: 8px !important;
+    border: 1px solid #ddd !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+  }
+}

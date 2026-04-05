@@ -43,7 +43,7 @@ export function Report() {
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="report-header mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
             <Zap size={18} className="text-indigo-400" />
@@ -54,7 +54,7 @@ export function Report() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div className="report-controls flex flex-wrap items-center justify-between gap-3 mb-6">
         <Button
           size="lg"
           loading={generating}
@@ -74,27 +74,29 @@ export function Report() {
 
       {/* Error */}
       {error && (
-        <div className="mb-4 p-3 bg-red-900/20 border border-red-700/40 rounded-xl text-sm text-red-400">
+        <div className="report-error mb-4 p-3 bg-red-900/20 border border-red-700/40 rounded-xl text-sm text-red-400">
           {error}
         </div>
       )}
 
       {/* Main content: preview + export */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        <div className="xl:col-span-3">
+        <div className="report-preview-container xl:col-span-3">
           <ReportPreview html={reportHtml} loading={generating} />
         </div>
         <div>
           {activeProjectId && (
-            <ExportPanel
-              projectId={activeProjectId}
-              reportHtml={reportHtml}
-              onSaveToKB={handleSaveToKB}
-            />
+            <div className="export-panel">
+              <ExportPanel
+                projectId={activeProjectId}
+                reportHtml={reportHtml}
+                onSaveToKB={handleSaveToKB}
+              />
+            </div>
           )}
 
           {/* Tips */}
-          <div className="mt-4 bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+          <div className="tips-panel mt-4 bg-slate-800/50 border border-slate-700 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <BookOpen size={14} className="text-indigo-400" />
               <span className="text-xs font-medium text-slate-300">使用提示</span>
