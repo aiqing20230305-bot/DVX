@@ -11,9 +11,23 @@ interface TopicGridProps {
   status: AsyncStatus
   onToggleSelect: (id: string) => void
   onPriorityChange: (id: string, priority: number) => void
+  initialLoading?: boolean
 }
 
-export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPriorityChange }: TopicGridProps) {
+export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPriorityChange, initialLoading = false }: TopicGridProps) {
+  // Show skeleton during initial load
+  if (initialLoading) {
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
+          <span className="text-sm text-slate-500">加载已有选题...</span>
+        </div>
+        <SkeletonList count={6} />
+      </div>
+    )
+  }
+
   if (status === 'idle') {
     return (
       <div className="text-center py-20">

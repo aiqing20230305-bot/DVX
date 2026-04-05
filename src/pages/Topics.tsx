@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText, Zap, ArrowRight, RotateCcw } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
@@ -14,6 +14,7 @@ import { TopicCard } from '../types/index.js'
 export function Topics() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
+  const [initialLoading, setInitialLoading] = useState(true)
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
   const {
     topics, selectedIds, status,
@@ -37,17 +38,28 @@ export function Topics() {
 
   // Load existing data
   useEffect(() => {
-    if (!activeProjectId) return
+    if (!activeProjectId) {
+      setInitialLoading(false)
+      return
+    }
+
+    setInitialLoading(true)
     Promise.all([
       topicApi.listByProject(activeProjectId),
       insightApi.listByProject(activeProjectId)
-    ]).then(([{ topics }, { insights }]) => {
-      if (topics.length > 0) {
-        setTopics(topics)
-        setStatus('success')
-      }
-      setInsights(insights)
-    }).catch(console.error)
+    ])
+      .then(([{ topics }, { insights }]) => {
+        if (topics.length > 0) {
+          setTopics(topics)
+          setStatus('success')
+        }
+        setInsights(insights)
+        setInitialLoading(false)
+      })
+      .catch((err) => {
+        console.error('Failed to load topics:', err)
+        setInitialLoading(false)
+      })
   }, [activeProjectId])
 
   const handleGenerate = useCallback(async () => {
@@ -141,6 +153,7 @@ export function Topics() {
         status={status}
         onToggleSelect={handleToggleSelect}
         onPriorityChange={handlePriorityChange}
+        initialLoading={initialLoading}
       />
     </div>
   )
