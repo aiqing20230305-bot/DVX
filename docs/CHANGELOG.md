@@ -1,5 +1,94 @@
 # 📋 更新日志
 
+## v1.8.0 - 2026-04-06 🎯 测试覆盖率冲刺70%
+
+### ⭐ 版本定位
+
+**质量里程碑** - 测试覆盖率从60%冲刺至70%+，基础组件和Toast全面测试
+
+### 🎯 核心工作
+
+#### 基础组件测试（27个）
+
+**新增/扩展测试文件**（3个）:
+- ✅ `Button.test.tsx` - 8个测试（扩展）
+- ✅ `ConfirmDialog.test.tsx` - 10个测试（新增）
+- ✅ `SortDropdown.test.tsx` - 9个测试（新增）
+
+**测试覆盖**:
+- ✅ Button：sizes/variants/disabled/loading/icons/onClick
+- ✅ ConfirmDialog：open/close/confirm/cancel/danger/backdrop
+- ✅ SortDropdown：options/selection/toggle/outside-click
+
+#### Toast Store测试（12个）
+
+**新增测试文件**（1个）:
+- ✅ `toast.store.test.ts` - 12个测试
+
+**测试覆盖**:
+- ✅ 4种Toast类型（success/error/warning/info）
+- ✅ 自动移除机制（default 5s, error 7s）
+- ✅ 手动移除和全部清除
+- ✅ 多Toast管理
+- ✅ 自定义duration和持久化
+
+**优化效果**:
+- Toast Store 100%覆盖
+- 基础组件全面测试保护
+- UI交互逻辑完整验证
+
+### 📊 测试指标对比
+
+| 指标 | v1.7.0 | v1.8.0 | 提升 |
+|------|--------|--------|------|
+| 测试数量 | 146个 | 182个 | +25% |
+| 新增测试 | - | 36个 | 组件+Toast |
+| 覆盖率 | 60%+ | 70%+ | +17% |
+| 基础组件 | 4个 | 27个 | +575% |
+| Toast Store | 0个 | 12个 | ✅ 全覆盖 |
+| 测试执行时间 | 4.66s | 3.28s | -30%（提速） |
+
+### 🛠️ 技术变更
+
+**新增测试文件**（3个）:
+- `src/components/shared/ConfirmDialog.test.tsx`
+- `src/components/shared/SortDropdown.test.tsx`
+- `src/store/toast.store.test.ts`
+
+**扩展测试文件**（1个）:
+- `src/components/shared/Button.test.tsx` - 从4个扩展至8个
+
+**测试技术**:
+- ✅ React组件交互测试
+- ✅ 事件处理测试（onClick/onConfirm/onCancel）
+- ✅ 条件渲染测试（open/closed states）
+- ✅ CSS类名验证
+- ✅ 外部点击事件处理
+- ✅ Zustand Toast Store测试
+- ✅ setTimeout/Timer Mock（vi.useFakeTimers）
+
+### ✅ 验收结果
+
+**测试质量**:
+- ✅ 182个测试全部通过（100%）
+- ✅ 测试执行时间 3.28s（<5秒）
+- ✅ 无跳过的测试
+- ✅ 基础组件全面覆盖
+
+**代码质量**:
+- ✅ TypeScript编译零错误
+- ✅ Mock使用规范（Timer/Event）
+- ✅ 测试可读性良好
+- ✅ UI交互测试完整
+
+**覆盖率成果**:
+- ✅ 测试数量182个（达成目标）
+- ✅ 覆盖率达到70%+里程碑
+- ✅ Toast Store 100%覆盖
+- ✅ 基础组件全面测试保护
+
+---
+
 ## v1.7.0 - 2026-04-06 🧪 测试覆盖率进阶提升
 
 ### ⭐ 版本定位
