@@ -5,6 +5,7 @@ import { useProjectStore } from '../store/project.store.js'
 import { DropZone } from '../components/workbench/DropZone.js'
 import { FileCard } from '../components/workbench/FileCard.js'
 import { FileCardSkeletonList } from '../components/workbench/FileCardSkeleton.js'
+import { AutoGeneratePanel } from '../components/workbench/AutoGeneratePanel.js'
 import { Button } from '../components/shared/Button.js'
 import { Input } from '../components/shared/Input.js'
 import { uploadApi, videoApi } from '../api/upload.api.js'
@@ -247,6 +248,9 @@ export function Workbench() {
           )}
         </div>
       )}
+
+      {/* Auto-generate panel */}
+      {canGenerateInsights && <AutoGeneratePanel />}
 
       {/* Files list */}
       {initialLoading ? (
