@@ -7,6 +7,7 @@ import { useTopicStore } from '../store/topic.store.js'
 import { topicApi } from '../api/topic.api.js'
 import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
+import { SearchBar } from '../components/shared/SearchBar.js'
 import { TopicGrid } from '../components/topics/TopicGrid.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { TopicCard } from '../types/index.js'
@@ -15,6 +16,7 @@ export function Topics() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
   const {
     topics, selectedIds, status,
@@ -84,6 +86,13 @@ export function Topics() {
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
+  // Filter topics based on search query
+  const filteredTopics = searchQuery
+    ? topics.filter(topic =>
+        topic.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : topics
+
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
@@ -139,6 +148,18 @@ export function Topics() {
         )}
       </div>
 
+      {/* Search */}
+      {topics.length > 0 && !isGenerating && (
+        <div className="mb-4">
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="搜索选题标题..."
+            resultCount={searchQuery ? filteredTopics.length : undefined}
+          />
+        </div>
+      )}
+
       {/* Selection tip */}
       {status === 'success' && topics.length > 0 && (
         <div className="mb-4 px-4 py-2.5 bg-indigo-900/20 border border-indigo-700/30 rounded-xl text-xs text-indigo-300">
@@ -148,7 +169,7 @@ export function Topics() {
 
       {/* Topics grid */}
       <TopicGrid
-        topics={topics}
+        topics={filteredTopics}
         selectedIds={selectedIds}
         status={status}
         onToggleSelect={handleToggleSelect}

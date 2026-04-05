@@ -7,6 +7,7 @@ import { useScriptStore } from '../store/script.store.js'
 import { scriptApi } from '../api/script.api.js'
 import { topicApi } from '../api/topic.api.js'
 import { Button } from '../components/shared/Button.js'
+import { SearchBar } from '../components/shared/SearchBar.js'
 import { ABVariantPanel } from '../components/scripts/ABVariantPanel.js'
 import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
@@ -17,6 +18,7 @@ export function Scripts() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   const { topics, selectedIds: topicSelectedIds, setTopics } = useTopicStore()
   const {
     scripts, activeTopicId,
@@ -63,6 +65,13 @@ export function Scripts() {
 
   const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id) || t.selected)
 
+  // Filter selected topics based on search query
+  const filteredSelectedTopics = searchQuery
+    ? selectedTopics.filter(topic =>
+        topic.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : selectedTopics
+
   const handleGenerate = useCallback(async (topicId: string) => {
     if (!activeProjectId) return
     setActiveTopicId(topicId)
@@ -100,6 +109,18 @@ export function Scripts() {
         <p className="text-slate-500 text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
+      {/* Search */}
+      {selectedTopics.length > 0 && !initialLoading && (
+        <div className="mb-6">
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="搜索选题标题..."
+            resultCount={searchQuery ? filteredSelectedTopics.length : undefined}
+          />
+        </div>
+      )}
+
       {/* Initial loading */}
       {initialLoading ? (
         <div>
@@ -125,7 +146,7 @@ export function Scripts() {
       {/* Topic script sections */}
       {!initialLoading && selectedTopics.length > 0 && (
         <div className="space-y-6">
-          {selectedTopics.map((topic: TopicCard) => {
+          {filteredSelectedTopics.map((topic: TopicCard) => {
           const topicScripts = scripts.filter(s => s.topic_id === topic.id)
           const isExpanded = expandedTopics.has(topic.id)
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id

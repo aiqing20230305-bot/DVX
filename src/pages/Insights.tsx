@@ -5,6 +5,7 @@ import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
+import { SearchBar } from '../components/shared/SearchBar.js'
 import { InsightStream } from '../components/insights/InsightStream.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { Insight } from '../types/index.js'
@@ -13,6 +14,7 @@ export function Insights() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   const {
     insights, selectedIds, status, streamBuffer,
     setInsights, addInsight, toggleSelection, selectAll, clearSelection,
@@ -80,6 +82,14 @@ export function Insights() {
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
+  // Filter insights based on search query
+  const filteredInsights = searchQuery
+    ? insights.filter(insight =>
+        insight.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        insight.summary.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : insights
+
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
@@ -125,6 +135,18 @@ export function Insights() {
         )}
       </div>
 
+      {/* Search */}
+      {insights.length > 0 && !isGenerating && (
+        <div className="mb-4">
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="搜索洞察标题或摘要..."
+            resultCount={searchQuery ? filteredInsights.length : undefined}
+          />
+        </div>
+      )}
+
       {/* Insight selection tip */}
       {status === 'success' && insights.length > 0 && (
         <div className="mb-4 px-4 py-2.5 bg-indigo-900/20 border border-indigo-700/30 rounded-xl text-xs text-indigo-300">
@@ -135,7 +157,7 @@ export function Insights() {
       {/* Content */}
       <InsightStream
         status={status}
-        insights={insights}
+        insights={filteredInsights}
         selectedIds={selectedIds}
         streamBuffer={streamBuffer}
         onToggleSelect={toggleSelection}
