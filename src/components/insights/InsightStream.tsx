@@ -11,9 +11,23 @@ interface InsightStreamProps {
   selectedIds: Set<string>
   streamBuffer: string
   onToggleSelect: (id: string) => void
+  initialLoading?: boolean
 }
 
-export function InsightStream({ status, insights, selectedIds, streamBuffer, onToggleSelect }: InsightStreamProps) {
+export function InsightStream({ status, insights, selectedIds, streamBuffer, onToggleSelect, initialLoading = false }: InsightStreamProps) {
+  // Show skeleton during initial load
+  if (initialLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
+          <span className="text-sm text-slate-500">加载已有洞察...</span>
+        </div>
+        <SkeletonList count={6} />
+      </div>
+    )
+  }
+
   if (status === 'idle') {
     return (
       <div className="text-center py-20">

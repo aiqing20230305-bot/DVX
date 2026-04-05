@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lightbulb, Zap, ArrowRight, Check, RotateCcw } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
@@ -12,6 +12,7 @@ import { Insight } from '../types/index.js'
 export function Insights() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
+  const [initialLoading, setInitialLoading] = useState(true)
   const {
     insights, selectedIds, status, streamBuffer,
     setInsights, addInsight, toggleSelection, selectAll, clearSelection,
@@ -37,13 +38,24 @@ export function Insights() {
 
   // Fetch existing insights on mount
   useEffect(() => {
-    if (!activeProjectId) return
-    insightApi.listByProject(activeProjectId).then(({ insights }) => {
-      if (insights.length > 0) {
-        setInsights(insights)
-        setStatus('success')
-      }
-    }).catch(console.error)
+    if (!activeProjectId) {
+      setInitialLoading(false)
+      return
+    }
+
+    setInitialLoading(true)
+    insightApi.listByProject(activeProjectId)
+      .then(({ insights }) => {
+        if (insights.length > 0) {
+          setInsights(insights)
+          setStatus('success')
+        }
+        setInitialLoading(false)
+      })
+      .catch((err) => {
+        console.error('Failed to fetch insights:', err)
+        setInitialLoading(false)
+      })
   }, [activeProjectId])
 
   const handleGenerate = useCallback(async () => {
@@ -127,6 +139,7 @@ export function Insights() {
         selectedIds={selectedIds}
         streamBuffer={streamBuffer}
         onToggleSelect={toggleSelection}
+        initialLoading={initialLoading}
       />
     </div>
   )
