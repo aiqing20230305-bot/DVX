@@ -1,7 +1,11 @@
 import { readFileSync } from 'fs'
-import pdfParse from 'pdf-parse'
+import { createRequire } from 'module'
 import { getAnthropicClient } from '../claude/client.js'
 import { config } from '../../config.js'
+
+// pdf-parse is CommonJS, use createRequire to import it
+const require = createRequire(import.meta.url)
+const pdfParse = require('pdf-parse')
 
 export interface PDFParseResult {
   type: 'pdf'
