@@ -8,6 +8,7 @@ import { Button } from '../components/shared/Button.js'
 import { uploadApi, videoApi } from '../api/upload.api.js'
 import { useFileUpload } from '../hooks/useFileUpload.js'
 import { UploadedFile } from '../types/index.js'
+import { toast } from '../store/toast.store.js'
 
 export function Workbench() {
   const navigate = useNavigate()
@@ -76,27 +77,45 @@ export function Workbench() {
     setUploadingCount(fileList.length)
     setError(null)
 
+    let successCount = 0
+    let failCount = 0
+
     for (const file of fileList) {
       try {
         const uploaded = await upload(file, activeProjectId, fileType)
         if (uploaded) {
           setFiles(prev => [uploaded, ...prev])
+          successCount++
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : String(err))
+        const errorMsg = err instanceof Error ? err.message : String(err)
+        setError(errorMsg)
+        toast.error('文件上传失败', `${file.name}: ${errorMsg}`)
+        failCount++
       }
     }
 
     setUploadingCount(0)
     await fetchFiles()
+
+    // Show success toast
+    if (successCount > 0) {
+      toast.success(
+        `成功上传 ${successCount} 个文件`,
+        successCount === fileList.length ? '文件正在AI解析中...' : undefined
+      )
+    }
   }
 
   const handleDeleteFile = async (id: string) => {
     try {
       await uploadApi.delete(id)
       setFiles(prev => prev.filter(f => f.id !== id))
+      toast.success('文件已删除')
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      setError(errorMsg)
+      toast.error('删除失败', errorMsg)
     }
   }
 

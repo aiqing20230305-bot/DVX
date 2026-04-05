@@ -165,6 +165,15 @@
   }
 }
 
+@keyframes shrink-width {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
 /* === 工具类 === */
 .animate-fade-in {
   animation: fade-in var(--duration-base) var(--ease-out);
@@ -188,6 +197,18 @@
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 300ms var(--ease-out);
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 300ms var(--ease-in);
+}
+
+.animate-shrink-width {
+  animation: shrink-width linear;
 }
 
 /* === 过渡工具类 === */
