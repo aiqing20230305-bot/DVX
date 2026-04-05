@@ -13,6 +13,9 @@ dist/
 data.db
 data.db-shm
 data.db-wal
+data*.db
+data*.db-shm
+data*.db-wal
 *.sqlite
 *.sqlite3
 
@@ -51,3 +54,11 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+# 生成的报告文件
+*-策略报告.html
+*-报告.html
+
+# 参考资料
+参考/
+reference/

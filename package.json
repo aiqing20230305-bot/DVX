@@ -7,7 +7,8 @@
     "dev:client": "vite",
     "dev:server": "tsx watch server/index.ts",
     "build": "vite build && tsc -p tsconfig.node.json",
-    "start": "node dist/server/index.js"
+    "build:railway": "vite build",
+    "start": "NODE_ENV=production tsx server/index.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

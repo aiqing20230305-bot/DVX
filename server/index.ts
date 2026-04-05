@@ -1,7 +1,12 @@
 import express from 'express'
 import cors from 'cors'
-import { mkdirSync } from 'fs'
+import { mkdirSync, existsSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { config } from './config.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 import { uploadRouter } from './routes/upload.route.js'
 import { videoRouter } from './routes/video.route.js'
 import { insightRouter } from './routes/insight.route.js'
@@ -223,10 +228,20 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() })
 })
 
+// Serve static files in production
+const clientPath = join(__dirname, '../dist/client')
+if (existsSync(clientPath)) {
+  app.use(express.static(clientPath))
+  app.get('*', (_req, res) => {
+    res.sendFile(join(clientPath, 'index.html'))
+  })
+}
+
 app.use(errorMiddleware)
 
+const isProduction = process.env.NODE_ENV === 'production'
 app.listen(config.port, () => {
   console.log(`\n🚀 超级洞察 API 服务已启动`)
   console.log(`   地址: http://localhost:${config.port}`)
-  console.log(`   环境: development\n`)
+  console.log(`   环境: ${isProduction ? 'production' : 'development'}\n`)
 })
