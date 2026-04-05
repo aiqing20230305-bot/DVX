@@ -17,6 +17,7 @@ export const videoApi = {
 export async function uploadFile(
   file: File,
   projectId: string,
+  fileType?: 'competitor_data' | 'product_info' | 'product_features',
   onProgress?: (pct: number) => void
 ): Promise<{ upload: UploadedFile }> {
   return new Promise((resolve, reject) => {
@@ -24,6 +25,9 @@ export async function uploadFile(
     const formData = new FormData()
     formData.append('file', file)
     formData.append('projectId', projectId)
+    if (fileType) {
+      formData.append('fileType', fileType)
+    }
 
     xhr.upload.addEventListener('progress', (e) => {
       if (e.lengthComputable) {

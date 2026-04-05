@@ -18,10 +18,21 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
       return
     }
 
-    const { projectId } = req.body as { projectId: string }
+    const { projectId, fileType } = req.body as { projectId: string; fileType?: string }
     if (!projectId) {
       res.status(400).json({ error: '缺少 projectId' })
       return
+    }
+
+    // Validate and default fileType
+    const validFileTypes = ['competitor_data', 'product_info', 'product_features']
+    const safeFileType = fileType && validFileTypes.includes(fileType) ? fileType : 'competitor_data'
+
+    // File type display names
+    const fileTypeNames: Record<string, string> = {
+      competitor_data: '竞品数据',
+      product_info: '产品信息',
+      product_features: '产品卖点'
     }
 
     // Create upload record
@@ -31,13 +42,15 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
       original_name: req.file.originalname,
       mime_type: req.file.mimetype,
       size: req.file.size,
+      file_type: safeFileType as 'competitor_data' | 'product_info' | 'product_features',
       status: 'parsing',
       parsed_data: null,
       error_message: null
     })
 
-    // Log upload action
-    logRepo.create(projectId, 'upload', `上传文件：${req.file.originalname}`)
+    // Log upload action with file type
+    const typeName = fileTypeNames[safeFileType] || '数据'
+    logRepo.create(projectId, 'upload', `上传${typeName}：${req.file.originalname}`)
 
     // Return immediately, parse async
     res.json({ upload })
@@ -64,8 +77,9 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
 
       uploadRepo.updateStatus(upload.id, 'ready', parsedData)
 
-      // Log parse success
-      logRepo.create(projectId, 'parse', `解析完成：${req.file.originalname}`)
+      // Log parse success with file type
+      const typeName = fileTypeNames[safeFileType] || '数据'
+      logRepo.create(projectId, 'parse', `解析完成（${typeName}）：${req.file.originalname}`)
     } catch (parseErr) {
       const msg = parseErr instanceof Error ? parseErr.message : String(parseErr)
       uploadRepo.updateStatus(upload.id, 'error', undefined, msg)

@@ -71,6 +71,14 @@ export function FileCard({ file, onDelete, progress }: FileCardProps) {
   const [showPreview, setShowPreview] = useState(false)
   const parsedData = file.parsed_data ? JSON.parse(file.parsed_data) : null
 
+  const fileTypeLabels = {
+    competitor_data: { label: '竞品数据', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
+    product_info: { label: '产品信息', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+    product_features: { label: '产品卖点', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' }
+  }
+
+  const typeInfo = fileTypeLabels[file.file_type]
+
   return (
     <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden card-hover">
       <div className="flex items-center gap-3 p-4">
@@ -81,6 +89,9 @@ export function FileCard({ file, onDelete, progress }: FileCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-medium text-slate-200 truncate">{file.original_name}</span>
+            <span className={`px-2 py-0.5 text-xs rounded-full border ${typeInfo.color}`}>
+              {typeInfo.label}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <StatusBadge status={file.status} progress={progress} />

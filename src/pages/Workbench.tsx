@@ -57,7 +57,7 @@ export function Workbench() {
     }
   }, [files, fetchFiles])
 
-  const handleFiles = async (fileList: File[]) => {
+  const handleFiles = async (fileList: File[], fileType: 'competitor_data' | 'product_info' | 'product_features') => {
     if (!activeProjectId) {
       // Create default project
       await addProject('默认项目')
@@ -69,7 +69,7 @@ export function Workbench() {
 
     for (const file of fileList) {
       try {
-        const uploaded = await upload(file, activeProjectId)
+        const uploaded = await upload(file, activeProjectId, fileType)
         if (uploaded) {
           setFiles(prev => [uploaded, ...prev])
         }

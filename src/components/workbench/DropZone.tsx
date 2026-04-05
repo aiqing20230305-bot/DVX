@@ -3,7 +3,7 @@ import { Upload, FileSpreadsheet, FileText, Image, Film, X } from 'lucide-react'
 import { Button } from '../shared/Button.js'
 
 interface DropZoneProps {
-  onFiles: (files: File[]) => void
+  onFiles: (files: File[], fileType: 'competitor_data' | 'product_info' | 'product_features') => void
   disabled?: boolean
   uploading?: boolean
 }
@@ -34,6 +34,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [fileType, setFileType] = useState<'competitor_data' | 'product_info' | 'product_features'>('competitor_data')
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -60,13 +61,50 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
 
   const handleUpload = () => {
     if (pendingFiles.length > 0) {
-      onFiles(pendingFiles)
+      onFiles(pendingFiles, fileType)
       setPendingFiles([])
     }
   }
 
+  const fileTypeOptions = [
+    { value: 'competitor_data' as const, label: '竞品数据', description: '竞品视频、爆款数据等' },
+    { value: 'product_info' as const, label: '产品信息', description: '产品介绍、规格参数等' },
+    { value: 'product_features' as const, label: '产品卖点', description: '核心卖点、差异化优势等' }
+  ]
+
   return (
     <div className="space-y-4">
+      {/* File Type Selector */}
+      <div className="space-y-2">
+        <div className="text-sm font-medium text-slate-300">选择数据类型</div>
+        <div className="grid grid-cols-3 gap-3">
+          {fileTypeOptions.map(option => (
+            <button
+              key={option.value}
+              onClick={() => setFileType(option.value)}
+              disabled={disabled}
+              className={[
+                'relative px-4 py-3 rounded-lg border-2 transition-all text-left',
+                fileType === option.value
+                  ? 'border-indigo-500 bg-indigo-500/10'
+                  : 'border-slate-700 bg-slate-800/30 hover:border-slate-600',
+                disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              ].join(' ')}
+            >
+              {fileType === option.value && (
+                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-indigo-500 flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              )}
+              <div className="font-medium text-slate-200 mb-1">{option.label}</div>
+              <div className="text-xs text-slate-500">{option.description}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}

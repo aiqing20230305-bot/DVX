@@ -10,54 +10,91 @@ import { initSSE, sendSSEEvent, closeSSE } from '../utils/sse.js'
 function buildDataContext(uploads: ReturnType<typeof uploadRepo.findByProject>): string {
   const parts: string[] = []
 
-  for (const upload of uploads) {
-    if (upload.status !== 'ready' || !upload.parsed_data) continue
+  // Group uploads by file type
+  const competitorData = uploads.filter(u => u.status === 'ready' && u.file_type === 'competitor_data')
+  const productInfo = uploads.filter(u => u.status === 'ready' && u.file_type === 'product_info')
+  const productFeatures = uploads.filter(u => u.status === 'ready' && u.file_type === 'product_features')
 
-    parts.push(`\n=== 文件：${upload.original_name} ===`)
+  // Add competitor data section
+  if (competitorData.length > 0) {
+    parts.push('\n\n========== 竞品数据 ==========\n')
+    for (const upload of competitorData) {
+      if (!upload.parsed_data) continue
+      parts.push(`\n=== 文件：${upload.original_name} ===`)
+      parts.push(parseUploadData(upload))
+    }
+  }
 
-    try {
-      const data = JSON.parse(upload.parsed_data)
+  // Add product info section
+  if (productInfo.length > 0) {
+    parts.push('\n\n========== 产品信息 ==========\n')
+    for (const upload of productInfo) {
+      if (!upload.parsed_data) continue
+      parts.push(`\n=== 文件：${upload.original_name} ===`)
+      parts.push(parseUploadData(upload))
+    }
+  }
 
-      if (data.type === 'excel') {
-        for (const sheet of data.sheets ?? []) {
-          parts.push(`\n[工作表：${sheet.name}]`)
-          parts.push(`数据规模：${sheet.summary.rowCount} 行 × ${sheet.summary.columnCount} 列`)
-          parts.push(`字段：${sheet.headers.join('、')}`)
+  // Add product features section
+  if (productFeatures.length > 0) {
+    parts.push('\n\n========== 产品核心卖点 ==========\n')
+    for (const upload of productFeatures) {
+      if (!upload.parsed_data) continue
+      parts.push(`\n=== 文件：${upload.original_name} ===`)
+      parts.push(parseUploadData(upload))
+    }
+  }
 
-          if (sheet.summary.numericColumns.length > 0) {
-            parts.push('\n数值统计：')
-            for (const col of sheet.summary.numericColumns.slice(0, 10)) {
-              parts.push(`  ${col.name}：最小值=${col.min.toFixed(2)}，最大值=${col.max.toFixed(2)}，均值=${col.avg.toFixed(2)}，合计=${col.sum.toFixed(2)}`)
-            }
-          }
+  return parts.join('\n')
+}
 
-          // Sample rows
-          if (sheet.rows.length > 0) {
-            parts.push('\n数据样本（前10行）：')
-            parts.push(JSON.stringify(sheet.rows.slice(0, 10), null, 2))
+function parseUploadData(upload: ReturnType<typeof uploadRepo.findByProject>[number]): string {
+  const parts: string[] = []
+
+  if (!upload.parsed_data) return ''
+
+  try {
+    const data = JSON.parse(upload.parsed_data)
+
+    if (data.type === 'excel') {
+      for (const sheet of data.sheets ?? []) {
+        parts.push(`\n[工作表：${sheet.name}]`)
+        parts.push(`数据规模：${sheet.summary.rowCount} 行 × ${sheet.summary.columnCount} 列`)
+        parts.push(`字段：${sheet.headers.join('、')}`)
+
+        if (sheet.summary.numericColumns.length > 0) {
+          parts.push('\n数值统计：')
+          for (const col of sheet.summary.numericColumns.slice(0, 10)) {
+            parts.push(`  ${col.name}：最小值=${col.min.toFixed(2)}，最大值=${col.max.toFixed(2)}，均值=${col.avg.toFixed(2)}，合计=${col.sum.toFixed(2)}`)
           }
         }
-      } else if (data.type === 'pdf') {
-        parts.push(`\n文档摘要：${data.summary}`)
-        if (data.sections?.length > 0) {
-          parts.push('\n章节内容：')
-          for (const section of data.sections.slice(0, 5)) {
-            parts.push(`\n[${section.heading}]\n${section.content.slice(0, 500)}`)
-          }
-        }
-      } else if (data.type === 'image') {
-        parts.push(`\n图片描述：${data.description}`)
-        parts.push(`提取文字：${data.extractedText}`)
-        if (data.dataPoints?.length > 0) {
-          parts.push('\n数据点：')
-          for (const dp of data.dataPoints) {
-            parts.push(`  ${dp.label}: ${dp.value}`)
-          }
+
+        // Sample rows
+        if (sheet.rows.length > 0) {
+          parts.push('\n数据样本（前10行）：')
+          parts.push(JSON.stringify(sheet.rows.slice(0, 10), null, 2))
         }
       }
-    } catch {
-      parts.push(upload.parsed_data.slice(0, 1000))
+    } else if (data.type === 'pdf') {
+      parts.push(`\n文档摘要：${data.summary}`)
+      if (data.sections?.length > 0) {
+        parts.push('\n章节内容：')
+        for (const section of data.sections.slice(0, 5)) {
+          parts.push(`\n[${section.heading}]\n${section.content.slice(0, 500)}`)
+        }
+      }
+    } else if (data.type === 'image') {
+      parts.push(`\n图片描述：${data.description}`)
+      parts.push(`提取文字：${data.extractedText}`)
+      if (data.dataPoints?.length > 0) {
+        parts.push('\n数据点：')
+        for (const dp of data.dataPoints) {
+          parts.push(`  ${dp.label}: ${dp.value}`)
+        }
+      }
     }
+  } catch {
+    parts.push(upload.parsed_data.slice(0, 1000))
   }
 
   return parts.join('\n')

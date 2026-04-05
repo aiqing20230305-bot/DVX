@@ -12,13 +12,17 @@ interface FileUploadState {
 export function useFileUpload() {
   const [uploads, setUploads] = useState<Map<string, FileUploadState>>(new Map())
 
-  const upload = useCallback(async (file: File, projectId: string): Promise<UploadedFile | null> => {
+  const upload = useCallback(async (
+    file: File,
+    projectId: string,
+    fileType?: 'competitor_data' | 'product_info' | 'product_features'
+  ): Promise<UploadedFile | null> => {
     const key = `${file.name}-${file.size}-${Date.now()}`
 
     setUploads(prev => new Map(prev).set(key, { progress: 0, status: 'uploading', error: null, result: null }))
 
     try {
-      const result = await uploadFile(file, projectId, (pct) => {
+      const result = await uploadFile(file, projectId, fileType, (pct) => {
         setUploads(prev => {
           const next = new Map(prev)
           const current = next.get(key)
@@ -45,8 +49,12 @@ export function useFileUpload() {
     }
   }, [])
 
-  const uploadMany = useCallback(async (files: File[], projectId: string): Promise<UploadedFile[]> => {
-    const results = await Promise.allSettled(files.map(f => upload(f, projectId)))
+  const uploadMany = useCallback(async (
+    files: File[],
+    projectId: string,
+    fileType?: 'competitor_data' | 'product_info' | 'product_features'
+  ): Promise<UploadedFile[]> => {
+    const results = await Promise.allSettled(files.map(f => upload(f, projectId, fileType)))
     return results
       .filter((r): r is PromiseFulfilledResult<UploadedFile | null> => r.status === 'fulfilled')
       .map(r => r.value)

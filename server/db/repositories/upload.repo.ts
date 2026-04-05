@@ -8,6 +8,7 @@ export interface Upload {
   original_name: string
   mime_type: string
   size: number
+  file_type: 'competitor_data' | 'product_info' | 'product_features'
   status: 'uploading' | 'parsing' | 'ready' | 'error'
   parsed_data: string | null
   error_message: string | null
@@ -31,9 +32,9 @@ export const uploadRepo = {
     const now = Date.now()
     const id = genId()
     db.prepare(
-      `INSERT INTO uploads (id, project_id, filename, original_name, mime_type, size, status, parsed_data, error_message, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(id, data.project_id, data.filename, data.original_name, data.mime_type, data.size, data.status, data.parsed_data, data.error_message, now, now)
+      `INSERT INTO uploads (id, project_id, filename, original_name, mime_type, size, file_type, status, parsed_data, error_message, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, data.project_id, data.filename, data.original_name, data.mime_type, data.size, data.file_type, data.status, data.parsed_data, data.error_message, now, now)
     return { id, ...data, created_at: now, updated_at: now }
   },
 
