@@ -11,6 +11,9 @@ export const scriptApi = {
   update: (id: string, data: { segments?: ScriptSegment[]; fullText?: string; wordCount?: number }) =>
     api.put<{ success: boolean }>(`/script/${id}`, data),
 
+  deleteMany: (ids: string[]) =>
+    api.delete<{ success: boolean; count: number }>('/script/batch', { ids }),
+
   generateStream: (projectId: string, topicId: string) =>
     fetch('/api/script/generate', {
       method: 'POST',

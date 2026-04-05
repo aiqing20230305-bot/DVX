@@ -107,5 +107,11 @@ export const topicRepo = {
   deleteByProject(projectId: string): void {
     const db = getDb()
     db.prepare('DELETE FROM topics WHERE project_id = ?').run(projectId)
+  },
+
+  deleteMany(ids: string[]): void {
+    const db = getDb()
+    const placeholders = ids.map(() => '?').join(',')
+    db.prepare(`DELETE FROM topics WHERE id IN (${placeholders})`).run(...ids)
   }
 }

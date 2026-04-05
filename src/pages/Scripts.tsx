@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download } from 'lucide-react'
+import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useTopicStore } from '../store/topic.store.js'
 import { useScriptStore } from '../store/script.store.js'
@@ -98,6 +98,29 @@ export function Scripts() {
       toast.success('导出成功', `已导出 ${scripts.length} 个脚本`)
     } catch (err) {
       toast.error('导出失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  const handleDeleteTopicScripts = async (topicId: string, topicTitle: string) => {
+    const topicScripts = scripts.filter(s => s.topic_id === topicId)
+    if (topicScripts.length === 0) return
+
+    const confirmed = window.confirm(
+      `确定要删除「${topicTitle}」的所有脚本吗？\n\n将删除 ${topicScripts.length} 个脚本（A/B版本），此操作不可撤销！`
+    )
+
+    if (!confirmed) return
+
+    try {
+      const idsToDelete = topicScripts.map(s => s.id)
+      await scriptApi.deleteMany(idsToDelete)
+
+      // 从本地状态中移除
+      setScripts(scripts.filter(s => s.topic_id !== topicId))
+
+      toast.success('删除成功', `已删除 ${topicScripts.length} 个脚本`)
+    } catch (err) {
+      toast.error('删除失败', err instanceof Error ? err.message : String(err))
     }
   }
 
@@ -203,12 +226,21 @@ export function Scripts() {
                     {topicScripts.length > 0 ? '重新生成' : '生成脚本'}
                   </Button>
                   {topicScripts.length > 0 && (
-                    <button
-                      onClick={() => toggleTopicExpand(topic.id)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors"
-                    >
-                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleDeleteTopicScripts(topic.id, topic.title)}
+                        className="p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-slate-700 transition-colors"
+                        title="删除该选题的所有脚本"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                      <button
+                        onClick={() => toggleTopicExpand(topic.id)}
+                        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors"
+                      >
+                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

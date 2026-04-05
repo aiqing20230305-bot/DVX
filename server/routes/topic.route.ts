@@ -41,4 +41,19 @@ router.patch('/:id', (req: Request, res: Response) => {
   }
 })
 
+router.delete('/batch', (req: Request, res: Response) => {
+  try {
+    const { ids } = req.body as { ids: string[] }
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ error: '缺少有效的 ids 数组' })
+      return
+    }
+    topicRepo.deleteMany(ids)
+    res.json({ success: true, count: ids.length })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
 export { router as topicRouter }

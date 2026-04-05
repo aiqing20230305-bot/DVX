@@ -8,6 +8,9 @@ export const insightApi = {
   update: (id: string, data: { selected?: boolean; title?: string; summary?: string }) =>
     api.patch<{ success: boolean }>(`/insight/${id}`, data),
 
+  deleteMany: (ids: string[]) =>
+    api.delete<{ success: boolean; count: number }>('/insight/batch', { ids }),
+
   generateStream: (projectId: string) =>
     fetch('/api/insight/generate', {
       method: 'POST',

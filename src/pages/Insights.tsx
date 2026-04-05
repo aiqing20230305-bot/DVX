@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Lightbulb, Zap, ArrowRight, Check, RotateCcw, Download } from 'lucide-react'
+import { Lightbulb, Zap, ArrowRight, Check, RotateCcw, Download, Trash2 } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { insightApi } from '../api/insight.api.js'
@@ -108,6 +108,32 @@ export function Insights() {
     }
   }
 
+  const handleBatchDelete = async () => {
+    if (selectedCount === 0) {
+      toast.error('请先选择要删除的洞察')
+      return
+    }
+
+    const confirmed = window.confirm(
+      `确定要删除选中的 ${selectedCount} 条洞察吗？\n\n此操作不可撤销！`
+    )
+
+    if (!confirmed) return
+
+    try {
+      const idsToDelete = Array.from(selectedIds)
+      await insightApi.deleteMany(idsToDelete)
+
+      // 从本地状态中移除
+      setInsights(insights.filter(i => !selectedIds.has(i.id)))
+      clearSelection()
+
+      toast.success('删除成功', `已删除 ${selectedCount} 条洞察`)
+    } catch (err) {
+      toast.error('删除失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -149,6 +175,11 @@ export function Insights() {
               <Button variant="secondary" size="sm" icon={<Check size={13} />} onClick={selectAll}>全选</Button>
               <Button variant="ghost" size="sm" onClick={clearSelection}>清除选择</Button>
               <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
+              {selectedCount > 0 && (
+                <Button variant="ghost" size="sm" icon={<Trash2 size={13} />} onClick={handleBatchDelete} className="text-red-400 hover:text-red-300">
+                  删除 ({selectedCount})
+                </Button>
+              )}
               <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
             </>
           )}

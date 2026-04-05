@@ -81,5 +81,11 @@ export const insightRepo = {
   deleteByProject(projectId: string): void {
     const db = getDb()
     db.prepare('DELETE FROM insights WHERE project_id = ?').run(projectId)
+  },
+
+  deleteMany(ids: string[]): void {
+    const db = getDb()
+    const placeholders = ids.map(() => '?').join(',')
+    db.prepare(`DELETE FROM insights WHERE id IN (${placeholders})`).run(...ids)
   }
 }

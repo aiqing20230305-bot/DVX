@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Zap, ArrowRight, RotateCcw, Download } from 'lucide-react'
+import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2 } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { useTopicStore } from '../store/topic.store.js'
@@ -111,6 +111,33 @@ export function Topics() {
     }
   }
 
+  const handleBatchDelete = async () => {
+    if (selectedCount === 0) {
+      toast.error('请先选择要删除的选题')
+      return
+    }
+
+    const confirmed = window.confirm(
+      `确定要删除选中的 ${selectedCount} 个选题吗？\n\n此操作不可撤销！`
+    )
+
+    if (!confirmed) return
+
+    try {
+      const idsToDelete = Array.from(selectedIds)
+      await topicApi.deleteMany(idsToDelete)
+
+      // 从本地状态中移除
+      setTopics(topics.filter(t => !selectedIds.has(t.id)))
+      toggleSelection // Clear selection via store
+      selectedIds.forEach(id => toggleSelection(id))
+
+      toast.success('删除成功', `已删除 ${selectedCount} 个选题`)
+    } catch (err) {
+      toast.error('删除失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -164,6 +191,11 @@ export function Topics() {
           {topics.length > 0 && !isGenerating && (
             <>
               <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
+              {selectedCount > 0 && (
+                <Button variant="ghost" size="sm" icon={<Trash2 size={13} />} onClick={handleBatchDelete} className="text-red-400 hover:text-red-300">
+                  删除 ({selectedCount})
+                </Button>
+              )}
               <Button variant="ghost" size="sm" icon={<RotateCcw size={13} />} onClick={reset}>重置</Button>
             </>
           )}

@@ -8,6 +8,9 @@ export const topicApi = {
   update: (id: string, data: { selected?: boolean; priority?: number }) =>
     api.patch<{ success: boolean }>(`/topic/${id}`, data),
 
+  deleteMany: (ids: string[]) =>
+    api.delete<{ success: boolean; count: number }>('/topic/batch', { ids }),
+
   generateStream: (projectId: string, insightIds: string[]) =>
     fetch('/api/topic/generate', {
       method: 'POST',
