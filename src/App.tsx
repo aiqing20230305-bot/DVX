@@ -10,6 +10,7 @@ import { KnowledgeBase } from './pages/KnowledgeBase.js'
 import { Projects } from './pages/Projects.js'
 import { ProjectDashboard } from './pages/ProjectDashboard.js'
 import { ToastContainer } from './components/shared/ToastContainer.js'
+import { ErrorBoundary } from './components/shared/ErrorBoundary.js'
 import { useProjectStore } from './store/project.store.js'
 import { useUIStore } from './store/ui.store.js'
 
@@ -27,7 +28,7 @@ export function App() {
   }, [])
 
   return (
-    <>
+    <ErrorBoundary>
       <Shell>
         <Routes>
           <Route path="/" element={<Workbench />} />
@@ -41,6 +42,6 @@ export function App() {
         </Routes>
       </Shell>
       <ToastContainer />
-    </>
+    </ErrorBoundary>
   )
 }
