@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Zap, CheckCircle2, Loader2, XCircle, AlertCircle } from 'lucide-react'
 import { Button } from '../shared/Button.js'
 import { toast } from '../../store/toast.store.js'
@@ -36,6 +36,8 @@ export function AutoGeneratePanel() {
     scripts: { status: 'pending', label: '生成脚本' },
     report: { status: 'pending', label: '生成报告' }
   })
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const cancelledRef = useRef(false)
 
   const updateStep = (step: Step, updates: Partial<StepInfo>) => {
     setSteps(prev => ({
@@ -44,17 +46,42 @@ export function AutoGeneratePanel() {
     }))
   }
 
+  const resetState = () => {
+    setStatus('idle')
+    setSteps({
+      insights: { status: 'pending', label: '生成洞察' },
+      topics: { status: 'pending', label: '生成选题' },
+      scripts: { status: 'pending', label: '生成脚本' },
+      report: { status: 'pending', label: '生成报告' }
+    })
+    setAbortController(null)
+    cancelledRef.current = false
+  }
+
+  const handleCancel = () => {
+    cancelledRef.current = true
+    abortController?.abort()
+    resetState()
+    toast.info('已取消', '生成已取消，可以重新开始')
+  }
+
   const handleGenerate = async () => {
     if (!activeProjectId) {
       toast.error('错误', '请先选择项目')
       return
     }
 
+    // Create abort controller
+    const controller = new AbortController()
+    setAbortController(controller)
+    cancelledRef.current = false
+
     setStatus('running')
     toast.info('开始生成', '正在自动执行完整工作流...')
 
     try {
       // Step 1: Generate Insights
+      if (cancelledRef.current) return
       updateStep('insights', { status: 'running' })
 
       const insightsResponse = await insightApi.generateStream(activeProjectId)
@@ -88,6 +115,7 @@ export function AutoGeneratePanel() {
       updateStep('insights', { status: 'completed', count: freshInsights.length })
 
       // Step 2: Generate Topics
+      if (cancelledRef.current) return
       updateStep('topics', { status: 'running' })
 
       const insightIds = freshInsights.map(i => i.id)
@@ -122,6 +150,7 @@ export function AutoGeneratePanel() {
       updateStep('topics', { status: 'completed', count: freshTopics.length })
 
       // Step 3: Generate Scripts (for all topics)
+      if (cancelledRef.current) return
       updateStep('scripts', { status: 'running' })
 
       for (const topic of freshTopics) {
@@ -147,19 +176,34 @@ export function AutoGeneratePanel() {
       updateStep('scripts', { status: 'completed', count: freshScripts.length })
 
       // Step 4: Generate Report
+      if (cancelledRef.current) return
       updateStep('report', { status: 'running' })
 
       await api.post('/report/generate', { projectId: activeProjectId })
       updateStep('report', { status: 'completed' })
 
       // Success
-      setStatus('success')
-      toast.success('生成完成！', '战略报告已生成，点击"查看报告"查看结果')
+      if (!cancelledRef.current) {
+        setStatus('success')
+        toast.success('生成完成！', '战略报告已生成，点击"查看报告"查看结果')
+      }
 
     } catch (error) {
+      // Check if it's an abort error (user cancelled)
+      if (error instanceof Error && error.name === 'AbortError') {
+        return // Already handled by handleCancel
+      }
+
+      // Don't show error if cancelled
+      if (cancelledRef.current) {
+        return
+      }
+
       console.error('Auto-generate failed:', error)
       setStatus('error')
       toast.error('生成失败', error instanceof Error ? error.message : '请稍后重试')
+    } finally {
+      setAbortController(null)
     }
   }
 
@@ -184,7 +228,14 @@ export function AutoGeneratePanel() {
             {status === 'success' ? '✅ 生成完成' : status === 'error' ? '❌ 生成失败' : '⚡ 生成进度'}
           </h3>
           {status === 'running' && (
-            <span className="text-xs text-slate-500">请耐心等待...</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCancel}
+              icon={<XCircle size={14} />}
+            >
+              取消
+            </Button>
           )}
         </div>
 
@@ -216,15 +267,7 @@ export function AutoGeneratePanel() {
             </Button>
             <Button
               variant="secondary"
-              onClick={() => {
-                setStatus('idle')
-                setSteps({
-                  insights: { status: 'pending', label: '生成洞察' },
-                  topics: { status: 'pending', label: '生成选题' },
-                  scripts: { status: 'pending', label: '生成脚本' },
-                  report: { status: 'pending', label: '生成报告' }
-                })
-              }}
+              onClick={resetState}
             >
               重新生成
             </Button>
@@ -234,15 +277,7 @@ export function AutoGeneratePanel() {
         {status === 'error' && (
           <Button
             variant="secondary"
-            onClick={() => {
-              setStatus('idle')
-              setSteps({
-                insights: { status: 'pending', label: '生成洞察' },
-                topics: { status: 'pending', label: '生成选题' },
-                scripts: { status: 'pending', label: '生成脚本' },
-                report: { status: 'pending', label: '生成报告' }
-              })
-            }}
+            onClick={resetState}
             className="w-full"
           >
             重试
