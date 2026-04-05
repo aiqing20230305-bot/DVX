@@ -13,11 +13,15 @@ import { ToastContainer } from './components/shared/ToastContainer.js'
 import { ErrorBoundary } from './components/shared/ErrorBoundary.js'
 import { useProjectStore } from './store/project.store.js'
 import { useUIStore } from './store/ui.store.js'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js'
 import './styles/print.css'
 
 export function App() {
   const { fetchProjects } = useProjectStore()
   const { theme } = useUIStore()
+
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts()
 
   useEffect(() => {
     // Apply theme
