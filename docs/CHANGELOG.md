@@ -1,5 +1,32 @@
 # 📋 更新日志
 
+## v0.2.4 - 2026-04-06
+
+### ✨ 新功能
+
+#### Insights 页面初始加载骨架屏
+- 首次进入 Insights 页面时显示加载状态
+- 显示 6 个骨架屏占位卡片
+- 加载提示文案："加载已有洞察..."
+- 数据加载完成后平滑过渡到真实内容
+- 复用现有 SkeletonList 组件
+
+### 🎨 UI/UX 改进
+
+- 首次进入 Insights 页面有明确的加载反馈
+- 减少空白等待时间，提升感知性能
+- 视觉连续性增强，符合现代 Web 标准
+- 与 Workbench 页面加载体验保持一致
+
+### 🔧 技术实现
+
+- Insights.tsx 添加 `initialLoading` 状态管理
+- useEffect 中在 API 调用前后设置加载状态
+- InsightStream 组件新增 `initialLoading` 可选属性
+- 优先检查 initialLoading，然后检查 status 状态
+
+---
+
 ## v0.2.3 - 2026-04-06
 
 ### ✨ 新功能
