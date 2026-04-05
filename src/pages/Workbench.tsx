@@ -6,6 +6,7 @@ import { DropZone } from '../components/workbench/DropZone.js'
 import { FileCard } from '../components/workbench/FileCard.js'
 import { FileCardSkeletonList } from '../components/workbench/FileCardSkeleton.js'
 import { AutoGeneratePanel } from '../components/workbench/AutoGeneratePanel.js'
+import { ProjectStatsPanel } from '../components/workbench/ProjectStatsPanel.js'
 import { Button } from '../components/shared/Button.js'
 import { Input } from '../components/shared/Input.js'
 import { uploadApi, videoApi } from '../api/upload.api.js'
@@ -191,6 +192,9 @@ export function Workbench() {
           <button onClick={() => setError(null)} className="ml-auto text-red-500 hover:text-red-300">✕</button>
         </div>
       )}
+
+      {/* Project stats panel */}
+      {activeProjectId && <ProjectStatsPanel />}
 
       {/* Drop zone */}
       <div className="mb-8">
