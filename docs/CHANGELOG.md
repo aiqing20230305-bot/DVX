@@ -1,5 +1,197 @@
 # 📋 更新日志
 
+## v0.7.0 - 2026-04-06
+
+### 🎉 重大更新
+
+这是一个里程碑版本，标志着应用从 v0.6.x（内容管理增强）升级到 v0.7.x（数据可视化）阶段。
+
+### ✨ 新功能
+
+#### 数据可视化仪表盘
+- 在Workbench添加交互式图表
+- 数据生成趋势可视化
+- 平台分布一目了然
+- 支持时间范围切换
+
+### 📊 可视化能力
+
+**数据生成趋势图**（折线图）:
+- 洞察生成趋势（橙色线）
+- 选题生成趋势（蓝色线）
+- 脚本生成趋势（紫色线）
+- 按天统计，连续展示
+- X轴：日期（月/日）
+- Y轴：生成数量
+
+**平台分布图**（饼图）:
+- 抖音选题占比（红色）
+- 快手选题占比（橙色）
+- 小红书选题占比（粉色）
+- 自动显示百分比
+- 仅显示有数据的平台
+
+### 🎨 UI/UX 改进
+
+**时间范围切换**:
+- 7天：查看最近一周趋势
+- 30天（默认）：查看月度趋势
+- 全部：查看完整历史（以30天窗口显示）
+- 按钮式切换，当前选中高亮
+
+**布局设计**:
+- 两栏网格布局（桌面端）
+- 单栏堆叠（移动端）
+- 响应式图表尺寸
+- 与ProjectStatsPanel协同展示
+
+**视觉效果**:
+- 深色主题图表
+- 网格线（虚线）
+- Tooltip悬停提示
+- Legend图例说明
+- 品牌色系一致
+
+**用户价值**:
+- 直观理解：图表比数字更易理解趋势
+- 快速洞察：一眼看出数据生成规律
+- 决策支持：基于历史数据规划未来
+- 进度监控：实时了解项目推进情况
+
+### 🔧 技术实现
+
+**新增组件**: `src/components/workbench/DataChartsPanel.tsx` (~174行)
+
+**使用的库**:
+- `recharts@2.13.0`: React图表库
+- LineChart: 趋势图
+- PieChart: 饼图
+- ResponsiveContainer: 响应式容器
+
+**数据处理**:
+
+1. **时间范围过滤**:
+   ```typescript
+   const rangeMs = timeRange === 'all' ? Infinity : parseInt(timeRange) * 24 * 60 * 60 * 1000
+   const filteredData = data.filter(item => item.created_at >= startTime)
+   ```
+
+2. **按天分组统计**:
+   ```typescript
+   const trendData = useMemo(() => {
+     const dataMap: Record<string, { date, insights, topics, scripts }> = {}
+     
+     // 初始化所有日期（填充0）
+     for (let i = days - 1; i >= 0; i--) {
+       const date = new Date(now - i * 24 * 60 * 60 * 1000)
+       const dateStr = `${date.getMonth() + 1}/${date.getDate()}`
+       dataMap[dateStr] = { date: dateStr, insights: 0, topics: 0, scripts: 0 }
+     }
+     
+     // 累加数据
+     filteredData.forEach(item => {
+       const dateStr = formatDate(item.created_at)
+       if (dataMap[dateStr]) dataMap[dateStr].insights++
+     })
+     
+     return Object.values(dataMap)
+   }, [filteredData, timeRange])
+   ```
+
+3. **平台分布统计**:
+   ```typescript
+   const platformData = useMemo(() => {
+     const counts: Record<string, number> = {}
+     filteredTopics.forEach(topic => {
+       counts[topic.platform] = (counts[topic.platform] || 0) + 1
+     })
+     return Object.entries(counts)
+       .map(([platform, count]) => ({ name, value: count, color }))
+       .filter(item => item.value > 0)
+   }, [filteredTopics])
+   ```
+
+4. **自动隐藏逻辑**:
+   ```typescript
+   // 无数据时不显示面板
+   if (insights.length === 0 && topics.length === 0 && scripts.length === 0) {
+     return null
+   }
+   
+   // 无选题时不显示平台分布图
+   {platformData.length > 0 && <PieChart>...</PieChart>}
+   ```
+
+### 📝 使用场景
+
+**场景1: 每日复盘**
+- 打开Workbench查看趋势图
+- 了解今天/本周生成了多少内容
+- 对比昨天/上周的数据
+- 调整明天的工作节奏
+
+**场景2: 项目规划**
+- 查看30天趋势
+- 识别生产高峰期和低谷期
+- 规划未来的内容生产计划
+- 合理分配资源
+
+**场景3: 平台策略**
+- 查看平台分布饼图
+- 了解各平台选题占比
+- 调整平台投放策略
+- 平衡多平台布局
+
+**场景4: 团队汇报**
+- 截图展示数据趋势
+- 直观呈现工作成果
+- 支持决策讨论
+- 提升汇报效果
+
+### 🎯 里程碑意义
+
+**产品层面**:
+- 从工具型应用升级为数据驱动型应用
+- 提供数据洞察能力，而不仅是数据管理
+- 增强产品竞争力和专业度
+- 为后续高级分析功能奠定基础
+
+**技术层面**:
+- 成功集成recharts图表库
+- 建立数据可视化组件体系
+- 掌握时间序列数据处理
+- 响应式图表渲染
+
+**用户价值**:
+- 从"知道有多少"到"理解趋势如何"
+- 从数字堆积到视觉洞察
+- 从被动查看到主动发现
+- 从单点操作到全局把控
+
+### 🐛 错误处理
+
+- 无数据时不显示面板
+- 图表数据为空时显示空状态
+- 时间范围切换平滑无闪烁
+- 响应式布局自适应
+
+### 🚀 下一步展望
+
+基于v0.7.0的数据可视化基础，后续可以：
+1. 添加更多图表类型（柱状图、区域图）
+2. 优先级分布可视化
+3. 字数分布区间图
+4. 对比分析功能（本周 vs 上周）
+5. 数据导出为图片
+
+**建议暂停主功能迭代**：
+- 已连续完成6个版本（v0.6.0-v0.7.0）
+- 核心功能已完善（搜索、排序、导出、删除、可视化）
+- 需要真实用户反馈验证价值
+- 转向性能优化和体验打磨
+
+---
+
 ## v0.6.4 - 2026-04-06
 
 ### ✨ 新功能
