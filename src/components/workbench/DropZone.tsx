@@ -40,16 +40,15 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
     if (!files) return
     const arr = Array.from(files)
 
-    // Warn about large files (> 15MB for PDF)
+    // Warn about very large files (> 50MB)
     const largeFiles = arr.filter(f => {
       const sizeInMB = f.size / (1024 * 1024)
-      const isPDF = f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
-      return isPDF && sizeInMB > 15
+      return sizeInMB > 50
     })
 
     if (largeFiles.length > 0) {
       const names = largeFiles.map(f => `${f.name} (${formatSize(f.size)})`).join('、')
-      if (!confirm(`检测到大文件: ${names}\n\nPDF文件超过15MB可能解析较慢或失败，是否继续？`)) {
+      if (!confirm(`检测到大文件: ${names}\n\n文件超过50MB可能上传较慢，是否继续？`)) {
         return
       }
     }
@@ -153,7 +152,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false }: DropZ
             <p className="text-slate-300 font-medium mb-1">
               {isDragOver ? '释放文件以上传' : '拖放文件，或点击选择'}
             </p>
-            <p className="text-slate-500 text-sm">支持 Excel、CSV、PDF、图片、视频(MP4/MOV/WebM) · PDF建议不超过15MB</p>
+            <p className="text-slate-500 text-sm">支持 Excel、CSV、PDF、图片、视频(MP4/MOV/WebM) · 最大 50MB</p>
           </div>
           <div className="flex gap-3 mt-1">
             {[

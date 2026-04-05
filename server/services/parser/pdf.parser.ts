@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import Anthropic from '@anthropic-ai/sdk'
+import pdfParse from 'pdf-parse'
 import { getAnthropicClient } from '../claude/client.js'
 import { config } from '../../config.js'
 
@@ -11,53 +11,68 @@ export interface PDFParseResult {
   pageEstimate: number
 }
 
+/**
+ * 优化策略：使用pdf-parse快速提取文本，然后让Claude分析文本
+ * 相比直接让Claude处理PDF二进制，这种方式速度更快、更稳定
+ */
 export async function parsePDF(filePath: string): Promise<PDFParseResult> {
-  const client = getAnthropicClient()
   const buffer = readFileSync(filePath)
 
-  // Check file size (warn if > 10MB)
-  const sizeInMB = buffer.length / (1024 * 1024)
-  if (sizeInMB > 15) {
-    throw new Error(`PDF文件过大 (${sizeInMB.toFixed(1)}MB)，建议不超过15MB`)
-  }
-
-  const base64 = buffer.toString('base64')
-
-  const content: Anthropic.MessageParam['content'] = [
-    {
-      type: 'document',
-      source: {
-        type: 'base64',
-        media_type: 'application/pdf',
-        data: base64
-      }
-    } as Anthropic.DocumentBlockParam,
-    {
-      type: 'text',
-      text: `请提取并整理这份PDF文档的内容，返回以下JSON格式（直接输出JSON，不要markdown代码块）：
-{
-  "text": "文档完整文本内容",
-  "sections": [{"heading": "章节标题", "content": "章节内容"}],
-  "summary": "文档摘要（200字内）",
-  "pageEstimate": 估计页数
-}`
-    }
-  ]
+  // Step 1: 使用pdf-parse快速提取PDF文本（本地处理，速度快）
+  let extractedText: string
+  let pageCount: number
 
   try {
-    // Add timeout handling (60 seconds)
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('PDF解析超时（60秒），文件可能过大或内容复杂')), 60000)
+    const pdfData = await pdfParse(buffer, {
+      max: 0 // 提取所有页面
     })
 
-    const response = await Promise.race([
-      client.messages.create({
-        model: config.anthropicModel,
-        max_tokens: 4096,
-        messages: [{ role: 'user', content }]
-      }),
-      timeoutPromise
-    ])
+    extractedText = pdfData.text.trim()
+    pageCount = pdfData.numpages
+
+    if (!extractedText || extractedText.length < 10) {
+      throw new Error('PDF文本提取失败或内容为空，可能是扫描版PDF')
+    }
+  } catch (err) {
+    throw new Error(`PDF文本提取失败: ${err instanceof Error ? err.message : '未知错误'}`)
+  }
+
+  // Step 2: 让Claude分析提取的文本（比处理PDF二进制快得多）
+  const client = getAnthropicClient()
+
+  // 如果文本过长，截取前20000字符（约3000 tokens）
+  const textToAnalyze = extractedText.length > 20000
+    ? extractedText.slice(0, 20000) + '\n\n...(文档内容过长，已截取前20000字符)'
+    : extractedText
+
+  const prompt = `请分析以下PDF文档的文本内容，提取结构化信息。
+
+文档页数：${pageCount}页
+文档文本：
+${textToAnalyze}
+
+请返回以下JSON格式（直接输出JSON，不要markdown代码块）：
+{
+  "text": "文档完整文本内容（如果过长可以适当总结）",
+  "sections": [{"heading": "章节标题", "content": "章节内容"}],
+  "summary": "文档核心内容摘要（200字内）",
+  "pageEstimate": ${pageCount}
+}
+
+注意：
+1. 识别文档中的章节结构，提取标题和内容
+2. summary要突出关键信息和核心观点
+3. 直接输出JSON，不要使用markdown代码块`
+
+  try {
+    const response = await client.messages.create({
+      model: config.anthropicModel,
+      max_tokens: 4096,
+      messages: [{
+        role: 'user',
+        content: prompt
+      }]
+    })
 
     const textBlock = response.content.find(b => b.type === 'text')
     const rawText = textBlock?.type === 'text' ? textBlock.text : '{}'
@@ -65,24 +80,26 @@ export async function parsePDF(filePath: string): Promise<PDFParseResult> {
     try {
       const cleanJson = rawText.replace(/```json\n?|\n?```/g, '').trim()
       const parsed = JSON.parse(cleanJson) as Omit<PDFParseResult, 'type'>
-      return { type: 'pdf', ...parsed }
-    } catch {
+
+      // 确保返回完整的提取文本
       return {
         type: 'pdf',
-        text: rawText,
+        text: extractedText, // 使用完整提取的文本
+        sections: parsed.sections || [],
+        summary: parsed.summary || extractedText.slice(0, 200),
+        pageEstimate: pageCount
+      }
+    } catch {
+      // JSON解析失败，返回基础结构
+      return {
+        type: 'pdf',
+        text: extractedText,
         sections: [],
-        summary: rawText.slice(0, 200),
-        pageEstimate: 1
+        summary: extractedText.slice(0, 200),
+        pageEstimate: pageCount
       }
     }
   } catch (err) {
-    // Better error messages
-    if (err instanceof Error) {
-      if (err.message.includes('timeout') || err.message.includes('超时')) {
-        throw err
-      }
-      throw new Error(`PDF解析失败: ${err.message}`)
-    }
-    throw new Error('PDF解析失败: 未知错误')
+    throw new Error(`PDF分析失败: ${err instanceof Error ? err.message : '未知错误'}`)
   }
 }
