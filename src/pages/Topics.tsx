@@ -9,6 +9,7 @@ import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
 import { SearchBar } from '../components/shared/SearchBar.js'
 import { SortDropdown, SortOption } from '../components/shared/SortDropdown.js'
+import { FilterBar } from '../components/shared/FilterBar.js'
 import { TopicGrid } from '../components/topics/TopicGrid.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { TopicCard } from '../types/index.js'
@@ -22,6 +23,9 @@ export function Topics() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('priority')
   const [sortAscending, setSortAscending] = useState(false)
+  const [filterPlatform, setFilterPlatform] = useState('all')
+  const [filterPriority, setFilterPriority] = useState('all')
+  const [filterSelected, setFilterSelected] = useState('all')
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
   const {
     topics, selectedIds, status,
@@ -185,12 +189,32 @@ export function Topics() {
     { value: 'title', label: '标题' }
   ]
 
-  // Filter topics based on search query
-  const filteredTopics = searchQuery
-    ? topics.filter(topic =>
-        topic.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : topics
+  // Filter topics based on search query and filters
+  const filteredTopics = topics.filter(topic => {
+    // Search filter
+    if (searchQuery && !topic.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false
+    }
+
+    // Platform filter
+    if (filterPlatform !== 'all' && topic.platform !== filterPlatform) {
+      return false
+    }
+
+    // Priority filter
+    if (filterPriority !== 'all' && String(topic.priority || 0) !== filterPriority) {
+      return false
+    }
+
+    // Selected filter
+    if (filterSelected !== 'all') {
+      const isSelected = selectedIds.has(topic.id) || topic.selected
+      if (filterSelected === 'selected' && !isSelected) return false
+      if (filterSelected === 'unselected' && isSelected) return false
+    }
+
+    return true
+  })
 
   // Sort topics
   const sortedTopics = [...filteredTopics].sort((a, b) => {
@@ -292,6 +316,56 @@ export function Topics() {
               setSortBy(value)
               setSortAscending(ascending)
             }}
+          />
+        </div>
+      )}
+
+      {/* Filters */}
+      {topics.length > 0 && !isGenerating && (
+        <div className="mb-4">
+          <FilterBar
+            filters={[
+              {
+                label: '平台',
+                value: filterPlatform,
+                onChange: setFilterPlatform,
+                options: [
+                  { value: 'all', label: '全部' },
+                  { value: 'douyin', label: '抖音', count: topics.filter(t => t.platform === 'douyin').length },
+                  { value: 'kuaishou', label: '快手', count: topics.filter(t => t.platform === 'kuaishou').length },
+                  { value: 'xiaohongshu', label: '小红书', count: topics.filter(t => t.platform === 'xiaohongshu').length }
+                ]
+              },
+              {
+                label: '优先级',
+                value: filterPriority,
+                onChange: setFilterPriority,
+                options: [
+                  { value: 'all', label: '全部' },
+                  { value: '5', label: '5星', count: topics.filter(t => (t.priority || 0) === 5).length },
+                  { value: '4', label: '4星', count: topics.filter(t => (t.priority || 0) === 4).length },
+                  { value: '3', label: '3星', count: topics.filter(t => (t.priority || 0) === 3).length },
+                  { value: '2', label: '2星', count: topics.filter(t => (t.priority || 0) === 2).length },
+                  { value: '1', label: '1星', count: topics.filter(t => (t.priority || 0) === 1).length }
+                ]
+              },
+              {
+                label: '状态',
+                value: filterSelected,
+                onChange: setFilterSelected,
+                options: [
+                  { value: 'all', label: '全部' },
+                  { value: 'selected', label: '已选', count: topics.filter(t => selectedIds.has(t.id) || t.selected).length },
+                  { value: 'unselected', label: '未选', count: topics.filter(t => !selectedIds.has(t.id) && !t.selected).length }
+                ]
+              }
+            ]}
+            onClear={() => {
+              setFilterPlatform('all')
+              setFilterPriority('all')
+              setFilterSelected('all')
+            }}
+            resultCount={filteredTopics.length}
           />
         </div>
       )}
