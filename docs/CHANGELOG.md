@@ -1,5 +1,208 @@
 # 📋 更新日志
 
+## v0.5.0 - 2026-04-06
+
+### 🎉 重大更新
+
+这是一个里程碑版本，标志着应用从 v0.4.x（功能增强）升级到 v0.5.x（工作流自动化）阶段。
+
+### ✨ 新功能
+
+#### 一键生成全流程
+- 新增"一键生成战略报告"功能，位于数据工作台
+- 上传数据后，点击一个按钮自动完成完整工作流
+- 自动执行：洞察生成 → 选题策划 → 脚本创作 → 战略报告
+- 实时显示4个步骤的执行状态和进度
+- 完成后自动跳转到报告页面
+- 大幅降低使用门槛，提升工作效率
+
+### 🎨 UI/UX 改进
+
+**操作简化**:
+- 操作步骤: 5步 → 1步（降低80%）
+- 页面切换: 4次 → 0次  
+- 手动点击: 5次 → 1次
+- 学习成本显著降低
+- 出错概率显著降低（无需手动选择）
+
+**四种状态设计**:
+1. **idle（等待状态）**: 渐变背景卡片 + "🚀 一键生成"大按钮 + 流程说明
+2. **running（执行中）**: 进度列表 + 状态图标动画 + "请耐心等待"提示
+3. **success（成功）**: 统计信息 + "查看报告"和"重新生成"按钮
+4. **error（失败）**: 错误提示 + "重试"按钮
+
+**状态指示器**:
+- ✓ 已完成 - CheckCircle2（绿色）
+- ⟳ 进行中 - Loader2 动画（蓝色）
+- ✗ 失败 - XCircle（红色）
+- ○ 待执行 - 空心圆（灰色）
+
+**实时反馈**:
+- 显示每步生成数量（"生成洞察 (12)"）
+- 完成后显示完整统计（12条洞察、8个选题、16个脚本）
+- Toast 通知关键进度
+
+### 🔧 技术实现
+
+**新增组件**: `src/components/workbench/AutoGeneratePanel.tsx` (~280行)
+
+**核心功能**:
+```typescript
+const handleGenerate = async () => {
+  // Step 1: 生成洞察
+  updateStep('insights', { status: 'running' })
+  const insightsResponse = await insightApi.generateStream(projectId)
+  // SSE流式读取 + 状态更新
+  updateStep('insights', { status: 'completed', count: insights.length })
+  
+  // Step 2: 生成选题（自动选择所有洞察）
+  updateStep('topics', { status: 'running' })
+  const insightIds = insights.map(i => i.id)
+  await topicApi.generateStream(projectId, insightIds)
+  updateStep('topics', { status: 'completed', count: topics.length })
+  
+  // Step 3: 生成脚本（为所有选题生成）
+  updateStep('scripts', { status: 'running' })
+  for (const topic of topics) {
+    await scriptApi.generateStream(projectId, topic.id)
+  }
+  updateStep('scripts', { status: 'completed', count: scripts.length })
+  
+  // Step 4: 生成报告
+  updateStep('report', { status: 'running' })
+  await api.post('/report/generate', { projectId })
+  updateStep('report', { status: 'completed' })
+  
+  // 成功 → 跳转
+  setStatus('success')
+  toast.success('生成完成！', '点击"查看报告"查看结果')
+}
+```
+
+**集成位置**: `src/pages/Workbench.tsx`
+- 位于"视频URL分析"和"文件列表"之间
+- 条件显示：至少有1个文件解析完成时显示
+
+**SSE流式集成**:
+- 复用现有 `generateStream` API
+- 手动处理 ReadableStream（Reader + TextDecoder）
+- 逐行解析 `data: {...}` 格式
+- 实时更新组件状态和Zustand store
+
+**状态管理**:
+```typescript
+type Step = 'insights' | 'topics' | 'scripts' | 'report'
+type StepStatus = 'pending' | 'running' | 'completed' | 'error'
+
+interface StepInfo {
+  status: StepStatus
+  label: string
+  count?: number    // 生成数量
+  error?: string    // 错误信息
+}
+```
+
+### 💡 设计决策
+
+**为什么用前端编排而不是后端编排？**
+- ✅ 无需新增后端API，复用现有接口
+- ✅ 前端直接控制流程，灵活性高
+- ✅ 可以实时更新UI状态
+- ✅ 降低实现复杂度
+- ❌ 后端编排：需要后台任务队列、进度持久化、复杂度高
+
+**为什么顺序执行而不是并行？**
+- ✅ 步骤之间有依赖关系（选题依赖洞察ID，脚本依赖选题ID）
+- ✅ 保证数据一致性
+- ✅ 避免并发冲突
+- ❌ 并行执行：可能导致数据不一致，增加复杂度
+
+**为什么组件内状态而不是持久化？**
+- ✅ 简化实现，本版本足够用
+- ✅ 组件卸载时自动清理
+- ❌ 持久化：需要 localStorage 或后端存储，增加复杂度
+- 💡 后续可扩展（v0.5.1 可加持久化）
+
+**为什么在 Workbench 而不是新建独立页面？**
+- ✅ 与文件上传流程自然衔接（上传 → 一键生成）
+- ✅ 减少页面跳转，操作更连贯
+- ✅ 用户无需记忆新页面位置
+- ❌ 独立页面：增加导航复杂度
+
+### 🎯 用户价值
+
+**效率提升**:
+- ⏱️ 总耗时不变，但无需手动干预
+- 🚀 可以离开屏幕做其他事情
+- 📢 完成后自动通知（Toast）
+- 🎯 一键直达结果页面
+
+**体验提升**:
+- 🎓 学习成本降低：5步操作 → 1步操作
+- 🛡️ 出错概率降低：无需手动选择洞察/选题
+- 🎨 操作流畅：无需页面切换
+- ✨ 信心增强：实时看到进度反馈
+
+**产品成熟度**:
+- 📦 从"工具集"到"解决方案"
+- 🏆 从"需要培训"到"开箱即用"
+- 🌟 从"分步操作"到"自动化"
+
+### 🛡️ 错误处理
+
+**全局错误捕获**:
+```typescript
+try {
+  await executeWorkflow()
+} catch (error) {
+  setStatus('error')
+  toast.error('生成失败', error.message)
+  // 提供"重试"按钮
+}
+```
+
+**错误恢复**:
+- 显示具体错误信息
+- 提供"重试"按钮
+- 重置所有状态后可重新执行
+- 保留已上传的文件数据
+
+### 📝 代码统计
+
+- **新增组件**: 1 个（AutoGeneratePanel.tsx）
+- **新增代码**: ~280 行 TypeScript + TSX
+- **修改文件**: 1 个（Workbench.tsx，导入和渲染）
+- **新增依赖**: 0 个（复用现有API）
+- **测试用例**: 0 个（手动测试）
+
+### 🚀 里程碑意义
+
+v0.5.0 是应用发展的重要里程碑：
+
+1. **Minor版本升级**: v0.4.x → v0.5.x
+2. **能力跃升**: 从"分步操作"到"自动化工作流"
+3. **用户价值**: 大幅降低使用门槛和学习成本
+4. **产品成熟度**: 从"工具集"到"解决方案"
+
+### 后续优化方向
+
+**v0.5.1 - 进度持久化（可选）**:
+- 使用 localStorage 保存进度
+- 页面刷新后恢复进度
+- 支持"从上次中断处继续"
+
+**v0.5.2 - 自定义生成参数（可选）**:
+- 允许用户配置生成数量（洞察数、选题数）
+- 允许用户选择生成平台（抖音/快手/小红书）
+- 允许用户跳过某些步骤
+
+**v0.6.0 - 批量处理和定时任务（未来）**:
+- 支持多个项目批量生成
+- 支持定时任务（每天自动生成）
+- 支持生成模板（快速套用）
+
+---
+
 ## v0.4.2 - 2026-04-06
 
 ### ✨ 新功能
