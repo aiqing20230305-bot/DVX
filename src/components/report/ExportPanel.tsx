@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Download, BookOpen, CheckCircle2 } from 'lucide-react'
+import { Download, BookOpen, CheckCircle2, FileText } from 'lucide-react'
 import { Button } from '../shared/Button.js'
+import { toast } from '../../store/toast.store.js'
 
 interface ExportPanelProps {
   projectId: string
@@ -36,6 +37,20 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
 
   const handleCopyHtml = () => {
     navigator.clipboard.writeText(reportHtml)
+    toast.success('已复制', 'HTML源码已复制到剪贴板')
+  }
+
+  const handlePrintToPDF = () => {
+    if (!reportHtml) {
+      toast.error('无法打印', '请先生成报告')
+      return
+    }
+
+    // Open print dialog
+    window.print()
+
+    // Show helpful toast
+    toast.info('打印提示', '在打印对话框中选择"另存为PDF"即可保存')
   }
 
   return (
@@ -44,9 +59,20 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
       <div className="space-y-3">
         <Button
           variant="primary"
+          icon={<FileText size={15} />}
+          onClick={handlePrintToPDF}
+          disabled={!reportHtml}
+          className="w-full justify-center"
+        >
+          打印为 PDF
+        </Button>
+
+        <Button
+          variant="secondary"
           icon={<Download size={15} />}
           onClick={handleExportHTML}
           loading={downloadingHtml}
+          disabled={!reportHtml}
           className="w-full justify-center"
         >
           下载 HTML 报告
