@@ -71,7 +71,8 @@ export function Sidebar() {
     <>
       <aside className={[
         'flex flex-col h-full bg-slate-900 border-r border-slate-800 transition-all duration-300 flex-shrink-0',
-        sidebarCollapsed ? 'w-16' : 'w-60'
+        'md:relative fixed left-0 top-0 bottom-0 z-50',
+        sidebarCollapsed ? 'w-16 md:w-16 -translate-x-full md:translate-x-0' : 'w-60'
       ].join(' ')}>
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-slate-800">
@@ -79,7 +80,7 @@ export function Sidebar() {
             <Zap size={16} className="text-white" />
           </div>
           {!sidebarCollapsed && (
-            <div className="min-w-0">
+            <div className="min-w-0 animate-fade-in-scale">
               <div className="font-bold text-slate-100 text-sm leading-tight">超级洞察</div>
               <div className="text-xs text-slate-500">AI 内容战略平台</div>
             </div>
@@ -88,7 +89,7 @@ export function Sidebar() {
 
         {/* Project selector */}
         {!sidebarCollapsed && (
-          <div className="px-3 py-3 border-b border-slate-800">
+          <div className="px-3 py-3 border-b border-slate-800 animate-fade-in-scale">
             <div className="relative">
               <div className="flex gap-1">
                 <button
@@ -112,12 +113,13 @@ export function Sidebar() {
               </div>
 
               {projectDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl shadow-black/50 z-50 overflow-hidden">
-                  {projects.map(project => (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl shadow-black/50 z-50 overflow-hidden animate-fade-in-down">
+                  {projects.map((project, index) => (
                     <div
                       key={project.id}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 cursor-pointer group"
+                      className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 cursor-pointer group transition-colors duration-150"
                       onClick={() => { setActiveProject(project.id); setProjectDropdown(false) }}
+                      style={{ animationDelay: `${index * 30}ms` }}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="text-sm text-slate-200 truncate">{project.name}</div>
@@ -153,10 +155,10 @@ export function Sidebar() {
                 to={to}
                 end={end}
                 className={({ isActive }) => [
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative overflow-hidden',
                   isActive
-                    ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-600/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent'
+                    ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-600/30 shadow-lg shadow-indigo-900/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800 hover:shadow-md hover:shadow-black/20 border border-transparent hover:border-slate-700'
                 ].join(' ')}
                 title={sidebarCollapsed ? label : undefined}
               >
