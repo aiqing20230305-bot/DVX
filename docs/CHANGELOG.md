@@ -1,5 +1,185 @@
 # 📋 更新日志
 
+## v0.7.2 - 2026-04-06
+
+### ✨ 新功能
+
+#### 高级筛选功能
+- 支持按平台、优先级、状态多维度筛选选题
+- 与搜索、排序协同工作，形成完整的数据查找体系
+- 实时显示筛选结果数量
+- 一键清除筛选条件
+
+### 🎯 功能详情
+
+**筛选维度**（Topics页面）:
+1. **平台筛选**: 全部/抖音/快手/小红书
+2. **优先级筛选**: 全部/5星/4星/3星/2星/1星
+3. **状态筛选**: 全部/已选/未选
+
+**筛选特性**:
+- 显示每个选项的数量（如"抖音 (5)"）
+- 当前选中项高亮显示（蓝色背景）
+- 多个筛选条件可同时生效
+- 有筛选时显示"清除筛选"按钮
+- 显示筛选后的结果数量
+
+### 🎨 UI/UX 改进
+
+**FilterBar组件**:
+- 灰色背景卡片，视觉层次清晰
+- 筛选图标 + "筛选"标签
+- 标签按钮式选项（非下拉菜单）
+- 选中项：蓝色背景 + 白色文字
+- 未选中：灰色背景 + 灰色文字
+- 每个选项显示数量（括号内）
+
+**布局设计**:
+- 横向排列，自动换行
+- 左侧：筛选分组（平台/优先级/状态）
+- 右侧：清除按钮 + 结果数量
+
+**交互流程**:
+1. 点击筛选选项（如"抖音"）
+2. 列表立即过滤显示抖音选题
+3. 可继续叠加其他筛选（如"5星"）
+4. 点击"清除筛选"恢复全部数据
+
+**数据查找三件套**:
+1. **搜索**（v0.6.0）：按关键词查找
+2. **排序**（v0.6.4）：按字段排序
+3. **筛选**（v0.7.2）：按条件过滤 ⭐ 完成
+
+**用户价值**:
+- 精准定位：快速找到特定平台、优先级的选题
+- 灵活组合：多个筛选条件叠加使用
+- 数据洞察：每个选项显示数量，了解分布情况
+- 效率提升：避免滚动查找，直达目标
+
+### 🔧 技术实现
+
+**新增组件**: `src/components/shared/FilterBar.tsx` (~70行)
+
+**组件Props**:
+```typescript
+interface FilterBarProps {
+  filters: {
+    label: string          // 筛选组标签（如"平台"）
+    options: FilterOption[]  // 选项列表
+    value: string           // 当前选中值
+    onChange: (value: string) => void  // 变化回调
+  }[]
+  onClear?: () => void      // 清除筛选回调
+  resultCount?: number      // 结果数量
+}
+
+interface FilterOption {
+  value: string   // 选项值
+  label: string   // 显示文本
+  count?: number  // 数量（可选）
+}
+```
+
+**筛选逻辑**（Topics页面）:
+```typescript
+const filteredTopics = topics.filter(topic => {
+  // 搜索过滤
+  if (searchQuery && !topic.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+    return false
+  }
+
+  // 平台过滤
+  if (filterPlatform !== 'all' && topic.platform !== filterPlatform) {
+    return false
+  }
+
+  // 优先级过滤
+  if (filterPriority !== 'all' && String(topic.priority || 0) !== filterPriority) {
+    return false
+  }
+
+  // 状态过滤
+  if (filterSelected !== 'all') {
+    const isSelected = selectedIds.has(topic.id) || topic.selected
+    if (filterSelected === 'selected' && !isSelected) return false
+    if (filterSelected === 'unselected' && isSelected) return false
+  }
+
+  return true
+})
+```
+
+**链式处理**:
+```typescript
+// 1. 搜索 + 筛选
+const filtered = topics.filter(搜索条件 && 筛选条件)
+
+// 2. 排序
+const sorted = filtered.sort(排序逻辑)
+
+// 3. 渲染
+<TopicGrid topics={sorted} />
+```
+
+**数量统计**:
+```typescript
+filters={[
+  {
+    label: '平台',
+    options: [
+      { value: 'all', label: '全部' },
+      { 
+        value: 'douyin', 
+        label: '抖音', 
+        count: topics.filter(t => t.platform === 'douyin').length 
+      },
+      // ...
+    ]
+  }
+]}
+```
+
+### 📝 使用场景
+
+**场景1: 精准定位**
+- 筛选"抖音" + "5星" + "已选"
+- 快速找到高优先级的抖音选题
+- 优先安排制作
+
+**场景2: 平台分析**
+- 点击"小红书"筛选
+- 查看所有小红书选题
+- 了解小红书内容储备
+
+**场景3: 优先级管理**
+- 筛选"1星"选题
+- 查看低优先级内容
+- 决定是否删除或提升
+
+**场景4: 组合查找**
+- 搜索"美妆" + 筛选"抖音" + 排序"优先级降序"
+- 快速找到最重要的抖音美妆选题
+- 数据查找三件套协同发力
+
+### 🎯 产品能力矩阵
+
+| 功能 | 版本 | 能力 | 状态 |
+|------|------|------|------|
+| 搜索 | v0.6.0 | 关键词查找 | ✅ |
+| 排序 | v0.6.4 | 多维度排序 | ✅ |
+| 筛选 | v0.7.2 | 多条件过滤 | ✅ |
+
+**数据查找体系已完整搭建！**
+
+### 🐛 错误处理
+
+- 筛选条件为空时显示全部数据
+- 筛选结果为空时正常显示空状态
+- 清除筛选立即恢复
+- 筛选不影响原始数据
+
+---
+
 ## v0.7.1 - 2026-04-06
 
 ### ✨ 新功能
