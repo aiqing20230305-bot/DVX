@@ -14,6 +14,7 @@ import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
+import { useDebounce } from '../hooks/useDebounce.js'
 import { Script, ScriptSegment, TopicCard } from '../types/index.js'
 import { PlatformBadge } from '../components/shared/Badge.js'
 import { exportScriptsToExcel } from '../utils/export.utils.js'
@@ -25,6 +26,7 @@ export function Scripts() {
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [sortBy, setSortBy] = useState('created_at')
   const [sortAscending, setSortAscending] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -102,9 +104,9 @@ export function Scripts() {
   ]
 
   // Filter selected topics based on search query
-  const filteredSelectedTopics = searchQuery
+  const filteredSelectedTopics = debouncedSearchQuery
     ? selectedTopics.filter(topic =>
-        topic.title.toLowerCase().includes(searchQuery.toLowerCase())
+        topic.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
       )
     : selectedTopics
 

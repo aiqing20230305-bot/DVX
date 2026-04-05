@@ -23,7 +23,7 @@ function TrendIcon({ trend }: { trend?: string }) {
   return <Minus size={14} className="text-slate-500" />
 }
 
-export function InsightCard({ insight, selected = false, onToggleSelect }: InsightCardProps) {
+export const InsightCard = React.memo(function InsightCard({ insight, selected = false, onToggleSelect }: InsightCardProps) {
   return (
     <div
       className={[
@@ -87,4 +87,4 @@ export function InsightCard({ insight, selected = false, onToggleSelect }: Insig
       )}
     </div>
   )
-}
+})

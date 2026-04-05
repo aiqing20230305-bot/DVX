@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lightbulb, Zap, ArrowRight, Check, RotateCcw, Download, Trash2, CheckCircle, XCircle, FileDown } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
@@ -13,6 +13,7 @@ import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
+import { useDebounce } from '../hooks/useDebounce.js'
 import { Insight } from '../types/index.js'
 import { exportInsightsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
@@ -23,6 +24,7 @@ export function Insights() {
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [sortBy, setSortBy] = useState('created_at')
   const [sortAscending, setSortAscending] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -244,24 +246,27 @@ export function Insights() {
     { value: 'title', label: '标题' }
   ]
 
-  // Filter insights based on search query
-  const filteredInsights = searchQuery
-    ? insights.filter(insight =>
-        insight.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        insight.summary.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : insights
+  // Filter and sort insights (memoized for performance)
+  const sortedInsights = useMemo(() => {
+    // Filter based on debounced search query
+    const filtered = debouncedSearchQuery
+      ? insights.filter(insight =>
+          insight.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+          insight.summary.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+        )
+      : insights
 
-  // Sort insights
-  const sortedInsights = [...filteredInsights].sort((a, b) => {
-    let comparison = 0
-    if (sortBy === 'created_at') {
-      comparison = a.created_at - b.created_at
-    } else if (sortBy === 'title') {
-      comparison = a.title.localeCompare(b.title, 'zh-CN')
-    }
-    return sortAscending ? comparison : -comparison
-  })
+    // Sort
+    return [...filtered].sort((a, b) => {
+      let comparison = 0
+      if (sortBy === 'created_at') {
+        comparison = a.created_at - b.created_at
+      } else if (sortBy === 'title') {
+        comparison = a.title.localeCompare(b.title, 'zh-CN')
+      }
+      return sortAscending ? comparison : -comparison
+    })
+  }, [insights, debouncedSearchQuery, sortBy, sortAscending])
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">

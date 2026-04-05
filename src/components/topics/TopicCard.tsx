@@ -16,7 +16,7 @@ const platformAccent: Record<string, string> = {
   xiaohongshu: 'border-red-800/40 hover:border-red-700/60',
 }
 
-export function TopicCard({ topic, selected = false, onToggleSelect, onPriorityChange }: TopicCardProps) {
+export const TopicCard = React.memo(function TopicCard({ topic, selected = false, onToggleSelect, onPriorityChange }: TopicCardProps) {
   const duration = topic.estimated_duration
   const durationStr = duration >= 60 ? `${Math.floor(duration / 60)}分${duration % 60 > 0 ? `${duration % 60}秒` : ''}` : `${duration}秒`
 
@@ -91,4 +91,4 @@ export function TopicCard({ topic, selected = false, onToggleSelect, onPriorityC
       )}
     </div>
   )
-}
+})

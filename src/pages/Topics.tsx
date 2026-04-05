@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2, Star, CheckCircle, XCircle, FileDown } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
@@ -16,6 +16,7 @@ import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
+import { useDebounce } from '../hooks/useDebounce.js'
 import { TopicCard } from '../types/index.js'
 import { exportTopicsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
@@ -26,6 +27,7 @@ export function Topics() {
   const { activeProjectId } = useProjectStore()
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [sortBy, setSortBy] = useState('priority')
   const [sortAscending, setSortAscending] = useState(false)
   const [filterPlatform, setFilterPlatform] = useState('all')
@@ -294,45 +296,48 @@ export function Topics() {
     { value: 'title', label: '标题' }
   ]
 
-  // Filter topics based on search query and filters
-  const filteredTopics = topics.filter(topic => {
-    // Search filter
-    if (searchQuery && !topic.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false
-    }
+  // Filter and sort topics (memoized for performance)
+  const sortedTopics = useMemo(() => {
+    // Filter based on debounced search query and filters
+    const filtered = topics.filter(topic => {
+      // Search filter
+      if (debouncedSearchQuery && !topic.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())) {
+        return false
+      }
 
-    // Platform filter
-    if (filterPlatform !== 'all' && topic.platform !== filterPlatform) {
-      return false
-    }
+      // Platform filter
+      if (filterPlatform !== 'all' && topic.platform !== filterPlatform) {
+        return false
+      }
 
-    // Priority filter
-    if (filterPriority !== 'all' && String(topic.priority || 0) !== filterPriority) {
-      return false
-    }
+      // Priority filter
+      if (filterPriority !== 'all' && String(topic.priority || 0) !== filterPriority) {
+        return false
+      }
 
-    // Selected filter
-    if (filterSelected !== 'all') {
-      const isSelected = selectedIds.has(topic.id) || topic.selected
-      if (filterSelected === 'selected' && !isSelected) return false
-      if (filterSelected === 'unselected' && isSelected) return false
-    }
+      // Selected filter
+      if (filterSelected !== 'all') {
+        const isSelected = selectedIds.has(topic.id) || topic.selected
+        if (filterSelected === 'selected' && !isSelected) return false
+        if (filterSelected === 'unselected' && isSelected) return false
+      }
 
-    return true
-  })
+      return true
+    })
 
-  // Sort topics
-  const sortedTopics = [...filteredTopics].sort((a, b) => {
-    let comparison = 0
-    if (sortBy === 'priority') {
-      comparison = (a.priority || 0) - (b.priority || 0)
-    } else if (sortBy === 'created_at') {
-      comparison = a.created_at - b.created_at
-    } else if (sortBy === 'title') {
-      comparison = a.title.localeCompare(b.title, 'zh-CN')
-    }
-    return sortAscending ? comparison : -comparison
-  })
+    // Sort
+    return [...filtered].sort((a, b) => {
+      let comparison = 0
+      if (sortBy === 'priority') {
+        comparison = (a.priority || 0) - (b.priority || 0)
+      } else if (sortBy === 'created_at') {
+        comparison = a.created_at - b.created_at
+      } else if (sortBy === 'title') {
+        comparison = a.title.localeCompare(b.title, 'zh-CN')
+      }
+      return sortAscending ? comparison : -comparison
+    })
+  }, [topics, debouncedSearchQuery, filterPlatform, filterPriority, filterSelected, selectedIds, sortBy, sortAscending])
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
