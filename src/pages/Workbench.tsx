@@ -152,32 +152,32 @@ export function Workbench() {
       {/* Page header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
-            <Database size={18} className="text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
+            <Database size={18} className="text-[#5B8EFF]" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">数据工作台</h1>
+          <h1 className="text-2xl font-bold text-[#1F2329]">数据工作台</h1>
         </div>
-        <p className="text-slate-500 text-sm ml-12">上传电商数据文件，AI 自动解析并提取结构化信息</p>
+        <p className="text-[#8F959E] text-sm ml-12">上传电商数据文件，AI 自动解析并提取结构化信息</p>
       </div>
 
       {/* Project info */}
       {!activeProject ? (
-        <div className="mb-6 p-4 bg-amber-900/20 border border-amber-700/40 rounded-xl flex items-start gap-3">
-          <AlertCircle size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+          <AlertCircle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
-            <div className="text-sm font-medium text-amber-300 mb-1">尚未创建项目</div>
-            <p className="text-xs text-amber-400/80">请先在侧边栏创建一个项目，然后上传文件</p>
+            <div className="text-sm font-medium text-amber-900 mb-1">尚未创建项目</div>
+            <p className="text-xs text-amber-700">请先在侧边栏创建一个项目，然后上传文件</p>
           </div>
         </div>
       ) : (
-        <div className="mb-6 px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl flex items-center justify-between">
+        <div className="mb-6 px-4 py-3 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl flex items-center justify-between">
           <div>
-            <span className="text-xs text-slate-500">当前项目</span>
-            <div className="text-sm font-medium text-slate-200">{activeProject.name}</div>
+            <span className="text-xs text-[#8F959E]">当前项目</span>
+            <div className="text-sm font-medium text-[#1F2329]">{activeProject.name}</div>
           </div>
           <button
             onClick={fetchFiles}
-            className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700 transition-colors"
+            className="p-2 rounded-lg text-[#8F959E] hover:text-[#646A73] hover:bg-[#DEE0E3] transition-colors"
             title="刷新"
           >
             <RefreshCw size={14} />
@@ -187,10 +187,10 @@ export function Workbench() {
 
       {/* Error message */}
       {error && (
-        <div className="mb-4 p-3 bg-red-900/20 border border-red-700/40 rounded-xl flex items-center gap-2 text-sm text-red-400">
-          <AlertCircle size={15} />
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-sm text-red-900">
+          <AlertCircle size={15} className="text-red-600" />
           {error}
-          <button onClick={() => setError(null)} className="ml-auto text-red-500 hover:text-red-300">✕</button>
+          <button onClick={() => setError(null)} className="ml-auto text-red-600 hover:text-red-800">✕</button>
         </div>
       )}
 
@@ -212,11 +212,11 @@ export function Workbench() {
 
       {/* Video URL analysis */}
       {activeProjectId && (
-        <div className="mb-8 p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="mb-8 p-4 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl">
           <div className="flex items-center gap-2 mb-3">
             <Film size={16} className="text-purple-400" />
-            <h3 className="text-sm font-medium text-slate-200">视频URL分析</h3>
-            <span className="text-xs text-slate-500">输入视频链接，AI自动提取关键帧并分析</span>
+            <h3 className="text-sm font-medium text-[#1F2329]">视频URL分析</h3>
+            <span className="text-xs text-[#8F959E]">输入视频链接，AI自动提取关键帧并分析</span>
           </div>
           <div className="flex gap-2">
             <div className="flex-1">
@@ -236,7 +236,7 @@ export function Workbench() {
             <button
               onClick={handleVideoUrlAnalyze}
               disabled={!videoUrl.trim() || videoAnalyzing}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 disabled:text-slate-500 text-white text-sm rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-[#DEE0E3] disabled:text-[#8F959E] text-white text-sm rounded-lg transition-colors flex items-center gap-2"
             >
               {videoAnalyzing ? (
                 <>
@@ -260,11 +260,45 @@ export function Workbench() {
       {/* Auto-generate panel */}
       {canGenerateInsights && <AutoGeneratePanel />}
 
+      {/* Uploading status banner */}
+      {uploadingCount > 0 && (
+        <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700/40 rounded-xl">
+          <div className="flex items-center gap-3">
+            <Loader2 size={18} className="text-blue-400 animate-spin flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-sm font-medium text-blue-300 mb-0.5">
+                正在上传文件...
+              </div>
+              <div className="text-xs text-blue-400/80">
+                {uploadingCount} 个文件正在上传中
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Parsing status banner */}
+      {files.some(f => f.status === 'parsing') && (
+        <div className="mb-4 p-4 bg-amber-900/20 border border-amber-700/40 rounded-xl">
+          <div className="flex items-center gap-3">
+            <Loader2 size={18} className="text-amber-400 animate-spin flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-sm font-medium text-amber-300 mb-0.5">
+                AI 正在解析文件...
+              </div>
+              <div className="text-xs text-amber-400/80">
+                {files.filter(f => f.status === 'parsing').length} 个文件正在解析中，请稍候
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Files list */}
       {initialLoading ? (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-200">
+            <h2 className="text-base font-semibold text-[#1F2329]">
               加载中...
             </h2>
           </div>
@@ -273,9 +307,9 @@ export function Workbench() {
       ) : files.length > 0 ? (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-200">
+            <h2 className="text-base font-semibold text-[#1F2329]">
               已上传文件
-              <span className="ml-2 text-sm font-normal text-slate-500">
+              <span className="ml-2 text-sm font-normal text-[#8F959E]">
                 ({readyCount}/{files.length} 已解析)
               </span>
             </h2>

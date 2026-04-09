@@ -23,7 +23,7 @@ export function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        className="bg-slate-800 border border-slate-700 rounded-lg p-6 max-w-md mx-4 shadow-xl"
+        className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6 max-w-md mx-4 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3 mb-4">
@@ -35,14 +35,14 @@ export function ConfirmDialog({
             </div>
           )}
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-slate-100 mb-2">{title}</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">{message}</p>
+            <h3 className="text-lg font-semibold text-[#1F2329] mb-2">{title}</h3>
+            <p className="text-sm text-[#646A73] leading-relaxed">{message}</p>
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-[#F2F3F5] hover:bg-[#DEE0E3] text-[#646A73] rounded-lg transition-colors text-sm font-medium"
           >
             取消
           </button>
@@ -51,7 +51,7 @@ export function ConfirmDialog({
             className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
               danger
                 ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                : 'bg-[#3370FF] hover:bg-[#1E4FD9] text-white'
             }`}
           >
             确认

@@ -203,12 +203,12 @@ export function Scripts() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
-            <PenTool size={18} className="text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
+            <PenTool size={18} className="text-[#5B8EFF]" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">脚本创作</h1>
+          <h1 className="text-2xl font-bold text-[#1F2329]">脚本创作</h1>
         </div>
-        <p className="text-slate-500 text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
+        <p className="text-[#8F959E] text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
       {/* Batch Toolbar */}
@@ -258,18 +258,18 @@ export function Scripts() {
       {initialLoading ? (
         <div>
           <div className="flex items-center gap-2 mb-5">
-            <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
-            <span className="text-sm text-slate-500">加载已有脚本和选题...</span>
+            <div className="w-2 h-2 rounded-full bg-[#C9CDD4] animate-pulse" />
+            <span className="text-sm text-[#8F959E]">加载已有脚本和选题...</span>
           </div>
           <CardSkeleton count={3} />
         </div>
       ) : selectedTopics.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
-            <PenTool size={28} className="text-slate-600" />
+          <div className="w-16 h-16 rounded-2xl bg-[#F7F8FA] border border-[#DEE0E3] flex items-center justify-center mx-auto mb-4">
+            <PenTool size={28} className="text-[#C9CDD4]" />
           </div>
-          <h3 className="text-slate-400 font-medium mb-2">没有已选选题</h3>
-          <p className="text-slate-600 text-sm mb-6">请先在「选题策划」页面选择要创作脚本的选题</p>
+          <h3 className="text-[#646A73] font-medium mb-2">没有已选选题</h3>
+          <p className="text-[#C9CDD4] text-sm mb-6">请先在「选题策划」页面选择要创作脚本的选题</p>
           <Button variant="secondary" onClick={() => navigate('/topics')}>
             前往选题策划
           </Button>
@@ -299,15 +299,15 @@ export function Scripts() {
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id
 
           return (
-            <div key={topic.id} className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+            <div key={topic.id} className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl overflow-hidden">
               {/* Topic header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#DEE0E3]">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <PlatformBadge platform={topic.platform} />
-                    <span className="text-xs text-slate-500">{topic.estimated_duration}秒</span>
+                    <span className="text-xs text-[#8F959E]">{topic.estimated_duration}秒</span>
                   </div>
-                  <h3 className="text-base font-semibold text-slate-100 truncate">{topic.title}</h3>
+                  <h3 className="text-base font-semibold text-[#1F2329] truncate">{topic.title}</h3>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <Button
@@ -323,14 +323,14 @@ export function Scripts() {
                     <>
                       <button
                         onClick={() => handleDeleteTopicScripts(topic.id, topic.title)}
-                        className="p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-slate-700 transition-colors"
+                        className="p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-[#DEE0E3] transition-colors"
                         title="删除该选题的所有脚本"
                       >
                         <Trash2 size={14} />
                       </button>
                       <button
                         onClick={() => toggleTopicExpand(topic.id)}
-                        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors"
+                        className="p-2 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#DEE0E3] transition-colors"
                       >
                         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </button>
@@ -351,12 +351,12 @@ export function Scripts() {
               )}
 
               {topicScripts.length > 0 && !isExpanded && !isGeneratingThis && (
-                <div className="px-5 py-3 flex items-center gap-4 text-xs text-slate-600">
+                <div className="px-5 py-3 flex items-center gap-4 text-xs text-[#C9CDD4]">
                   <span>A版 · {topicScripts.find(s => s.variant === 'A')?.word_count ?? 0}字</span>
                   <span>B版 · {topicScripts.find(s => s.variant === 'B')?.word_count ?? 0}字</span>
                   <button
                     onClick={() => toggleTopicExpand(topic.id)}
-                    className="text-indigo-400 hover:text-indigo-300 transition-colors ml-auto"
+                    className="text-[#5B8EFF] hover:text-[#5B8EFF] transition-colors ml-auto"
                   >
                     展开查看 →
                   </button>

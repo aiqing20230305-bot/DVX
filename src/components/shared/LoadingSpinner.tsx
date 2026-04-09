@@ -18,15 +18,15 @@ export function LoadingSpinner({ size = 'md', text, center = true }: LoadingSpin
     <div className="inline-flex flex-col items-center gap-3 animate-fade-in">
       <div className="relative">
         {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20 animate-pulse" />
+        <div className="absolute inset-0 rounded-full border-2 border-[#3370FF]/20 animate-pulse" />
         {/* Spinner */}
         <Loader2
           size={sizeMap[size]}
-          className="animate-spinner text-indigo-400"
+          className="animate-spinner text-[#3370FF]"
         />
       </div>
       {text && (
-        <p className="text-sm text-slate-400 animate-pulse">{text}</p>
+        <p className="text-sm text-[#646A73] animate-pulse">{text}</p>
       )}
     </div>
   )
@@ -69,7 +69,7 @@ export function CardSkeleton({ count = 1 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="bg-slate-800 border border-slate-700 rounded-xl p-4 animate-fade-in"
+          className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-4 animate-fade-in"
           style={{ animationDelay: `${i * 100}ms` }}
         >
           <div className="flex items-start gap-4">

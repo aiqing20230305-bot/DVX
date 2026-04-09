@@ -12,12 +12,22 @@ export async function generateTopicsStream(projectId: string, insightIds: string
 
   try {
     const allInsights = insightRepo.findByProject(projectId)
-    const selectedInsights = insightIds.length > 0
+
+    // Determine which insights to use:
+    // 1. If insightIds specified, use those
+    // 2. Otherwise check for manually selected insights
+    // 3. If none selected, auto-select all insights (UX improvement)
+    let selectedInsights = insightIds.length > 0
       ? allInsights.filter(i => insightIds.includes(i.id))
       : allInsights.filter(i => i.selected === 1)
 
+    // Auto-select all insights if none are selected
     if (selectedInsights.length === 0) {
-      sendSSEEvent(res, 'error', { message: '请先选择至少一个洞察' })
+      selectedInsights = allInsights
+    }
+
+    if (selectedInsights.length === 0) {
+      sendSSEEvent(res, 'error', { message: '该项目暂无洞察，请先生成洞察' })
       closeSSE(res)
       return
     }

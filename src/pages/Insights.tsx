@@ -273,12 +273,12 @@ export function Insights() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
-            <Lightbulb size={18} className="text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
+            <Lightbulb size={18} className="text-[#5B8EFF]" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">洞察引擎</h1>
+          <h1 className="text-2xl font-bold text-[#1F2329]">洞察引擎</h1>
         </div>
-        <p className="text-slate-500 text-sm ml-12">AI 深度分析上传数据，挖掘电商内容机会</p>
+        <p className="text-[#8F959E] text-sm ml-12">AI 深度分析上传数据，挖掘电商内容机会</p>
       </div>
 
       {/* Controls */}
@@ -371,7 +371,7 @@ export function Insights() {
 
       {/* Insight selection tip */}
       {status === 'success' && insights.length > 0 && (
-        <div className="mb-4 px-4 py-2.5 bg-indigo-900/20 border border-indigo-700/30 rounded-xl text-xs text-indigo-300">
+        <div className="mb-4 px-4 py-2.5 bg-[#3370FF]/8 border border-[#3370FF]/20 rounded-xl text-xs text-[#1F2329]">
           点击洞察卡片选择（建议选 3-5 条），然后点击「生成选题」进入下一步
         </div>
       )}

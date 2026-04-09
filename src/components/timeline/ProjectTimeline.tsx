@@ -36,7 +36,7 @@ const actionColors: Record<string, string> = {
   insight: 'text-yellow-400 bg-yellow-900/20',
   topic: 'text-purple-400 bg-purple-900/20',
   script: 'text-pink-400 bg-pink-900/20',
-  report: 'text-indigo-400 bg-indigo-900/20',
+  report: 'text-[#5B8EFF] bg-[#0D3DB8]/20',
 }
 
 const actionLabels: Record<string, string> = {
@@ -73,14 +73,14 @@ export function ProjectTimeline({ projectId, limit = 50 }: ProjectTimelineProps)
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader className="animate-spin text-indigo-500" size={24} />
+        <Loader className="animate-spin text-[#3370FF]" size={24} />
       </div>
     )
   }
 
   if (logs.length === 0) {
     return (
-      <div className="text-center text-slate-500 py-8">
+      <div className="text-center text-[#8F959E] py-8">
         暂无活动记录
       </div>
     )
@@ -90,14 +90,14 @@ export function ProjectTimeline({ projectId, limit = 50 }: ProjectTimelineProps)
     <div className="space-y-3">
       {displayedLogs.map((log, index) => {
         const Icon = actionIcons[log.action] || Clock
-        const colorClass = actionColors[log.action] || 'text-slate-400 bg-slate-800'
+        const colorClass = actionColors[log.action] || 'text-[#646A73] bg-[#F7F8FA]'
         const label = actionLabels[log.action] || log.action
 
         return (
           <div key={log.id} className="flex gap-3 relative">
             {/* Timeline line */}
             {index < displayedLogs.length - 1 && (
-              <div className="absolute left-5 top-10 bottom-0 w-0.5 bg-slate-700" />
+              <div className="absolute left-5 top-10 bottom-0 w-0.5 bg-[#DEE0E3]" />
             )}
 
             {/* Icon */}
@@ -109,12 +109,12 @@ export function ProjectTimeline({ projectId, limit = 50 }: ProjectTimelineProps)
             <div className="flex-1 min-w-0 pt-1">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-slate-200">{label}</div>
+                  <div className="text-sm font-medium text-[#1F2329]">{label}</div>
                   {log.details && (
-                    <div className="text-xs text-slate-400 mt-0.5 line-clamp-2">{log.details}</div>
+                    <div className="text-xs text-[#646A73] mt-0.5 line-clamp-2">{log.details}</div>
                   )}
                 </div>
-                <div className="text-xs text-slate-500 flex-shrink-0">
+                <div className="text-xs text-[#8F959E] flex-shrink-0">
                   {formatDistanceToNow(log.created_at)}
                 </div>
               </div>
@@ -126,7 +126,7 @@ export function ProjectTimeline({ projectId, limit = 50 }: ProjectTimelineProps)
       {logs.length > 10 && !expanded && (
         <button
           onClick={() => setExpanded(true)}
-          className="w-full flex items-center justify-center gap-2 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-2 text-sm text-[#646A73] hover:text-[#1F2329] transition-colors"
         >
           <span>查看更多</span>
           <ChevronDown size={16} />

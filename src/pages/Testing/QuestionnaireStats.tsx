@@ -18,7 +18,7 @@ export function QuestionnaireStats() {
   if (loading || !currentQuestionnaire || !stats) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">加载中...</div>
+        <div className="text-[#646A73]">加载中...</div>
       </div>
     )
   }
@@ -29,42 +29,42 @@ export function QuestionnaireStats() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/testing/questionnaires')}
-          className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-[#F7F8FA] rounded-lg transition-colors"
         >
-          <ArrowLeft size={20} className="text-slate-400" />
+          <ArrowLeft size={20} className="text-[#646A73]" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">{currentQuestionnaire.title}</h1>
-          <p className="text-sm text-slate-400 mt-1">问卷统计</p>
+          <h1 className="text-2xl font-bold text-[#1F2329]">{currentQuestionnaire.title}</h1>
+          <p className="text-sm text-[#646A73] mt-1">问卷统计</p>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
           <div className="flex items-center gap-3 mb-2">
-            <Users size={20} className="text-indigo-400" />
-            <h3 className="text-slate-300 font-medium">总回答数</h3>
+            <Users size={20} className="text-[#5B8EFF]" />
+            <h3 className="text-[#646A73] font-medium">总回答数</h3>
           </div>
-          <p className="text-3xl font-bold text-slate-100">{stats.total_responses}</p>
+          <p className="text-3xl font-bold text-[#1F2329]">{stats.total_responses}</p>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
           <div className="flex items-center gap-3 mb-2">
             <MessageSquare size={20} className="text-green-400" />
-            <h3 className="text-slate-300 font-medium">问题数量</h3>
+            <h3 className="text-[#646A73] font-medium">问题数量</h3>
           </div>
-          <p className="text-3xl font-bold text-slate-100">{currentQuestionnaire.questions.length}</p>
+          <p className="text-3xl font-bold text-[#1F2329]">{currentQuestionnaire.questions.length}</p>
         </div>
       </div>
 
       {/* Question Stats */}
       <div className="space-y-4">
         {stats.question_stats.map((questionStat, index) => (
-          <div key={questionStat.question_id} className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">
+          <div key={questionStat.question_id} className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-[#1F2329] mb-4">
               {index + 1}. {questionStat.question_text}
-              <span className="text-sm text-slate-500 ml-2">
+              <span className="text-sm text-[#8F959E] ml-2">
                 ({questionStat.question_type === 'radio' ? '单选' :
                   questionStat.question_type === 'checkbox' ? '多选' :
                   questionStat.question_type === 'text' ? '文本' : '评分'})
@@ -82,12 +82,12 @@ export function QuestionnaireStats() {
                   return (
                     <div key={option}>
                       <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-slate-300">{option}</span>
-                        <span className="text-slate-400">{count} 人 ({percentage}%)</span>
+                        <span className="text-[#646A73]">{option}</span>
+                        <span className="text-[#646A73]">{count} 人 ({percentage}%)</span>
                       </div>
-                      <div className="h-2 bg-slate-900 rounded-full overflow-hidden">
+                      <div className="h-2 bg-[#F2F3F5] rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-indigo-600 rounded-full transition-all"
+                          className="h-full bg-[#3370FF] rounded-full transition-all"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
@@ -101,8 +101,8 @@ export function QuestionnaireStats() {
             {questionStat.question_type === 'rating' && questionStat.average_rating !== undefined && (
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-3xl font-bold text-slate-100">{questionStat.average_rating}</span>
-                  <span className="text-slate-400">/ 5.0</span>
+                  <span className="text-3xl font-bold text-[#1F2329]">{questionStat.average_rating}</span>
+                  <span className="text-[#646A73]">/ 5.0</span>
                 </div>
                 <div className="flex gap-1 mt-2">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -111,7 +111,7 @@ export function QuestionnaireStats() {
                       className={`w-6 h-6 ${
                         star <= Math.round(questionStat.average_rating!)
                           ? 'text-yellow-500'
-                          : 'text-slate-700'
+                          : 'text-[#DEE0E3]'
                       }`}
                     >
                       ★
@@ -125,11 +125,11 @@ export function QuestionnaireStats() {
             {questionStat.question_type === 'text' && questionStat.text_answers && (
               <div className="space-y-2">
                 {questionStat.text_answers.length === 0 ? (
-                  <p className="text-slate-500 text-sm">暂无回答</p>
+                  <p className="text-[#8F959E] text-sm">暂无回答</p>
                 ) : (
                   questionStat.text_answers.map((answer, i) => (
-                    <div key={i} className="bg-slate-900/50 rounded p-3">
-                      <p className="text-slate-300 text-sm">{answer}</p>
+                    <div key={i} className="bg-[#F2F3F5]/50 rounded p-3">
+                      <p className="text-[#646A73] text-sm">{answer}</p>
                     </div>
                   ))
                 )}

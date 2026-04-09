@@ -4,6 +4,16 @@ import { generateScriptsStream } from '../services/script.service.js'
 
 const router = Router()
 
+// Helper function to extract duration from timing string (e.g., "0-3s" -> 3)
+function extractDuration(timing?: string): number {
+  if (!timing) return 0
+  const match = timing.match(/(\d+)-(\d+)s?/)
+  if (!match) return 0
+  const start = parseInt(match[1], 10)
+  const end = parseInt(match[2], 10)
+  return end - start
+}
+
 router.post('/generate', async (req: Request, res: Response) => {
   const { projectId, topicId } = req.body as { projectId: string; topicId: string }
   if (!projectId || !topicId) {
@@ -17,10 +27,23 @@ router.get('/:projectId', (req: Request, res: Response) => {
   try {
     const projectId = req.params.projectId as string
     const scripts = scriptRepo.findByProject(projectId)
-    const parsed = scripts.map(s => ({
-      ...s,
-      segments: JSON.parse(s.segments)
-    }))
+    const parsed = scripts.map(s => {
+      const segmentsData = JSON.parse(s.segments)
+      const rawSegments = segmentsData.segments || []
+
+      // Map database field names to frontend expected names
+      const mappedSegments = rawSegments.map((seg: any) => ({
+        type: seg.type,
+        content: seg.voiceover || seg.content || '',
+        direction: seg.shot || seg.direction || '',
+        duration: extractDuration(seg.timing) || seg.duration || 0
+      }))
+
+      return {
+        ...s,
+        segments: mappedSegments
+      }
+    })
     res.json({ scripts: parsed })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
@@ -32,10 +55,23 @@ router.get('/topic/:topicId', (req: Request, res: Response) => {
   try {
     const topicId = req.params.topicId as string
     const scripts = scriptRepo.findByTopic(topicId)
-    const parsed = scripts.map(s => ({
-      ...s,
-      segments: JSON.parse(s.segments)
-    }))
+    const parsed = scripts.map(s => {
+      const segmentsData = JSON.parse(s.segments)
+      const rawSegments = segmentsData.segments || []
+
+      // Map database field names to frontend expected names
+      const mappedSegments = rawSegments.map((seg: any) => ({
+        type: seg.type,
+        content: seg.voiceover || seg.content || '',
+        direction: seg.shot || seg.direction || '',
+        duration: extractDuration(seg.timing) || seg.duration || 0
+      }))
+
+      return {
+        ...s,
+        segments: mappedSegments
+      }
+    })
     res.json({ scripts: parsed })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)

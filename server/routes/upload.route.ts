@@ -79,10 +79,18 @@ router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Resp
 
       if (mime.includes('sheet') || mime.includes('excel') || mime === 'text/csv' || ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
         console.log('[upload] 调用Excel解析器...')
-        parsedData = await parseExcel(filePath)
+        parsedData = await parseExcel(filePath, (current, total) => {
+          // Update progress in database
+          uploadRepo.updateProgress(upload.id, current, total)
+          console.log(`[upload] 解析进度: ${current}/${total} (${Math.round(current / total * 100)}%)`)
+        })
       } else if (mime === 'application/pdf' || ext === 'pdf') {
         console.log('[upload] 调用PDF解析器...')
-        parsedData = await parsePDF(filePath)
+        parsedData = await parsePDF(filePath, (step, total) => {
+          // Update progress in database
+          uploadRepo.updateProgress(upload.id, step, total)
+          console.log(`[upload] PDF解析进度: ${step}/${total} (${Math.round(step / total * 100)}%)`)
+        })
       } else if (mime.startsWith('video/') || ['mp4', 'mov', 'webm'].includes(ext)) {
         console.log('[upload] 调用视频解析器...')
         parsedData = await parseVideo(filePath)

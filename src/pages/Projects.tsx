@@ -56,8 +56,8 @@ export function Projects() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-100">项目管理</h1>
-            <p className="text-slate-400 text-sm mt-1">管理和组织你的所有项目</p>
+            <h1 className="text-2xl font-bold text-[#1F2329]">项目管理</h1>
+            <p className="text-[#646A73] text-sm mt-1">管理和组织你的所有项目</p>
           </div>
           <Button onClick={() => navigate('/')}>
             <Plus size={16} />
@@ -79,7 +79,7 @@ export function Projects() {
           </div>
 
           {/* Status filter */}
-          <div className="flex gap-1 bg-slate-800 rounded-lg p-1 border border-slate-700">
+          <div className="flex gap-1 bg-[#F7F8FA] rounded-lg p-1 border border-[#DEE0E3]">
             {[
               { key: 'all', label: '全部' },
               { key: 'active', label: '活跃' },
@@ -91,8 +91,8 @@ export function Projects() {
                 className={[
                   'px-3 py-1.5 rounded text-sm font-medium transition-colors',
                   filter === item.key
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#3370FF] text-white'
+                    : 'text-[#646A73] hover:text-[#1F2329]'
                 ].join(' ')}
               >
                 {item.label}
@@ -104,8 +104,8 @@ export function Projects() {
         {/* Projects Grid */}
         {filteredProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Folder size={48} className="text-slate-600 mb-4" />
-            <div className="text-slate-400 mb-2">
+            <Folder size={48} className="text-[#C9CDD4] mb-4" />
+            <div className="text-[#646A73] mb-2">
               {search ? '未找到匹配的项目' : filter === 'archived' ? '暂无归档项目' : '暂无项目'}
             </div>
             {!search && filter === 'all' && (
@@ -120,20 +120,20 @@ export function Projects() {
             {filteredProjects.map(project => (
               <div
                 key={project.id}
-                className="bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-600 transition-all group overflow-hidden"
+                className="bg-[#F7F8FA] rounded-lg border border-[#DEE0E3] hover:border-[#C9CDD4] transition-all group overflow-hidden"
               >
                 {/* Header */}
-                <div className="p-4 border-b border-slate-700">
+                <div className="p-4 border-b border-[#DEE0E3]">
                   <div className="flex items-start justify-between gap-2">
                     <button
                       onClick={() => handleOpenProject(project.id)}
                       className="flex-1 text-left"
                     >
-                      <h3 className="font-semibold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1">
+                      <h3 className="font-semibold text-[#1F2329] group-hover:text-[#5B8EFF] transition-colors line-clamp-1">
                         {project.name}
                       </h3>
                       {project.description && (
-                        <p className="text-sm text-slate-400 mt-1 line-clamp-2">{project.description}</p>
+                        <p className="text-sm text-[#646A73] mt-1 line-clamp-2">{project.description}</p>
                       )}
                     </button>
 
@@ -141,7 +141,7 @@ export function Projects() {
                     <div className="relative">
                       <button
                         onClick={() => setDropdown(dropdown === project.id ? null : project.id)}
-                        className="p-1 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200"
+                        className="p-1 rounded hover:bg-[#DEE0E3] text-[#646A73] hover:text-[#1F2329]"
                       >
                         <MoreVertical size={16} />
                       </button>
@@ -152,22 +152,22 @@ export function Projects() {
                             className="fixed inset-0 z-40"
                             onClick={() => setDropdown(null)}
                           />
-                          <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl shadow-black/50 z-50 py-1 min-w-40">
+                          <div className="absolute right-0 top-full mt-1 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg shadow-xl shadow-black/50 z-50 py-1 min-w-40">
                             <button
                               onClick={() => handleArchive(project.id)}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700"
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#646A73] hover:bg-[#DEE0E3]"
                             >
                               <Archive size={14} />
                               {project.status === 'active' ? '归档' : '恢复'}
                             </button>
                             <button
                               onClick={() => handleDuplicate(project.id)}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700"
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#646A73] hover:bg-[#DEE0E3]"
                             >
                               <Copy size={14} />
                               复制
                             </button>
-                            <div className="h-px bg-slate-700 my-1" />
+                            <div className="h-px bg-[#DEE0E3] my-1" />
                             <button
                               onClick={() => handleDelete(project.id)}
                               className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-900/30"
@@ -187,13 +187,13 @@ export function Projects() {
                   {/* Info grid */}
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     {project.brand && (
-                      <div className="flex items-center gap-1.5 text-slate-400">
+                      <div className="flex items-center gap-1.5 text-[#646A73]">
                         <TrendingUp size={12} />
                         <span className="truncate">{project.brand}</span>
                       </div>
                     )}
                     {project.category && (
-                      <div className="flex items-center gap-1.5 text-slate-400">
+                      <div className="flex items-center gap-1.5 text-[#646A73]">
                         <Folder size={12} />
                         <span className="truncate">{project.category}</span>
                       </div>
@@ -203,7 +203,7 @@ export function Projects() {
                   {/* Tags */}
                   {project.tags.length > 0 && (
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <Tag size={12} className="text-slate-500 flex-shrink-0" />
+                      <Tag size={12} className="text-[#8F959E] flex-shrink-0" />
                       {project.tags.slice(0, 3).map(tag => (
                         <Badge key={tag} variant="secondary" className="text-xs">
                           {tag}
@@ -218,9 +218,9 @@ export function Projects() {
                   )}
 
                   {/* Footer */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-700">
-                    <Calendar size={12} className="text-slate-500" />
-                    <span className="text-xs text-slate-500">
+                  <div className="flex items-center gap-2 pt-2 border-t border-[#DEE0E3]">
+                    <Calendar size={12} className="text-[#8F959E]" />
+                    <span className="text-xs text-[#8F959E]">
                       {formatDate(project.updated_at)}
                     </span>
                     {project.status === 'archived' && (

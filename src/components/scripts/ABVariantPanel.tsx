@@ -17,8 +17,8 @@ export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPa
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 size={32} className="text-indigo-500 animate-spin" />
-          <p className="text-slate-400 text-sm">AI 正在创作脚本，请稍候...</p>
+          <Loader2 size={32} className="text-[#3370FF] animate-spin" />
+          <p className="text-[#646A73] text-sm">AI 正在创作脚本，请稍候...</p>
         </div>
       </div>
     )
@@ -27,11 +27,11 @@ export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPa
   if (!scriptA && !scriptB) {
     return (
       <div className="text-center py-20">
-        <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
-          <PenTool size={28} className="text-slate-600" />
+        <div className="w-16 h-16 rounded-2xl bg-[#F7F8FA] border border-[#DEE0E3] flex items-center justify-center mx-auto mb-4">
+          <PenTool size={28} className="text-[#C9CDD4]" />
         </div>
-        <h3 className="text-slate-400 font-medium mb-2">等待生成脚本</h3>
-        <p className="text-slate-600 text-sm">选择选题后，点击「生成脚本」开始创作 A/B 对照版本</p>
+        <h3 className="text-[#646A73] font-medium mb-2">等待生成脚本</h3>
+        <p className="text-[#C9CDD4] text-sm">选择选题后，点击「生成脚本」开始创作 A/B 对照版本</p>
       </div>
     )
   }
@@ -42,8 +42,8 @@ export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPa
         {scriptA
           ? <ScriptEditor script={scriptA} onSave={onSave} />
           : (
-            <div className="flex items-center justify-center h-40 border border-slate-700 rounded-xl">
-              <Loader2 size={24} className="text-indigo-500 animate-spin" />
+            <div className="flex items-center justify-center h-40 border border-[#DEE0E3] rounded-xl">
+              <Loader2 size={24} className="text-[#3370FF] animate-spin" />
             </div>
           )
         }
@@ -52,8 +52,8 @@ export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPa
         {scriptB
           ? <ScriptEditor script={scriptB} onSave={onSave} />
           : (
-            <div className="flex items-center justify-center h-40 border border-slate-700 rounded-xl">
-              <Loader2 size={24} className="text-indigo-500 animate-spin" />
+            <div className="flex items-center justify-center h-40 border border-[#DEE0E3] rounded-xl">
+              <Loader2 size={24} className="text-[#3370FF] animate-spin" />
             </div>
           )
         }

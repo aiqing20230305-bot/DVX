@@ -22,9 +22,9 @@ export function FilterBar({ filters, onClear, resultCount }: FilterBarProps) {
   const hasActiveFilters = filters.some(f => f.value !== 'all')
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
+    <div className="flex flex-wrap items-center gap-3 p-4 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl">
       {/* Filter Icon */}
-      <div className="flex items-center gap-2 text-slate-400">
+      <div className="flex items-center gap-2 text-[#646A73]">
         <Filter size={16} />
         <span className="text-sm font-medium">筛选</span>
       </div>
@@ -32,7 +32,7 @@ export function FilterBar({ filters, onClear, resultCount }: FilterBarProps) {
       {/* Filter Groups */}
       {filters.map((filter, index) => (
         <div key={index} className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">{filter.label}:</span>
+          <span className="text-xs text-[#8F959E]">{filter.label}:</span>
           <div className="flex gap-1">
             {filter.options.map(option => (
               <button
@@ -40,8 +40,8 @@ export function FilterBar({ filters, onClear, resultCount }: FilterBarProps) {
                 onClick={() => filter.onChange(option.value)}
                 className={`px-3 py-1 text-xs rounded-lg transition-colors ${
                   filter.value === option.value
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    ? 'bg-[#3370FF] text-white'
+                    : 'bg-[#F2F3F5] text-[#646A73] hover:bg-[#DEE0E3]'
                 }`}
               >
                 {option.label}
@@ -58,7 +58,7 @@ export function FilterBar({ filters, onClear, resultCount }: FilterBarProps) {
       {hasActiveFilters && onClear && (
         <button
           onClick={onClear}
-          className="ml-auto flex items-center gap-1 px-3 py-1 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="ml-auto flex items-center gap-1 px-3 py-1 text-xs text-[#646A73] hover:text-[#1F2329] transition-colors"
         >
           <X size={14} />
           清除筛选
@@ -67,8 +67,8 @@ export function FilterBar({ filters, onClear, resultCount }: FilterBarProps) {
 
       {/* Result Count */}
       {resultCount !== undefined && (
-        <div className="ml-auto text-xs text-slate-500">
-          找到 <span className="text-indigo-400 font-medium">{resultCount}</span> 个结果
+        <div className="ml-auto text-xs text-[#8F959E]">
+          找到 <span className="text-[#3370FF] font-medium">{resultCount}</span> 个结果
         </div>
       )}
     </div>

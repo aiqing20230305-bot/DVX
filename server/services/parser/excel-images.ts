@@ -68,7 +68,8 @@ export function hasStoryboardSheets(sheetNames: string[]): boolean {
  */
 export async function extractAndAnalyzeStoryboardImages(
   filePath: string,
-  sheetNames: string[]
+  sheetNames: string[],
+  onProgress?: (current: number, total: number) => void
 ): Promise<StoryboardAnalysisResult[]> {
   const storyboardSheets = sheetNames.filter((name) => name.includes('分镜'))
   if (storyboardSheets.length === 0) return []
@@ -97,7 +98,8 @@ export async function extractAndAnalyzeStoryboardImages(
   // Analyze all frames with Claude Vision
   const analyzedFrames = await analyzeMultipleFrames(
     frames,
-    '这是电商视频分镜脚本中的画面帧，来自投流数据分析表格'
+    '这是电商视频分镜脚本中的画面帧，来自投流数据分析表格',
+    onProgress
   )
 
   // Group results by storyboard sheet

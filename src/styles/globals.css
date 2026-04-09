@@ -1,34 +1,83 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand colors - Modern indigo palette */
-  --color-brand: #6366f1;
-  --color-brand-hover: #4f46e5;
-  --color-brand-light: #818cf8;
-  --color-brand-lighter: #a5b4fc;
+  /* Primary Brand Colors - Lark/飞书 Style Blue */
+  --color-primary: #3370FF;
+  --color-primary-hover: #1E4FD9;
+  --color-primary-light: #5B8EFF;
+  --color-primary-dark: #0D3DB8;
 
-  /* Surface colors - Enhanced contrast */
-  --color-surface: #1e293b;
-  --color-surface-2: #0f172a;
-  --color-surface-3: #334155;
-  --color-surface-hover: #2d3d52;
+  /* Legacy brand alias for compatibility */
+  --color-brand: #3370FF;
+  --color-brand-hover: #1E4FD9;
+  --color-brand-light: #5B8EFF;
+  --color-brand-lighter: #5B8EFF;
 
-  /* Text colors - Better readability */
-  --color-text: #f1f5f9;
-  --color-text-secondary: #cbd5e1;
-  --color-text-muted: #94a3b8;
-  --color-text-subtle: #64748b;
+  /* Background Colors - Light Theme (Lark Style) */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F7F8FA;
+  --color-bg-tertiary: #F2F3F5;
+  --color-bg-elevated: #FFFFFF;
 
-  /* Border colors - Subtle separation */
-  --color-border: #334155;
-  --color-border-light: #475569;
-  --color-border-lighter: #64748b;
+  /* Legacy surface alias */
+  --color-surface: #F7F8FA;
+  --color-surface-2: #FFFFFF;
+  --color-surface-3: #F2F3F5;
+  --color-surface-hover: #EBEDF0;
 
-  /* Status colors */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  /* Text Colors - Dark on Light */
+  --color-text-primary: #1F2329;
+  --color-text-secondary: #646A73;
+  --color-text-tertiary: #8F959E;
+  --color-text-disabled: #C9CDD4;
+  --color-text-link: #3370FF;
+  --color-text-link-hover: #1E4FD9;
+
+  /* Legacy text alias */
+  --color-text: #1F2329;
+  --color-text-muted: #646A73;
+  --color-text-subtle: #8F959E;
+
+  /* Border Colors - Light Theme */
+  --color-border: #DEE0E3;
+  --color-border-light: #E3E5E8;
+  --color-border-lighter: #EBEDF0;
+  --color-divider: rgba(0, 0, 0, 0.06);
+
+
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-warning: #FBBF24;
+  --color-warning-bg: rgba(251, 191, 36, 0.1);
+  --color-error: #EF4444;
+  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-info: #3498DB;
+  --color-info-bg: rgba(52, 152, 219, 0.1);
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, #3370FF 0%, #5B8EFF 100%);
+
+  /* Spacing System (8px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Animation Durations */
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --duration-slower: 600ms;
+
+  /* Easing Functions */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -43,8 +92,9 @@ html {
 
 body {
   margin: 0;
-  background-color: #0f172a;
-  color: #e2e8f0;
+  background-color: #FFFFFF;
+  color: #1F2329;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
 ::-webkit-scrollbar {
@@ -53,16 +103,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: #F7F8FA;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #DEE0E3;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #C9CDD4;
 }
 
 @keyframes pulse-cursor {
@@ -84,38 +134,39 @@ body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background: linear-gradient(90deg, #F7F8FA 25%, #F2F3F5 50%, #F7F8FA 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 /* Card interaction effects */
 .card-hover {
-  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1),
-              box-shadow 200ms cubic-bezier(0, 0, 0.2, 1),
-              border-color 200ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform var(--duration-slow) var(--ease-out),
+              box-shadow var(--duration-slow) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
 }
 
 .card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(99, 102, 241, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(51, 112, 255, 0.12);
+  border-color: var(--color-border-light);
 }
 
 .card-hover:active {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 /* Interactive elements */
 .interactive-element {
-  transition: all 150ms cubic-bezier(0, 0, 0.2, 1);
+  transition: all var(--duration-fast) var(--ease-out);
   cursor: pointer;
   user-select: none;
 }
 
 .interactive-element:hover {
-  background-color: rgba(100, 116, 139, 0.1);
+  background-color: #F2F3F5;
 }
 
 .interactive-element:active {

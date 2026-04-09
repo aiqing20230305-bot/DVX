@@ -38,15 +38,15 @@ export function SortDropdown({ options, value, ascending, onChange }: SortDropdo
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 hover:bg-slate-700 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg text-sm text-[#646A73] hover:bg-[#F2F3F5] transition-colors"
       >
         <ArrowUpDown size={14} />
         <span>{currentOption?.label || '排序'}</span>
-        <SortIcon size={12} className="text-slate-500" />
+        <SortIcon size={12} className="text-[#8F959E]" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-10 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-48 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg shadow-lg z-10 overflow-hidden">
           {/* Sort field options */}
           <div className="py-1">
             {options.map(option => (
@@ -56,16 +56,16 @@ export function SortDropdown({ options, value, ascending, onChange }: SortDropdo
                   onChange(option.value, ascending)
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-700 transition-colors flex items-center justify-between"
+                className="w-full px-4 py-2 text-left text-sm text-[#646A73] hover:bg-[#F2F3F5] transition-colors flex items-center justify-between"
               >
                 <span>{option.label}</span>
-                {value === option.value && <Check size={14} className="text-indigo-400" />}
+                {value === option.value && <Check size={14} className="text-[#3370FF]" />}
               </button>
             ))}
           </div>
 
           {/* Divider */}
-          <div className="border-t border-slate-700" />
+          <div className="border-t border-[#DEE0E3]" />
 
           {/* Sort direction */}
           <div className="py-1">
@@ -74,7 +74,7 @@ export function SortDropdown({ options, value, ascending, onChange }: SortDropdo
                 onChange(value, !ascending)
                 setIsOpen(false)
               }}
-              className="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-700 transition-colors flex items-center gap-2"
+              className="w-full px-4 py-2 text-left text-sm text-[#646A73] hover:bg-[#F2F3F5] transition-colors flex items-center gap-2"
             >
               <SortIcon size={14} />
               <span>{ascending ? '升序' : '降序'}</span>

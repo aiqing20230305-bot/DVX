@@ -38,7 +38,7 @@ export function SessionDetail() {
   }
 
   const getActionIcon = (type: string) => {
-    const iconClass = "text-slate-500"
+    const iconClass = "text-[#8F959E]"
     switch (type) {
       case 'navigate':
         return '🔗'
@@ -62,7 +62,7 @@ export function SessionDetail() {
   if (loading || !currentSession) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">加载中...</div>
+        <div className="text-[#646A73]">加载中...</div>
       </div>
     )
   }
@@ -113,13 +113,13 @@ export function SessionDetail() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/testing')}
-            className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-[#F7F8FA] rounded-lg transition-colors"
           >
-            <ArrowLeft size={20} className="text-slate-400" />
+            <ArrowLeft size={20} className="text-[#646A73]" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-slate-100">会话详情</h1>
-            <p className="text-sm text-slate-400 mt-1">{currentSession.scenario}</p>
+            <h1 className="text-2xl font-bold text-[#1F2329]">会话详情</h1>
+            <p className="text-sm text-[#646A73] mt-1">{currentSession.scenario}</p>
           </div>
         </div>
 
@@ -136,9 +136,9 @@ export function SessionDetail() {
               </button>
 
               {showQuestionnaireList && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                <div className="absolute top-full right-0 mt-2 w-64 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
                   {questionnaires.length === 0 ? (
-                    <div className="p-4 text-center text-slate-500 text-sm">
+                    <div className="p-4 text-center text-[#8F959E] text-sm">
                       暂无可用问卷
                     </div>
                   ) : (
@@ -150,7 +150,7 @@ export function SessionDetail() {
                           setShowQuestionnaireDialog(true)
                           setShowQuestionnaireList(false)
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-700 text-slate-200 text-sm border-b border-slate-700 last:border-b-0 transition-colors"
+                        className="w-full text-left px-4 py-3 hover:bg-[#DEE0E3] text-[#1F2329] text-sm border-b border-[#DEE0E3] last:border-b-0 transition-colors"
                       >
                         {q.title}
                       </button>
@@ -165,7 +165,7 @@ export function SessionDetail() {
               className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                 isTracking
                   ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                  : 'bg-[#3370FF] hover:bg-[#1E4FD9] text-white'
               }`}
             >
               {isTracking ? (
@@ -185,91 +185,91 @@ export function SessionDetail() {
       </div>
 
       {/* Session Info */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+      <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+            <div className="flex items-center gap-2 text-[#646A73] text-sm mb-2">
               <User size={16} />
               用户信息
             </div>
-            <div className="text-slate-100 font-medium">{currentSession.user_name}</div>
-            <div className="text-slate-500 text-sm">{currentSession.user_role}</div>
+            <div className="text-[#1F2329] font-medium">{currentSession.user_name}</div>
+            <div className="text-[#8F959E] text-sm">{currentSession.user_role}</div>
             {currentSession.user_email && (
-              <div className="text-slate-600 text-xs mt-1">{currentSession.user_email}</div>
+              <div className="text-[#C9CDD4] text-xs mt-1">{currentSession.user_email}</div>
             )}
           </div>
 
           <div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+            <div className="flex items-center gap-2 text-[#646A73] text-sm mb-2">
               <Clock size={16} />
               测试时长
             </div>
-            <div className="text-slate-100 font-medium">
+            <div className="text-[#1F2329] font-medium">
               {formatDuration(currentSession.start_time, currentSession.end_time)}
             </div>
-            <div className="text-slate-500 text-sm">
+            <div className="text-[#8F959E] text-sm">
               {currentSession.status === 'active' ? '测试中' : '已结束'}
             </div>
           </div>
 
           <div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+            <div className="flex items-center gap-2 text-[#646A73] text-sm mb-2">
               <Calendar size={16} />
               开始时间
             </div>
-            <div className="text-slate-100 font-medium">
+            <div className="text-[#1F2329] font-medium">
               {new Date(currentSession.start_time).toLocaleString('zh-CN')}
             </div>
           </div>
 
           <div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+            <div className="flex items-center gap-2 text-[#646A73] text-sm mb-2">
               <Activity size={16} />
               统计
             </div>
-            <div className="text-slate-100 font-medium">{actions.length} 个操作</div>
-            <div className="text-slate-500 text-sm">{feedback.length} 条反馈</div>
+            <div className="text-[#1F2329] font-medium">{actions.length} 个操作</div>
+            <div className="text-[#8F959E] text-sm">{feedback.length} 条反馈</div>
           </div>
         </div>
 
         {currentSession.notes && (
-          <div className="mt-6 pt-6 border-t border-slate-700">
-            <div className="text-slate-400 text-sm mb-2">备注</div>
-            <div className="text-slate-300">{currentSession.notes}</div>
+          <div className="mt-6 pt-6 border-t border-[#DEE0E3]">
+            <div className="text-[#646A73] text-sm mb-2">备注</div>
+            <div className="text-[#646A73]">{currentSession.notes}</div>
           </div>
         )}
       </div>
 
       {/* Actions Timeline */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-slate-100 mb-4">操作时间线</h2>
+      <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-[#1F2329] mb-4">操作时间线</h2>
         {actions.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">暂无操作记录</div>
+          <div className="text-center py-8 text-[#8F959E]">暂无操作记录</div>
         ) : (
           <div className="space-y-3">
             {actions.map((action, index) => (
               <div
                 key={action.id}
-                className="flex items-start gap-4 p-3 bg-slate-900/50 rounded-lg"
+                className="flex items-start gap-4 p-3 bg-[#F2F3F5]/50 rounded-lg"
               >
                 <div className="text-2xl">{getActionIcon(action.action_type)}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
-                    <span className="text-slate-300 font-medium">{action.action_type}</span>
-                    <span className="text-slate-600">·</span>
-                    <span className="text-slate-400 text-sm">{action.page}</span>
+                    <span className="text-[#646A73] font-medium">{action.action_type}</span>
+                    <span className="text-[#C9CDD4]">·</span>
+                    <span className="text-[#646A73] text-sm">{action.page}</span>
                     {action.target && (
                       <>
-                        <span className="text-slate-600">·</span>
-                        <span className="text-slate-500 text-sm">{action.target}</span>
+                        <span className="text-[#C9CDD4]">·</span>
+                        <span className="text-[#8F959E] text-sm">{action.target}</span>
                       </>
                     )}
                   </div>
                   {action.details && (
-                    <div className="text-slate-500 text-sm">{action.details}</div>
+                    <div className="text-[#8F959E] text-sm">{action.details}</div>
                   )}
                 </div>
-                <div className="text-slate-600 text-xs">
+                <div className="text-[#C9CDD4] text-xs">
                   {formatTime(action.timestamp)}
                 </div>
               </div>
@@ -279,19 +279,19 @@ export function SessionDetail() {
       </div>
 
       {/* Feedback */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+      <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
-          <MessageSquare size={20} className="text-slate-400" />
-          <h2 className="text-lg font-semibold text-slate-100">用户反馈</h2>
+          <MessageSquare size={20} className="text-[#646A73]" />
+          <h2 className="text-lg font-semibold text-[#1F2329]">用户反馈</h2>
         </div>
         {feedback.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">暂无反馈</div>
+          <div className="text-center py-8 text-[#8F959E]">暂无反馈</div>
         ) : (
           <div className="space-y-4">
             {feedback.map(item => (
-              <div key={item.id} className="p-4 bg-slate-900/50 rounded-lg">
-                <div className="text-slate-300 font-medium mb-2">{item.question_text}</div>
-                <div className="text-slate-400">{item.answer}</div>
+              <div key={item.id} className="p-4 bg-[#F2F3F5]/50 rounded-lg">
+                <div className="text-[#646A73] font-medium mb-2">{item.question_text}</div>
+                <div className="text-[#646A73]">{item.answer}</div>
               </div>
             ))}
           </div>

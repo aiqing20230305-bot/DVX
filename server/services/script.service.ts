@@ -27,44 +27,49 @@ export async function generateScriptsStream(projectId: string, topicId: string, 
 
     const systemPrompt = buildScriptSystemPrompt()
 
-    // Generate A and B variants
-    for (const variant of ['A', 'B'] as const) {
-      const userMessage = buildScriptUserMessage(topicData, variant)
-      let scriptSaved = false
+    // Generate A and B variants in parallel for better performance
+    await Promise.all(
+      (['A', 'B'] as const).map(async (variant) => {
+        const userMessage = buildScriptUserMessage(topicData, variant)
+        let scriptSaved = false
 
-      const parser = new XMLStreamParser<ScriptData>(
-        'script',
-        (item) => {
-          if (!scriptSaved) {
-            const saved = scriptRepo.create(projectId, topicId, variant, item)
-            scriptSaved = true
-            sendSSEEvent(res, `script_${variant}`, {
-              ...item,
-              id: saved.id,
-              variant,
-              topicId
-            })
+        const parser = new XMLStreamParser<ScriptData>(
+          'script',
+          (item) => {
+            if (!scriptSaved) {
+              const saved = scriptRepo.create(projectId, topicId, variant, item)
+              scriptSaved = true
+              sendSSEEvent(res, `script_${variant}`, {
+                ...item,
+                id: saved.id,
+                variant,
+                topicId
+              })
+            }
+          },
+          (err, raw) => {
+            console.error(`Failed to parse script ${variant}:`, err.message, raw.slice(0, 100))
           }
-        },
-        (err, raw) => {
-          console.error(`Failed to parse script ${variant}:`, err.message, raw.slice(0, 100))
-        }
-      )
+        )
 
-      sendSSEEvent(res, 'generating', { variant, message: `正在生成${variant}版本脚本...` })
+        sendSSEEvent(res, 'generating', { variant, message: `正在生成${variant}版本脚本...` })
 
-      await streamText({
-        systemPrompt,
-        userContent: userMessage,
-        onChunk: (text) => {
-          parser.feed(text)
-          sendSSEEvent(res, `chunk_${variant}`, { text })
-        },
-        onComplete: () => {
-          sendSSEEvent(res, `complete_${variant}`, { variant })
-        }
+        await streamText({
+          systemPrompt,
+          userContent: userMessage,
+          onChunk: (text) => {
+            parser.feed(text)
+            sendSSEEvent(res, `chunk_${variant}`, { text })
+          },
+          onComplete: () => {
+            sendSSEEvent(res, `complete_${variant}`, { variant })
+          }
+        })
       })
-    }
+    )
+
+    // Mark topic as selected after successful script generation
+    topicRepo.update(topicId, { selected: true })
 
     // Log script generation
     logRepo.create(projectId, 'script', `生成脚本：${topic.title}（A/B两版本）`)

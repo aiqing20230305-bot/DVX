@@ -48,5 +48,13 @@ export const uploadRepo = {
   delete(id: string): void {
     const db = getDb()
     db.prepare('DELETE FROM uploads WHERE id = ?').run(id)
+  },
+
+  updateProgress(id: string, current: number, total: number): void {
+    const db = getDb()
+    const now = Date.now()
+    const progressData = JSON.stringify({ _parseProgress: { current, total } })
+    db.prepare('UPDATE uploads SET parsed_data = ?, updated_at = ? WHERE id = ?')
+      .run(progressData, now, id)
   }
 }

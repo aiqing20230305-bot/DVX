@@ -15,15 +15,21 @@ export interface PDFParseResult {
  * 优化策略：使用pdf-parse快速提取文本，然后让Claude分析文本
  * 相比直接让Claude处理PDF二进制，这种方式速度更快、更稳定
  */
-export async function parsePDF(filePath: string): Promise<PDFParseResult> {
+export async function parsePDF(
+  filePath: string,
+  onProgress?: (step: number, total: number) => void
+): Promise<PDFParseResult> {
   const buffer = readFileSync(filePath)
+  // Convert Buffer to Uint8Array as required by pdf-parse
+  const uint8Array = new Uint8Array(buffer)
 
   // Step 1: 使用pdf-parse快速提取PDF文本（本地处理，速度快）
   let extractedText: string
   let pageCount: number
 
   try {
-    const parser = new PDFParse(buffer)
+    onProgress?.(1, 2) // 步骤1：提取文本
+    const parser = new PDFParse(uint8Array)
     const textResult = await parser.getText()
 
     extractedText = textResult.text.trim()
@@ -39,6 +45,7 @@ export async function parsePDF(filePath: string): Promise<PDFParseResult> {
   }
 
   // Step 2: 让Claude分析提取的文本（比处理PDF二进制快得多）
+  onProgress?.(2, 2) // 步骤2：AI分析
   const client = getAnthropicClient()
 
   // 如果文本过长，截取前20000字符（约3000 tokens）

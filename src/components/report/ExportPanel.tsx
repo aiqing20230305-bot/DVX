@@ -151,8 +151,8 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
   }
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-slate-200 mb-4">导出选项</h3>
+    <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-[#1F2329] mb-4">导出选项</h3>
       <div className="space-y-3">
         <Button
           variant="primary"
@@ -205,8 +205,8 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
         </Button>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-slate-700">
-        <p className="text-xs text-slate-600 text-center">
+      <div className="mt-4 pt-4 border-t border-[#DEE0E3]">
+        <p className="text-xs text-[#C9CDD4] text-center">
           HTML 报告可直接在浏览器中打开，支持打印为 PDF
         </p>
       </div>

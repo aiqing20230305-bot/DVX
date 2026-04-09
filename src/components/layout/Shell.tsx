@@ -34,7 +34,7 @@ export function Shell({ children }: ShellProps) {
   }, [])
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-white">
       {/* Mobile backdrop */}
       {!sidebarCollapsed && (
         <div

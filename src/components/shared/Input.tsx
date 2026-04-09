@@ -50,7 +50,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <label
             className={`
               block mb-1.5 text-sm font-medium transition-colors duration-200
-              ${error ? 'text-red-400' : success ? 'text-emerald-400' : isFocused ? 'text-indigo-400' : 'text-slate-300'}
+              ${error ? 'text-red-400' : success ? 'text-emerald-400' : isFocused ? 'text-[#3370FF]' : 'text-[#1F2329]'}
             `}
           >
             {label}
@@ -65,7 +65,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               size={16}
               className={`
                 absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-200
-                ${error ? 'text-red-400' : success ? 'text-emerald-400' : isFocused ? 'text-indigo-400' : 'text-slate-500'}
+                ${error ? 'text-red-400' : success ? 'text-emerald-400' : isFocused ? 'text-[#3370FF]' : 'text-[#8F959E]'}
               `}
             />
           )}
@@ -76,16 +76,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             className={`
               w-full ${paddingClasses.left} ${paddingClasses.right} ${sizeClasses[size]}
-              rounded-lg bg-slate-800 text-slate-200 placeholder-slate-500
+              rounded-lg bg-[#F7F8FA] text-[#1F2329] placeholder-[#737373]
               border transition-all duration-200
               ${
                 error
                   ? 'border-red-500 focus:border-red-400 focus:ring-2 focus:ring-red-500/20'
                   : success
                     ? 'border-emerald-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20'
-                    : 'border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20'
+                    : 'border-[#DEE0E3] focus:border-[#3370FF] focus:ring-2 focus:ring-[#3370FF]/20'
               }
-              ${isFocused ? 'shadow-lg shadow-indigo-500/10' : 'shadow-sm'}
+              ${isFocused ? 'shadow-lg shadow-[#3370FF]/10' : 'shadow-sm'}
               ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
               focus:outline-none
               ${className}
@@ -113,8 +113,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               disabled={disabled}
               className={`
                 absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-200
-                ${onRightIconClick ? 'cursor-pointer hover:text-indigo-400' : 'cursor-default'}
-                ${error ? 'text-red-400' : success ? 'text-emerald-400' : 'text-slate-500'}
+                ${onRightIconClick ? 'cursor-pointer hover:text-[#5B8EFF]' : 'cursor-default'}
+                ${error ? 'text-red-400' : success ? 'text-emerald-400' : 'text-[#8F959E]'}
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               tabIndex={-1}
@@ -129,7 +129,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <p
             className={`
               mt-1.5 text-xs transition-colors duration-200
-              ${error ? 'text-red-400 animate-shake' : 'text-slate-500'}
+              ${error ? 'text-red-400 animate-shake' : 'text-[#8F959E]'}
             `}
           >
             {error || helperText}

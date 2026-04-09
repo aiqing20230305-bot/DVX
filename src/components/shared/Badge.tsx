@@ -13,27 +13,27 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  // Insight types
-  trend: 'bg-blue-900/50 text-blue-300 ring-1 ring-blue-700/50',
-  competitor: 'bg-purple-900/50 text-purple-300 ring-1 ring-purple-700/50',
-  gap: 'bg-emerald-900/50 text-emerald-300 ring-1 ring-emerald-700/50',
-  attribution: 'bg-orange-900/50 text-orange-300 ring-1 ring-orange-700/50',
-  anomaly: 'bg-red-900/50 text-red-300 ring-1 ring-red-700/50',
+  // Insight types (light theme - darker text on light background)
+  trend: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
+  competitor: 'bg-purple-50 text-purple-700 ring-1 ring-purple-200',
+  gap: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+  attribution: 'bg-orange-50 text-orange-700 ring-1 ring-orange-200',
+  anomaly: 'bg-red-50 text-red-700 ring-1 ring-red-200',
   // Confidence
-  high: 'bg-emerald-900/50 text-emerald-300 ring-1 ring-emerald-700/50',
-  medium: 'bg-yellow-900/50 text-yellow-300 ring-1 ring-yellow-700/50',
-  low: 'bg-red-900/50 text-red-300 ring-1 ring-red-700/50',
+  high: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+  medium: 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200',
+  low: 'bg-red-50 text-red-700 ring-1 ring-red-200',
   // Platforms
-  douyin: 'bg-pink-900/50 text-pink-300 ring-1 ring-pink-700/50',
-  kuaishou: 'bg-orange-900/50 text-orange-300 ring-1 ring-orange-700/50',
-  xiaohongshu: 'bg-red-900/50 text-red-300 ring-1 ring-red-700/50',
+  douyin: 'bg-pink-50 text-pink-700 ring-1 ring-pink-200',
+  kuaishou: 'bg-orange-50 text-orange-700 ring-1 ring-orange-200',
+  xiaohongshu: 'bg-red-50 text-red-700 ring-1 ring-red-200',
   // Generic
-  default: 'bg-slate-700 text-slate-300 ring-1 ring-slate-600',
-  secondary: 'bg-slate-600 text-slate-200 ring-1 ring-slate-500',
-  info: 'bg-blue-900/50 text-blue-300 ring-1 ring-blue-700/50',
-  success: 'bg-emerald-900/50 text-emerald-300 ring-1 ring-emerald-700/50',
-  warning: 'bg-yellow-900/50 text-yellow-300 ring-1 ring-yellow-700/50',
-  error: 'bg-red-900/50 text-red-300 ring-1 ring-red-700/50',
+  default: 'bg-[#F7F8FA] text-[#646A73] ring-1 ring-[#DEE0E3]',
+  secondary: 'bg-[#F2F3F5] text-[#1F2329] ring-1 ring-[#E3E5E8]',
+  info: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
+  success: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+  warning: 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200',
+  error: 'bg-red-50 text-red-700 ring-1 ring-red-200',
 }
 
 const typeLabels: Partial<Record<BadgeVariant, string>> = {

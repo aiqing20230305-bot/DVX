@@ -344,23 +344,23 @@ export function Topics() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
-            <FileText size={18} className="text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
+            <FileText size={18} className="text-[#5B8EFF]" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">选题策划</h1>
+          <h1 className="text-2xl font-bold text-[#1F2329]">选题策划</h1>
         </div>
-        <p className="text-slate-500 text-sm ml-12">基于洞察生成高转化视频选题，覆盖抖音、快手、小红书</p>
+        <p className="text-[#8F959E] text-sm ml-12">基于洞察生成高转化视频选题，覆盖抖音、快手、小红书</p>
       </div>
 
       {/* Selected insights summary */}
       {insights.length > 0 && (
-        <div className="mb-4 px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl flex items-center justify-between">
-          <span className="text-xs text-slate-500">
+        <div className="mb-4 px-4 py-2.5 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl flex items-center justify-between">
+          <span className="text-xs text-[#8F959E]">
             已选洞察：{insightSelectedIds.size > 0 ? insightSelectedIds.size : '全部'} 条
           </span>
           <button
             onClick={() => navigate('/insights')}
-            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="text-xs text-[#5B8EFF] hover:text-[#5B8EFF] transition-colors"
           >
             返回修改 →
           </button>
@@ -444,7 +444,7 @@ export function Topics() {
               value={searchQuery}
               onChange={setSearchQuery}
               placeholder="搜索选题标题..."
-              resultCount={searchQuery ? filteredTopics.length : undefined}
+              resultCount={searchQuery ? sortedTopics.length : undefined}
             />
           </div>
           <SortDropdown
@@ -504,14 +504,14 @@ export function Topics() {
               setFilterPriority('all')
               setFilterSelected('all')
             }}
-            resultCount={filteredTopics.length}
+            resultCount={sortedTopics.length}
           />
         </div>
       )}
 
       {/* Selection tip */}
       {status === 'success' && topics.length > 0 && (
-        <div className="mb-4 px-4 py-2.5 bg-indigo-900/20 border border-indigo-700/30 rounded-xl text-xs text-indigo-300">
+        <div className="mb-4 px-4 py-2.5 bg-[#0D3DB8]/20 border border-[#1E4FD9]/30 rounded-xl text-xs text-[#5B8EFF]">
           点击选题卡片选择，调整优先级（五星），然后点击「生成脚本」进入脚本创作
         </div>
       )}

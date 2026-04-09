@@ -96,6 +96,15 @@ CREATE TABLE IF NOT EXISTS logs (
   created_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS reports (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL,
+  html_content TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
+
 -- Testing system tables
 CREATE TABLE IF NOT EXISTS test_sessions (
   id TEXT PRIMARY KEY,

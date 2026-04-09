@@ -53,41 +53,41 @@ export function StartTestSession() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/testing')}
-          className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-[#F7F8FA] rounded-lg transition-colors"
         >
-          <ArrowLeft size={20} className="text-slate-400" />
+          <ArrowLeft size={20} className="text-[#646A73]" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">启动测试会话</h1>
-          <p className="text-sm text-slate-400 mt-1">创建新的用户测试会话</p>
+          <h1 className="text-2xl font-bold text-[#1F2329]">启动测试会话</h1>
+          <p className="text-sm text-[#646A73] mt-1">创建新的用户测试会话</p>
         </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6 space-y-6">
         {/* User Name */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+          <label className="block text-sm font-medium text-[#646A73] mb-2">
             用户姓名 <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             value={formData.user_name}
             onChange={e => setFormData({ ...formData, user_name: e.target.value })}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-indigo-500"
+            className="w-full px-4 py-2 bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
             placeholder="请输入用户姓名"
           />
         </div>
 
         {/* User Role */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+          <label className="block text-sm font-medium text-[#646A73] mb-2">
             用户角色 <span className="text-red-400">*</span>
           </label>
           <select
             value={formData.user_role}
             onChange={e => setFormData({ ...formData, user_role: e.target.value })}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-indigo-500"
+            className="w-full px-4 py-2 bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
           >
             <option value="">请选择角色</option>
             <option value="内容策划">内容策划</option>
@@ -101,21 +101,21 @@ export function StartTestSession() {
 
         {/* User Email */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+          <label className="block text-sm font-medium text-[#646A73] mb-2">
             用户邮箱（可选）
           </label>
           <input
             type="email"
             value={formData.user_email}
             onChange={e => setFormData({ ...formData, user_email: e.target.value })}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-indigo-500"
+            className="w-full px-4 py-2 bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
             placeholder="用于后续联系（可选）"
           />
         </div>
 
         {/* Test Scenario */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-3">
+          <label className="block text-sm font-medium text-[#646A73] mb-3">
             测试场景 <span className="text-red-400">*</span>
           </label>
           <div className="space-y-3">
@@ -124,8 +124,8 @@ export function StartTestSession() {
                 key={scenario.id}
                 className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
                   formData.scenario === scenario.name
-                    ? 'border-indigo-500 bg-indigo-500/10'
-                    : 'border-slate-700 hover:border-slate-600 bg-slate-900/50'
+                    ? 'border-[#3370FF] bg-[#3370FF]/10'
+                    : 'border-[#DEE0E3] hover:border-[#C9CDD4] bg-[#F2F3F5]/50'
                 }`}
               >
                 <input
@@ -139,16 +139,16 @@ export function StartTestSession() {
                 <div className="flex items-start gap-3">
                   <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 ${
                     formData.scenario === scenario.name
-                      ? 'border-indigo-500 bg-indigo-500'
-                      : 'border-slate-600'
+                      ? 'border-[#3370FF] bg-[#3370FF]'
+                      : 'border-[#C9CDD4]'
                   }`}>
                     {formData.scenario === scenario.name && (
                       <div className="w-full h-full rounded-full bg-white scale-50"></div>
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className="text-slate-200 font-medium mb-1">{scenario.name}</div>
-                    <div className="text-slate-400 text-sm">{scenario.description}</div>
+                    <div className="text-[#1F2329] font-medium mb-1">{scenario.name}</div>
+                    <div className="text-[#646A73] text-sm">{scenario.description}</div>
                   </div>
                 </div>
               </label>
@@ -161,14 +161,14 @@ export function StartTestSession() {
           <button
             type="button"
             onClick={() => navigate('/testing')}
-            className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+            className="px-5 py-2.5 bg-[#DEE0E3] hover:bg-[#C9CDD4] text-[#1F2329] rounded-lg transition-colors"
           >
             取消
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-2.5 bg-[#3370FF] hover:bg-[#1E4FD9] text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <PlayCircle size={18} />
             {loading ? '创建中...' : '开始测试'}

@@ -37,7 +37,7 @@ export function TestingSessions() {
       case 'abandoned':
         return 'text-red-400 bg-red-400/10 border-red-400/30'
       default:
-        return 'text-slate-400 bg-slate-400/10 border-slate-400/30'
+        return 'text-[#646A73] bg-[#A3A3A3]/10 border-[#A3A3A3]/30'
     }
   }
 
@@ -70,7 +70,7 @@ export function TestingSessions() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">加载中...</div>
+        <div className="text-[#646A73]">加载中...</div>
       </div>
     )
   }
@@ -80,12 +80,12 @@ export function TestingSessions() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">测试会话管理</h1>
-          <p className="text-sm text-slate-400 mt-1">查看和管理用户测试会话</p>
+          <h1 className="text-2xl font-bold text-[#1F2329]">测试会话管理</h1>
+          <p className="text-sm text-[#646A73] mt-1">查看和管理用户测试会话</p>
         </div>
         <button
           onClick={() => navigate('/testing/start')}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+          className="px-4 py-2 bg-[#3370FF] hover:bg-[#1E4FD9] text-white rounded-lg transition-colors"
         >
           启动新测试
         </button>
@@ -93,25 +93,25 @@ export function TestingSessions() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-          <div className="text-slate-400 text-sm mb-1">总会话数</div>
-          <div className="text-2xl font-bold text-slate-100">{sessions.length}</div>
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-4">
+          <div className="text-[#646A73] text-sm mb-1">总会话数</div>
+          <div className="text-2xl font-bold text-[#1F2329]">{sessions.length}</div>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-          <div className="text-slate-400 text-sm mb-1">进行中</div>
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-4">
+          <div className="text-[#646A73] text-sm mb-1">进行中</div>
           <div className="text-2xl font-bold text-blue-400">
             {sessions.filter(s => s.status === 'active').length}
           </div>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-          <div className="text-slate-400 text-sm mb-1">已完成</div>
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-4">
+          <div className="text-[#646A73] text-sm mb-1">已完成</div>
           <div className="text-2xl font-bold text-green-400">
             {sessions.filter(s => s.status === 'completed').length}
           </div>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-          <div className="text-slate-400 text-sm mb-1">平均时长</div>
-          <div className="text-2xl font-bold text-slate-100">
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-4">
+          <div className="text-[#646A73] text-sm mb-1">平均时长</div>
+          <div className="text-2xl font-bold text-[#1F2329]">
             {sessions.filter(s => s.end_time).length > 0
               ? Math.floor(
                   sessions
@@ -129,7 +129,7 @@ export function TestingSessions() {
       {/* Sessions List */}
       <div className="space-y-3">
         {sessions.length === 0 ? (
-          <div className="text-center py-16 text-slate-500">
+          <div className="text-center py-16 text-[#8F959E]">
             暂无测试会话
           </div>
         ) : (
@@ -137,7 +137,7 @@ export function TestingSessions() {
             <div
               key={session.id}
               onClick={() => navigate(`/testing/session/${session.id}`)}
-              className="bg-slate-800 border border-slate-700 rounded-lg p-5 hover:border-indigo-500/50 transition-colors cursor-pointer"
+              className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-5 hover:border-[#3370FF]/50 transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
@@ -145,30 +145,30 @@ export function TestingSessions() {
                     {getStatusIcon(session.status)}
                     {getStatusText(session.status)}
                   </div>
-                  <div className="text-slate-300 font-medium">{session.scenario}</div>
+                  <div className="text-[#646A73] font-medium">{session.scenario}</div>
                 </div>
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-[#646A73]">
                   {formatTime(session.created_at)}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center gap-2 text-sm">
-                  <User size={16} className="text-slate-500" />
-                  <span className="text-slate-400">{session.user_name}</span>
-                  <span className="text-slate-600">·</span>
-                  <span className="text-slate-500">{session.user_role}</span>
+                  <User size={16} className="text-[#8F959E]" />
+                  <span className="text-[#646A73]">{session.user_name}</span>
+                  <span className="text-[#C9CDD4]">·</span>
+                  <span className="text-[#8F959E]">{session.user_role}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
-                  <Clock size={16} className="text-slate-500" />
-                  <span className="text-slate-400">
+                  <Clock size={16} className="text-[#8F959E]" />
+                  <span className="text-[#646A73]">
                     {formatDuration(session.start_time, session.end_time)}
                   </span>
                 </div>
 
                 {session.notes && (
-                  <div className="text-sm text-slate-500 truncate">
+                  <div className="text-sm text-[#8F959E] truncate">
                     备注: {session.notes}
                   </div>
                 )}

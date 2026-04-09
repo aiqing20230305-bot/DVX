@@ -21,10 +21,24 @@ export const kbRepo = {
     return db.prepare('SELECT * FROM kb_items ORDER BY created_at DESC').all() as KBItem[]
   },
 
+  findByProject(projectId: string, type?: string): KBItem[] {
+    const db = getDb()
+    if (type) {
+      return db.prepare('SELECT * FROM kb_items WHERE project_id = ? AND type = ? ORDER BY created_at DESC').all(projectId, type) as KBItem[]
+    }
+    return db.prepare('SELECT * FROM kb_items WHERE project_id = ? ORDER BY created_at DESC').all(projectId) as KBItem[]
+  },
+
   search(query: string): KBItem[] {
     const db = getDb()
     const q = `%${query}%`
     return db.prepare('SELECT * FROM kb_items WHERE title LIKE ? OR content LIKE ? OR tags LIKE ? ORDER BY created_at DESC').all(q, q, q) as KBItem[]
+  },
+
+  searchByProject(projectId: string, query: string): KBItem[] {
+    const db = getDb()
+    const q = `%${query}%`
+    return db.prepare('SELECT * FROM kb_items WHERE project_id = ? AND (title LIKE ? OR content LIKE ? OR tags LIKE ?) ORDER BY created_at DESC').all(projectId, q, q, q) as KBItem[]
   },
 
   findById(id: string): KBItem | undefined {

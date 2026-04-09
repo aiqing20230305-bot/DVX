@@ -5,14 +5,20 @@ const router = Router()
 
 router.get('/', (req: Request, res: Response) => {
   try {
+    const projectId = req.query['projectId'] as string | undefined
     const type = req.query['type'] as string | undefined
     const q = req.query['q'] as string | undefined
     let items: KBItem[]
 
+    if (!projectId) {
+      res.status(400).json({ error: '缺少必填参数：projectId' })
+      return
+    }
+
     if (q) {
-      items = kbRepo.search(q)
+      items = kbRepo.searchByProject(projectId, q)
     } else {
-      items = kbRepo.findAll(type)
+      items = kbRepo.findByProject(projectId, type)
     }
 
     const parsed = items.map(i => ({ ...i, tags: JSON.parse(i.tags) as string[] }))
@@ -25,12 +31,12 @@ router.get('/', (req: Request, res: Response) => {
 
 router.post('/', (req: Request, res: Response) => {
   try {
-    const { type, title, content, tags = [], project_id } = req.body as {
+    const { type, title, content, tags = [], projectId } = req.body as {
       type: KBItem['type']
       title: string
       content: string
       tags?: string[]
-      project_id?: string
+      projectId?: string
     }
 
     if (!type || !title || !content) {
@@ -38,7 +44,7 @@ router.post('/', (req: Request, res: Response) => {
       return
     }
 
-    const item = kbRepo.create({ type, title, content, tags: JSON.stringify(tags), project_id: project_id ?? null })
+    const item = kbRepo.create({ type, title, content, tags: JSON.stringify(tags), project_id: projectId ?? null })
     res.status(201).json({ item: { ...item, tags } })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)

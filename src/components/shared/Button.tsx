@@ -13,11 +13,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 text-white border border-indigo-500 hover:border-indigo-400 shadow-sm shadow-indigo-900/50 hover:shadow-md hover:shadow-indigo-900/60',
-  secondary: 'bg-slate-700 hover:bg-slate-600 active:bg-slate-700 text-slate-100 border border-slate-600 hover:border-slate-500',
-  danger: 'bg-red-600 hover:bg-red-500 active:bg-red-600 text-white border border-red-500 hover:border-red-400 shadow-sm shadow-red-900/50',
-  ghost: 'bg-transparent hover:bg-slate-800/80 active:bg-slate-800 text-slate-300 hover:text-slate-200 border border-transparent hover:border-slate-700',
-  outline: 'bg-transparent hover:bg-indigo-600/10 active:bg-indigo-600/20 text-indigo-400 hover:text-indigo-300 border border-indigo-600/50 hover:border-indigo-500'
+  primary: 'bg-[#3370FF] hover:bg-[#1E4FD9] active:bg-[#3370FF] text-white border border-[#3370FF] hover:border-[#5B8EFF] shadow-sm shadow-[#3370FF]/30 hover:shadow-md hover:shadow-[#3370FF]/40',
+  secondary: 'bg-[#F7F8FA] hover:bg-[#F2F3F5] active:bg-[#F7F8FA] text-[#1F2329] border border-[#DEE0E3] hover:border-[#E3E5E8]',
+  danger: 'bg-[#EF4444] hover:bg-[#DC2626] active:bg-[#EF4444] text-white border border-[#EF4444] hover:border-[#F87171] shadow-sm shadow-[#EF4444]/30',
+  ghost: 'bg-transparent hover:bg-[#F2F3F5] active:bg-[#F7F8FA] text-[#646A73] hover:text-[#1F2329] border border-transparent hover:border-[#DEE0E3]',
+  outline: 'bg-transparent hover:bg-[#3370FF]/10 active:bg-[#3370FF]/20 text-[#3370FF] hover:text-[#5B8EFF] border border-[#3370FF]/50 hover:border-[#5B8EFF]'
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -71,7 +71,7 @@ export function Button({
       className={[
         // Base styles
         'relative inline-flex items-center justify-center font-medium overflow-hidden',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3370FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]',
         'select-none transition-all duration-200',
         // Variant & size
         variantClasses[variant],

@@ -86,20 +86,20 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
+        <div className="flex items-center justify-between p-6 border-b border-[#DEE0E3]">
           <div>
-            <h2 className="text-xl font-bold text-slate-100">{currentQuestionnaire.title}</h2>
+            <h2 className="text-xl font-bold text-[#1F2329]">{currentQuestionnaire.title}</h2>
             {currentQuestionnaire.description && (
-              <p className="text-sm text-slate-400 mt-1">{currentQuestionnaire.description}</p>
+              <p className="text-sm text-[#646A73] mt-1">{currentQuestionnaire.description}</p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-[#DEE0E3] rounded-lg transition-colors"
           >
-            <X size={20} className="text-slate-400" />
+            <X size={20} className="text-[#646A73]" />
           </button>
         </div>
 
@@ -107,7 +107,7 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {currentQuestionnaire.questions.map((question, index) => (
             <div key={question.id} className="space-y-3">
-              <label className="block text-slate-200 font-medium">
+              <label className="block text-[#1F2329] font-medium">
                 {index + 1}. {question.question_text}
                 {question.required === 1 && <span className="text-red-500 ml-1">*</span>}
               </label>
@@ -116,14 +116,14 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
               {question.question_type === 'radio' && (
                 <div className="space-y-2 ml-4">
                   {question.options && JSON.parse(question.options).map((option: string) => (
-                    <label key={option} className="flex items-center gap-2 text-slate-300 cursor-pointer hover:text-slate-100">
+                    <label key={option} className="flex items-center gap-2 text-[#646A73] cursor-pointer hover:text-[#1F2329]">
                       <input
                         type="radio"
                         name={question.id}
                         value={option}
                         checked={answers[question.id] === option}
                         onChange={(e) => handleRadioChange(question.id, e.target.value)}
-                        className="text-indigo-600 focus:ring-indigo-500"
+                        className="text-[#3370FF] focus:ring-[#3370FF]"
                       />
                       {option}
                     </label>
@@ -137,12 +137,12 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
                   {question.options && JSON.parse(question.options).map((option: string) => {
                     const currentOptions = answers[question.id] ? answers[question.id].split(',') : []
                     return (
-                      <label key={option} className="flex items-center gap-2 text-slate-300 cursor-pointer hover:text-slate-100">
+                      <label key={option} className="flex items-center gap-2 text-[#646A73] cursor-pointer hover:text-[#1F2329]">
                         <input
                           type="checkbox"
                           checked={currentOptions.includes(option)}
                           onChange={(e) => handleCheckboxChange(question.id, option, e.target.checked)}
-                          className="text-indigo-600 focus:ring-indigo-500 rounded"
+                          className="text-[#3370FF] focus:ring-[#3370FF] rounded"
                         />
                         {option}
                       </label>
@@ -158,7 +158,7 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
                   onChange={(e) => handleTextChange(question.id, e.target.value)}
                   placeholder="请输入您的回答..."
                   rows={3}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 resize-none"
+                  className="w-full bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg px-4 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF] resize-none"
                 />
               )}
 
@@ -176,13 +176,13 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
                         className={
                           answers[question.id] && parseInt(answers[question.id]) >= rating
                             ? 'fill-yellow-500 text-yellow-500'
-                            : 'text-slate-600'
+                            : 'text-[#C9CDD4]'
                         }
                       />
                     </button>
                   ))}
                   {answers[question.id] && (
-                    <span className="text-slate-400 ml-2">{answers[question.id]} 星</span>
+                    <span className="text-[#646A73] ml-2">{answers[question.id]} 星</span>
                   )}
                 </div>
               )}
@@ -191,17 +191,17 @@ export function QuestionnaireDialog({ questionnaireId, sessionId, onClose, onSub
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-700">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-[#DEE0E3]">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+            className="px-4 py-2 bg-[#DEE0E3] hover:bg-[#C9CDD4] text-[#1F2329] rounded-lg transition-colors"
           >
             稍后再说
           </button>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-[#3370FF] hover:bg-[#1E4FD9] text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? '提交中...' : '提交答案'}
           </button>

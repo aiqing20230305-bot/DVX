@@ -23,10 +23,10 @@ export const TopicCard = React.memo(function TopicCard({ topic, selected = false
   return (
     <div
       className={[
-        'bg-slate-800 border rounded-xl p-5 transition-all duration-200 card-hover',
+        'bg-[#F7F8FA] border rounded-xl p-5 transition-all duration-200 card-hover',
         selected
-          ? 'border-indigo-500/60 bg-indigo-900/10'
-          : platformAccent[topic.platform] ?? 'border-slate-700',
+          ? 'border-[#3370FF]/60 bg-[#0D3DB8]/10'
+          : platformAccent[topic.platform] ?? 'border-[#DEE0E3]',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
       onClick={() => onToggleSelect?.(topic.id)}
@@ -35,7 +35,7 @@ export const TopicCard = React.memo(function TopicCard({ topic, selected = false
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex flex-wrap gap-2">
           <PlatformBadge platform={topic.platform} />
-          <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+          <span className="inline-flex items-center gap-1 text-xs text-[#8F959E]">
             <Clock size={11} />
             {durationStr}
           </span>
@@ -43,38 +43,38 @@ export const TopicCard = React.memo(function TopicCard({ topic, selected = false
         {onToggleSelect && (
           <div className="flex-shrink-0">
             {selected
-              ? <CheckSquare size={17} className="text-indigo-400" />
-              : <Square size={17} className="text-slate-600" />
+              ? <CheckSquare size={17} className="text-[#5B8EFF]" />
+              : <Square size={17} className="text-[#C9CDD4]" />
             }
           </div>
         )}
       </div>
 
       {/* Title */}
-      <h3 className="text-base font-semibold text-slate-100 mb-2 leading-snug">{topic.title}</h3>
+      <h3 className="text-base font-semibold text-[#1F2329] mb-2 leading-snug">{topic.title}</h3>
 
       {/* Angle */}
       <div className="mb-3">
-        <span className="text-xs text-slate-500">切角：</span>
-        <span className="text-sm text-slate-400">{topic.angle}</span>
+        <span className="text-xs text-[#8F959E]">切角：</span>
+        <span className="text-sm text-[#646A73]">{topic.angle}</span>
       </div>
 
       {/* Persona */}
       <div className="flex items-start gap-1.5 mb-3">
-        <Users size={13} className="text-slate-500 mt-0.5 flex-shrink-0" />
-        <span className="text-xs text-slate-500">{topic.persona}</span>
+        <Users size={13} className="text-[#8F959E] mt-0.5 flex-shrink-0" />
+        <span className="text-xs text-[#8F959E]">{topic.persona}</span>
       </div>
 
       {/* CTA */}
-      <div className="bg-slate-900 rounded-lg px-3 py-2 mb-4">
-        <span className="text-xs text-slate-500">CTA：</span>
-        <span className="text-xs text-indigo-300 font-medium">{topic.cta}</span>
+      <div className="bg-[#F2F3F5] rounded-lg px-3 py-2 mb-4">
+        <span className="text-xs text-[#8F959E]">CTA：</span>
+        <span className="text-xs text-[#5B8EFF] font-medium">{topic.cta}</span>
       </div>
 
       {/* Priority stars */}
       {onPriorityChange && (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <span className="text-xs text-slate-500 mr-1">优先级</span>
+          <span className="text-xs text-[#8F959E] mr-1">优先级</span>
           {[1, 2, 3, 4, 5].map(star => (
             <button
               key={star}
@@ -83,7 +83,7 @@ export const TopicCard = React.memo(function TopicCard({ topic, selected = false
             >
               <Star
                 size={14}
-                className={star <= topic.priority ? 'text-amber-400 fill-amber-400' : 'text-slate-600'}
+                className={star <= topic.priority ? 'text-amber-400 fill-amber-400' : 'text-[#C9CDD4]'}
               />
             </button>
           ))}

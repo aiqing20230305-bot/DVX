@@ -120,14 +120,19 @@ ${context ? `视频背景信息：${context}` : ''}`
 
 export async function analyzeMultipleFrames(
   frames: Array<{ buffer: Buffer; timestamp: string }>,
-  context?: string
+  context?: string,
+  onProgress?: (current: number, total: number) => void
 ): Promise<FrameAnalysis[]> {
   // Process frames sequentially to avoid rate limits
   const results: FrameAnalysis[] = []
-  for (const frame of frames) {
+  const total = frames.length
+
+  for (let i = 0; i < frames.length; i++) {
+    const frame = frames[i]
     try {
       const analysis = await analyzeFrame(frame.buffer, frame.timestamp, context)
       results.push(analysis)
+      onProgress?.(i + 1, total)
     } catch (err) {
       console.error(`Failed to analyze frame at ${frame.timestamp}:`, err)
       results.push({
@@ -139,6 +144,7 @@ export async function analyzeMultipleFrames(
         mood: '未知',
         elements: [],
       })
+      onProgress?.(i + 1, total)
     }
   }
   return results

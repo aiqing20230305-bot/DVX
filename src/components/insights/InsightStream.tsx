@@ -24,8 +24,8 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
-          <span className="text-sm text-slate-500">加载已有洞察...</span>
+          <div className="w-2 h-2 rounded-full bg-[#C9CDD4] animate-pulse" />
+          <span className="text-sm text-[#8F959E]">加载已有洞察...</span>
         </div>
         <SkeletonList count={6} />
       </div>
@@ -59,8 +59,8 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
         {/* Live stream view */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span className="text-sm text-slate-400">AI 正在分析数据，实时生成洞察...</span>
+            <div className="w-2 h-2 rounded-full bg-[#3370FF] animate-pulse" />
+            <span className="text-sm text-[#646A73]">AI 正在分析数据，实时生成洞察...</span>
           </div>
           <StreamingText
             text={streamBuffer}
@@ -72,7 +72,7 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
         {/* Cards as they arrive */}
         {insights.length > 0 && (
           <div>
-            <div className="text-sm text-slate-400 mb-3">已生成 {insights.length} 条洞察</div>
+            <div className="text-sm text-[#646A73] mb-3">已生成 {insights.length} 条洞察</div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {insights.map(insight => (
                 <InsightCard
@@ -97,7 +97,7 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
     return (
       <div className="text-center py-16">
         <div className="text-red-400 text-lg font-medium mb-2">生成失败</div>
-        <p className="text-slate-500 text-sm">请检查网络连接和 API 配置后重试</p>
+        <p className="text-[#8F959E] text-sm">请检查网络连接和 API 配置后重试</p>
       </div>
     )
   }
@@ -106,7 +106,7 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
   return (
     <div className="space-y-4">
       {insights.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">未生成任何洞察</div>
+        <div className="text-center py-16 text-[#8F959E]">未生成任何洞察</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {insights.map(insight => (

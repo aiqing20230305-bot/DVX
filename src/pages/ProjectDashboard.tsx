@@ -81,7 +81,7 @@ export function ProjectDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader className="animate-spin text-indigo-500" size={32} />
+        <Loader className="animate-spin text-[#3370FF]" size={32} />
       </div>
     )
   }
@@ -89,7 +89,7 @@ export function ProjectDashboard() {
   if (!project || !stats) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <div className="text-slate-400">项目不存在</div>
+        <div className="text-[#646A73]">项目不存在</div>
         <Button onClick={() => navigate('/')}>返回工作台</Button>
       </div>
     )
@@ -114,9 +114,9 @@ export function ProjectDashboard() {
                 返回
               </Button>
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-bold text-slate-100 mb-1">{project.name}</h1>
+                <h1 className="text-2xl font-bold text-[#1F2329] mb-1">{project.name}</h1>
                 {project.description && (
-                  <p className="text-slate-400 text-sm">{project.description}</p>
+                  <p className="text-[#646A73] text-sm">{project.description}</p>
                 )}
               </div>
             </div>
@@ -129,39 +129,39 @@ export function ProjectDashboard() {
           {/* Project Meta */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {project.brand && (
-              <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
+                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
                   <Target size={14} />
                   品牌
                 </div>
-                <div className="text-slate-200 font-medium">{project.brand}</div>
+                <div className="text-[#1F2329] font-medium">{project.brand}</div>
               </div>
             )}
             {project.category && (
-              <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
+                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
                   <TrendingUp size={14} />
                   品类
                 </div>
-                <div className="text-slate-200 font-medium">{project.category}</div>
+                <div className="text-[#1F2329] font-medium">{project.category}</div>
               </div>
             )}
             {project.target_audience && (
-              <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
+                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
                   <Users size={14} />
                   目标人群
                 </div>
-                <div className="text-slate-200 font-medium">{project.target_audience}</div>
+                <div className="text-[#1F2329] font-medium">{project.target_audience}</div>
               </div>
             )}
             {project.campaign && (
-              <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
+                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
                   <Calendar size={14} />
                   营销活动
                 </div>
-                <div className="text-slate-200 font-medium">{project.campaign}</div>
+                <div className="text-[#1F2329] font-medium">{project.campaign}</div>
               </div>
             )}
           </div>
@@ -169,7 +169,7 @@ export function ProjectDashboard() {
           {/* Tags */}
           {project.tags.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
-              <Tag size={16} className="text-slate-500" />
+              <Tag size={16} className="text-[#8F959E]" />
               {project.tags.map(tag => (
                 <Badge key={tag} variant="secondary">{tag}</Badge>
               ))}
@@ -182,7 +182,7 @@ export function ProjectDashboard() {
               <div
                 key={card.label}
                 onClick={() => navigate(card.to)}
-                className="bg-slate-800 rounded-lg p-5 border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer group"
+                className="bg-[#F7F8FA] rounded-lg p-5 border border-[#DEE0E3] hover:border-[#C9CDD4] transition-colors cursor-pointer group"
               >
                 <div className="flex items-start justify-between mb-3">
                   <card.icon className={`${card.color} group-hover:scale-110 transition-transform`} size={24} />
@@ -190,26 +190,26 @@ export function ProjectDashboard() {
                     <Badge variant="secondary" className="text-xs">{card.badge}</Badge>
                   )}
                 </div>
-                <div className="text-3xl font-bold text-slate-100 mb-1">{card.value}</div>
-                <div className="text-sm text-slate-400">{card.label}</div>
+                <div className="text-3xl font-bold text-[#1F2329] mb-1">{card.value}</div>
+                <div className="text-sm text-[#646A73]">{card.label}</div>
               </div>
             ))}
           </div>
 
           {/* Activity Heatmap */}
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <div className="bg-[#F7F8FA] rounded-lg p-6 border border-[#DEE0E3]">
             <div className="flex items-center gap-2 mb-4">
-              <Activity size={20} className="text-indigo-400" />
-              <h2 className="text-lg font-semibold text-slate-200">活动趋势（最近30天）</h2>
+              <Activity size={20} className="text-[#5B8EFF]" />
+              <h2 className="text-lg font-semibold text-[#1F2329]">活动趋势（最近30天）</h2>
             </div>
             <ActivityHeatmap projectId={id!} days={30} />
           </div>
 
           {/* Timeline */}
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <div className="bg-[#F7F8FA] rounded-lg p-6 border border-[#DEE0E3]">
             <div className="flex items-center gap-2 mb-4">
-              <Calendar size={20} className="text-indigo-400" />
-              <h2 className="text-lg font-semibold text-slate-200">项目时间线</h2>
+              <Calendar size={20} className="text-[#5B8EFF]" />
+              <h2 className="text-lg font-semibold text-[#1F2329]">项目时间线</h2>
             </div>
             <ProjectTimeline projectId={id!} limit={50} />
           </div>
@@ -230,73 +230,73 @@ export function ProjectDashboard() {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">项目名称 *</label>
+            <label className="block text-sm font-medium text-[#646A73] mb-1.5">项目名称 *</label>
             <input
               type="text"
               value={editForm.name || ''}
               onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 text-sm"
+              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">项目描述</label>
+            <label className="block text-sm font-medium text-[#646A73] mb-1.5">项目描述</label>
             <textarea
               value={editForm.description || ''}
               onChange={e => setEditForm({ ...editForm, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 text-sm resize-none"
+              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] text-sm resize-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">品牌名称</label>
+              <label className="block text-sm font-medium text-[#646A73] mb-1.5">品牌名称</label>
               <input
                 type="text"
                 value={editForm.brand || ''}
                 onChange={e => setEditForm({ ...editForm, brand: e.target.value })}
                 placeholder="例如：多芬"
-                className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm"
+                className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">品类</label>
+              <label className="block text-sm font-medium text-[#646A73] mb-1.5">品类</label>
               <input
                 type="text"
                 value={editForm.category || ''}
                 onChange={e => setEditForm({ ...editForm, category: e.target.value })}
                 placeholder="例如：个护"
-                className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm"
+                className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">目标人群</label>
+            <label className="block text-sm font-medium text-[#646A73] mb-1.5">目标人群</label>
             <input
               type="text"
               value={editForm.target_audience || ''}
               onChange={e => setEditForm({ ...editForm, target_audience: e.target.value })}
               placeholder="例如：25-35岁女性"
-              className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm"
+              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">营销活动</label>
+            <label className="block text-sm font-medium text-[#646A73] mb-1.5">营销活动</label>
             <input
               type="text"
               value={editForm.campaign || ''}
               onChange={e => setEditForm({ ...editForm, campaign: e.target.value })}
               placeholder="例如：618大促"
-              className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm"
+              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">标签（用逗号分隔）</label>
+            <label className="block text-sm font-medium text-[#646A73] mb-1.5">标签（用逗号分隔）</label>
             <input
               type="text"
               value={editForm.tags?.join(', ') || ''}
               onChange={e => setEditForm({ ...editForm, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
               placeholder="例如：快消品, 女性, 个护"
-              className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm"
+              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
             />
           </div>
         </div>

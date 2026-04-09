@@ -88,7 +88,7 @@ export function DataChartsPanel() {
     <div className="mb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-slate-400">数据统计</h3>
+        <h3 className="text-sm font-medium text-[#646A73]">数据统计</h3>
         <div className="flex gap-2">
           {(['7', '30', 'all'] as TimeRange[]).map(range => (
             <button
@@ -96,8 +96,8 @@ export function DataChartsPanel() {
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1 text-xs rounded-lg transition-colors ${
                 timeRange === range
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                  ? 'bg-[#3370FF] text-white'
+                  : 'bg-[#F7F8FA] text-[#646A73] hover:bg-[#DEE0E3]'
               }`}
             >
               {range === 'all' ? '全部' : `${range}天`}
@@ -109,8 +109,8 @@ export function DataChartsPanel() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Trend Chart */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-          <h4 className="text-sm font-medium text-slate-300 mb-4">数据生成趋势</h4>
+        <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-4">
+          <h4 className="text-sm font-medium text-[#646A73] mb-4">数据生成趋势</h4>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
@@ -134,8 +134,8 @@ export function DataChartsPanel() {
 
         {/* Platform Distribution */}
         {platformData.length > 0 && (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-            <h4 className="text-sm font-medium text-slate-300 mb-4">平台分布</h4>
+          <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-4">
+            <h4 className="text-sm font-medium text-[#646A73] mb-4">平台分布</h4>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie

@@ -28,7 +28,7 @@ function getFileIcon(file: File) {
   if (file.type.startsWith('image/')) {
     return <Image size={20} className="text-blue-400" />
   }
-  return <FileText size={20} className="text-slate-400" />
+  return <FileText size={20} className="text-[#646A73]" />
 }
 
 function formatSize(bytes: number): string {
@@ -95,6 +95,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
   const handleUpload = () => {
     if (pendingFiles.length > 0) {
       onFiles(pendingFiles, fileType)
+      // Clear immediately - user will see "AI 正在解析文件..." banner below
       setPendingFiles([])
     }
   }
@@ -109,7 +110,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
     <div className="space-y-4">
       {/* File Type Selector */}
       <div className="space-y-2">
-        <div className="text-sm font-medium text-slate-300">选择数据类型</div>
+        <div className="text-sm font-medium text-[#646A73]">选择数据类型</div>
         <div className="grid grid-cols-3 gap-3">
           {fileTypeOptions.map(option => (
             <button
@@ -119,20 +120,20 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
               className={[
                 'relative px-4 py-3 rounded-lg border-2 transition-all text-left',
                 fileType === option.value
-                  ? 'border-indigo-500 bg-indigo-500/10'
-                  : 'border-slate-700 bg-slate-800/30 hover:border-slate-600',
+                  ? 'border-[#3370FF] bg-[#3370FF]/10'
+                  : 'border-[#DEE0E3] bg-[#F7F8FA]/30 hover:border-[#C9CDD4]',
                 disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
               ].join(' ')}
             >
               {fileType === option.value && (
-                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-indigo-500 flex items-center justify-center">
+                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-[#3370FF] flex items-center justify-center">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
               )}
-              <div className="font-medium text-slate-200 mb-1">{option.label}</div>
-              <div className="text-xs text-slate-500">{option.description}</div>
+              <div className="font-medium text-[#1F2329] mb-1">{option.label}</div>
+              <div className="text-xs text-[#8F959E]">{option.description}</div>
             </button>
           ))}
         </div>
@@ -146,8 +147,8 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
         className={[
           'relative border-2 border-dashed rounded-xl p-10 text-center transition-all duration-200 cursor-pointer',
           isDragOver
-            ? 'border-indigo-500 bg-indigo-500/10'
-            : 'border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50',
+            ? 'border-[#3370FF] bg-[#3370FF]/10'
+            : 'border-[#DEE0E3] bg-[#F7F8FA]/30 hover:border-[#C9CDD4] hover:bg-[#F7F8FA]/50',
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         ].join(' ')}
       >
@@ -163,15 +164,15 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
         <div className="flex flex-col items-center gap-3">
           <div className={[
             'w-14 h-14 rounded-2xl flex items-center justify-center transition-colors',
-            isDragOver ? 'bg-indigo-600/30' : 'bg-slate-800'
+            isDragOver ? 'bg-[#3370FF]/30' : 'bg-[#F7F8FA]'
           ].join(' ')}>
-            <Upload size={24} className={isDragOver ? 'text-indigo-400' : 'text-slate-500'} />
+            <Upload size={24} className={isDragOver ? 'text-[#5B8EFF]' : 'text-[#8F959E]'} />
           </div>
           <div>
-            <p className="text-slate-300 font-medium mb-1">
+            <p className="text-[#646A73] font-medium mb-1">
               {isDragOver ? '释放文件以上传' : '拖放文件，或点击选择'}
             </p>
-            <p className="text-slate-500 text-sm">支持 Excel、CSV、PDF、图片、视频(MP4/MOV/WebM) · 最大 50MB</p>
+            <p className="text-[#8F959E] text-sm">支持 Excel、CSV、PDF、图片、视频(MP4/MOV/WebM) · 最大 50MB</p>
           </div>
           <div className="flex gap-3 mt-1">
             {[
@@ -180,7 +181,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
               { icon: <Image size={14} />, label: '图片', color: 'text-blue-400' },
               { icon: <Film size={14} />, label: '视频', color: 'text-purple-400' },
             ].map(({ icon, label, color }) => (
-              <span key={label} className={`flex items-center gap-1.5 text-xs ${color} bg-slate-800 px-2.5 py-1 rounded-full`}>
+              <span key={label} className={`flex items-center gap-1.5 text-xs ${color} bg-[#F7F8FA] px-2.5 py-1 rounded-full`}>
                 {icon}{label}
               </span>
             ))}
@@ -191,7 +192,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
       {/* Pending files list */}
       {pendingFiles.length > 0 && (
         <div className="space-y-2">
-          <div className="text-sm text-slate-400 font-medium">待上传文件 ({pendingFiles.length})</div>
+          <div className="text-sm text-[#646A73] font-medium">待上传文件 ({pendingFiles.length})</div>
           <div className="space-y-2">
             {pendingFiles.map((file, idx) => {
               const uploadState = getFileUploadState(file)
@@ -200,20 +201,20 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
               const hasError = uploadState?.status === 'error'
 
               return (
-                <div key={idx} className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                <div key={idx} className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg overflow-hidden">
                   <div className="flex items-center gap-3 px-3 py-2.5">
                     {getFileIcon(file)}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <div className="text-sm text-slate-200 truncate">{file.name}</div>
-                        {isUploading && <Loader2 size={12} className="text-indigo-400 animate-spin flex-shrink-0" />}
+                        <div className="text-sm text-[#1F2329] truncate">{file.name}</div>
+                        {isUploading && <Loader2 size={12} className="text-[#5B8EFF] animate-spin flex-shrink-0" />}
                         {isDone && <CheckCircle2 size={12} className="text-emerald-400 flex-shrink-0" />}
                         {hasError && <AlertCircle size={12} className="text-red-400 flex-shrink-0" />}
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-xs text-slate-500">{formatSize(file.size)}</div>
+                        <div className="text-xs text-[#8F959E]">{formatSize(file.size)}</div>
                         {isUploading && uploadState && (
-                          <div className="text-xs text-indigo-400">{uploadState.progress}%</div>
+                          <div className="text-xs text-[#5B8EFF]">{uploadState.progress}%</div>
                         )}
                         {isDone && <div className="text-xs text-emerald-400">上传完成</div>}
                         {hasError && uploadState?.error && (
@@ -224,7 +225,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
                     {!isUploading && !isDone && (
                       <button
                         onClick={(e) => { e.stopPropagation(); removeFile(idx) }}
-                        className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 transition-colors"
+                        className="p-1 rounded hover:bg-[#DEE0E3] text-[#8F959E] hover:text-[#646A73] transition-colors"
                       >
                         <X size={14} />
                       </button>
@@ -233,9 +234,9 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
 
                   {/* Progress bar */}
                   {isUploading && uploadState && (
-                    <div className="h-1 bg-slate-700">
+                    <div className="h-1 bg-[#DEE0E3]">
                       <div
-                        className="h-full bg-indigo-500 transition-all duration-300"
+                        className="h-full bg-[#3370FF] transition-all duration-300"
                         style={{ width: `${uploadState.progress}%` }}
                       />
                     </div>

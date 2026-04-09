@@ -16,6 +16,7 @@ import { reportRouter } from './routes/report.route.js'
 import { kbRouter } from './routes/kb.route.js'
 import { testingRouter } from './routes/testing.route.js'
 import { questionnaireRouter } from './routes/questionnaire.route.js'
+import { timelineRouter } from './routes/timeline.route.js'
 import { errorMiddleware } from './middleware/error.middleware.js'
 import { performanceMonitor } from './middleware/performanceMonitor.js'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
@@ -35,7 +36,8 @@ const app = express()
 
 // CORS configuration with origin whitelist
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || [
-  'http://localhost:5173', // Development
+  'http://localhost:5173', // Development (default Vite port)
+  'http://localhost:5176', // Development (alternative Vite port)
   'http://localhost:3001', // Production (same domain)
 ]
 
@@ -257,6 +259,7 @@ app.use('/api/report', reportRouter)
 app.use('/api/kb', kbRouter)
 app.use('/api/testing', testingRouter)
 app.use('/api/questionnaire', questionnaireRouter)
+app.use('/api/timeline', timelineRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() })

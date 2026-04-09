@@ -24,7 +24,7 @@ export function BatchToolbar({
   const isIndeterminate = selectedCount > 0 && selectedCount < totalCount
 
   return (
-    <div className="flex items-center justify-between p-4 bg-slate-800 border border-slate-700 rounded-lg mb-4">
+    <div className="flex items-center justify-between p-4 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg mb-4">
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -36,12 +36,12 @@ export function BatchToolbar({
               }
             }}
             onChange={() => (isAllSelected ? onClearSelection() : onSelectAll())}
-            className="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900"
+            className="w-4 h-4 rounded border-[#E3E5E8] text-[#3370FF] focus:ring-[#3370FF] focus:ring-offset-[#FFFFFF]"
           />
-          <span className="text-sm font-medium text-slate-300">全选</span>
+          <span className="text-sm font-medium text-[#646A73]">全选</span>
         </label>
-        <span className="text-sm text-slate-400">
-          已选: <span className="font-medium text-slate-300">{selectedCount}</span> / {totalCount}
+        <span className="text-sm text-[#8F959E]">
+          已选: <span className="font-medium text-[#646A73]">{selectedCount}</span> / {totalCount}
         </span>
       </div>
 
@@ -54,7 +54,7 @@ export function BatchToolbar({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                 action.danger
                   ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                  : 'bg-[#3370FF] hover:bg-[#1E4FD9] text-white'
               }`}
             >
               {action.icon}

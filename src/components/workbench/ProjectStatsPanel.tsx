@@ -78,7 +78,7 @@ export function ProjectStatsPanel() {
 
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-medium text-slate-400 mb-3">项目进度</h3>
+      <h3 className="text-sm font-medium text-[#646A73] mb-3">项目进度</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map(stat => {
           const Icon = stat.icon
@@ -88,37 +88,37 @@ export function ProjectStatsPanel() {
               onClick={() => navigate(stat.route)}
               className={`
                 relative p-4 rounded-xl border ${stat.borderColor} ${stat.bgColor}
-                hover:bg-slate-700/30 transition-all duration-200
+                hover:bg-[#DEE0E3]/30 transition-all duration-200
                 text-left group
               `}
             >
               {/* Icon */}
               <div className="flex items-center gap-2 mb-2">
                 <Icon size={16} className={stat.iconColor} />
-                <span className="text-xs font-medium text-slate-400">{stat.label}</span>
+                <span className="text-xs font-medium text-[#646A73]">{stat.label}</span>
               </div>
 
               {/* Value */}
               <div className="mb-1">
                 {stat.isText ? (
-                  <div className={`text-lg font-bold ${stat.isEmpty ? 'text-slate-500' : stat.iconColor}`}>
+                  <div className={`text-lg font-bold ${stat.isEmpty ? 'text-[#8F959E]' : stat.iconColor}`}>
                     {stat.value}
                   </div>
                 ) : (
-                  <div className={`text-2xl font-bold ${stat.isEmpty ? 'text-slate-500' : 'text-slate-100'}`}>
+                  <div className={`text-2xl font-bold ${stat.isEmpty ? 'text-[#8F959E]' : 'text-[#1F2329]'}`}>
                     {stat.value}
                   </div>
                 )}
               </div>
 
               {/* Sub value */}
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-[#8F959E]">
                 {stat.subValue}
               </div>
 
               {/* Hover arrow */}
               <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-xs text-slate-500">→</span>
+                <span className="text-xs text-[#8F959E]">→</span>
               </div>
             </button>
           )

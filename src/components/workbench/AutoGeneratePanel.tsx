@@ -149,26 +149,38 @@ export function AutoGeneratePanel() {
       setTopics(freshTopics)
       updateStep('topics', { status: 'completed', count: freshTopics.length })
 
-      // Step 3: Generate Scripts (for all topics)
+      // Step 3: Generate Scripts (only for top 8 high-priority topics)
       if (cancelledRef.current) return
       updateStep('scripts', { status: 'running' })
 
-      for (const topic of freshTopics) {
-        const scriptsResponse = await scriptApi.generateStream(activeProjectId, topic.id)
-        const scriptsReader = scriptsResponse.body?.getReader()
-        const scriptsDecoder = new TextDecoder()
+      // Select top 8 topics by priority
+      const topTopics = freshTopics
+        .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+        .slice(0, 8)
 
-        if (scriptsReader) {
-          let buffer = ''
-          while (true) {
-            const { done, value } = await scriptsReader.read()
-            if (done) break
+      // Generate scripts in parallel for better performance
+      await Promise.all(
+        topTopics.map(async (topic) => {
+          try {
+            const scriptsResponse = await scriptApi.generateStream(activeProjectId, topic.id)
+            const scriptsReader = scriptsResponse.body?.getReader()
+            const scriptsDecoder = new TextDecoder()
 
-            buffer += scriptsDecoder.decode(value, { stream: true })
-            // Process script stream data
+            if (scriptsReader) {
+              let buffer = ''
+              while (true) {
+                const { done, value } = await scriptsReader.read()
+                if (done) break
+
+                buffer += scriptsDecoder.decode(value, { stream: true })
+                // Process script stream data
+              }
+            }
+          } catch (error) {
+            console.error(`Failed to generate script for topic ${topic.id}:`, error)
           }
-        }
-      }
+        })
+      )
 
       // Refresh scripts
       const { scripts: freshScripts } = await scriptApi.listByProject(activeProjectId)
@@ -212,19 +224,19 @@ export function AutoGeneratePanel() {
       case 'completed':
         return <CheckCircle2 size={18} className="text-emerald-400" />
       case 'running':
-        return <Loader2 size={18} className="text-indigo-400 animate-spin" />
+        return <Loader2 size={18} className="text-[#5B8EFF] animate-spin" />
       case 'error':
         return <XCircle size={18} className="text-red-400" />
       default:
-        return <div className="w-[18px] h-[18px] rounded-full border-2 border-slate-600" />
+        return <div className="w-[18px] h-[18px] rounded-full border-2 border-[#C9CDD4]" />
     }
   }
 
   if (status === 'running' || status === 'success' || status === 'error') {
     return (
-      <div className="mb-6 bg-slate-800 border border-slate-700 rounded-xl p-6">
+      <div className="mb-6 bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-100">
+          <h3 className="text-base font-semibold text-[#1F2329]">
             {status === 'success' ? '✅ 生成完成' : status === 'error' ? '❌ 生成失败' : '⚡ 生成进度'}
           </h3>
           {status === 'running' && (
@@ -244,10 +256,10 @@ export function AutoGeneratePanel() {
             <div key={key} className="flex items-center gap-3">
               {getStepIcon(step.status)}
               <span className={`text-sm ${
-                step.status === 'completed' ? 'text-slate-300' :
-                step.status === 'running' ? 'text-indigo-300' :
-                step.status === 'error' ? 'text-red-300' :
-                'text-slate-500'
+                step.status === 'completed' ? 'text-[#646A73]' :
+                step.status === 'running' ? 'text-[#5B8EFF]' :
+                step.status === 'error' ? 'text-red-600' :
+                'text-[#8F959E]'
               }`}>
                 {step.label}
                 {step.count !== undefined && ` (${step.count})`}
@@ -288,14 +300,14 @@ export function AutoGeneratePanel() {
   }
 
   return (
-    <div className="mb-6 bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-700/30 rounded-xl p-6">
+    <div className="mb-6 bg-[#3370FF]/8 border border-[#3370FF]/20 rounded-xl p-6">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
-          <Zap size={24} className="text-indigo-400" />
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#3370FF]/15 border border-[#3370FF]/30 flex items-center justify-center">
+          <Zap size={24} className="text-[#3370FF]" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-slate-100 mb-1">一键生成战略报告</h3>
-          <p className="text-sm text-slate-400 mb-4">
+          <h3 className="text-base font-semibold text-[#1F2329] mb-1">一键生成战略报告</h3>
+          <p className="text-sm text-[#646A73] mb-4">
             上传数据后，自动执行完整工作流：洞察生成 → 选题策划 → 脚本创作 → 战略报告
           </p>
           <Button
@@ -309,10 +321,10 @@ export function AutoGeneratePanel() {
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-slate-700/50">
+      <div className="mt-4 pt-4 border-t border-[#3370FF]/10">
         <div className="flex items-start gap-2">
-          <AlertCircle size={14} className="text-slate-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-slate-500">
+          <AlertCircle size={14} className="text-[#3370FF]/60 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-[#646A73]">
             生成过程需要几分钟时间，请耐心等待。您可以最小化窗口，完成后会有通知提示。
           </p>
         </div>

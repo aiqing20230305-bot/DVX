@@ -4,6 +4,11 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
+  },
   build: {
     outDir: 'dist/client',
     emptyOutDir: true,
@@ -24,6 +29,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000, // Increase warning limit to 1MB
   },
   server: {
+    port: 5176,
     proxy: {
       '/api': 'http://localhost:3001'
     }

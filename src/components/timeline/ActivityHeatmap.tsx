@@ -36,14 +36,14 @@ export function ActivityHeatmap({ projectId, days = 30 }: ActivityHeatmapProps) 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader className="animate-spin text-indigo-500" size={24} />
+        <Loader className="animate-spin text-[#3370FF]" size={24} />
       </div>
     )
   }
 
   if (activity.length === 0) {
     return (
-      <div className="text-center text-slate-500 py-8">
+      <div className="text-center text-[#8F959E] py-8">
         暂无活动数据
       </div>
     )

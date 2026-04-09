@@ -20,8 +20,8 @@ export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPrior
     return (
       <div>
         <div className="flex items-center gap-2 mb-5">
-          <div className="w-2 h-2 rounded-full bg-slate-600 animate-pulse" />
-          <span className="text-sm text-slate-500">加载已有选题...</span>
+          <div className="w-2 h-2 rounded-full bg-[#C9CDD4] animate-pulse" />
+          <span className="text-sm text-[#8F959E]">加载已有选题...</span>
         </div>
         <SkeletonList count={6} />
       </div>
@@ -31,11 +31,11 @@ export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPrior
   if (status === 'idle') {
     return (
       <div className="text-center py-20">
-        <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
-          <FileText size={28} className="text-slate-600" />
+        <div className="w-16 h-16 rounded-2xl bg-[#F7F8FA] border border-[#DEE0E3] flex items-center justify-center mx-auto mb-4">
+          <FileText size={28} className="text-[#C9CDD4]" />
         </div>
-        <h3 className="text-slate-400 font-medium mb-2">等待生成选题</h3>
-        <p className="text-slate-600 text-sm">选择洞察后，点击「生成选题」开始创作</p>
+        <h3 className="text-[#646A73] font-medium mb-2">等待生成选题</h3>
+        <p className="text-[#C9CDD4] text-sm">选择洞察后，点击「生成选题」开始创作</p>
       </div>
     )
   }
@@ -44,8 +44,8 @@ export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPrior
     return (
       <div>
         <div className="flex items-center gap-2 mb-5">
-          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-          <span className="text-sm text-slate-400">AI 正在基于洞察生成选题方案...</span>
+          <div className="w-2 h-2 rounded-full bg-[#3370FF] animate-pulse" />
+          <span className="text-sm text-[#646A73]">AI 正在基于洞察生成选题方案...</span>
         </div>
         {topics.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -70,13 +70,13 @@ export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPrior
     return (
       <div className="text-center py-16">
         <div className="text-red-400 text-lg font-medium mb-2">生成失败</div>
-        <p className="text-slate-500 text-sm">请重试或检查洞察数据是否正确</p>
+        <p className="text-[#8F959E] text-sm">请重试或检查洞察数据是否正确</p>
       </div>
     )
   }
 
   if (topics.length === 0) {
-    return <div className="text-center py-16 text-slate-500">未生成任何选题</div>
+    return <div className="text-center py-16 text-[#8F959E]">未生成任何选题</div>
   }
 
   return (

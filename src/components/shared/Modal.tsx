@@ -44,16 +44,16 @@ export function Modal({ open, onClose, title, children, size = 'md', footer }: M
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div className={[
-        'relative w-full bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl shadow-black/50',
+        'relative w-full bg-[#F7F8FA] border border-[#DEE0E3] rounded-2xl shadow-2xl shadow-black/50',
         sizeClasses[size]
       ].join(' ')}>
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
-            <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#DEE0E3]">
+            <h2 className="text-lg font-semibold text-[#1F2329]">{title}</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700 transition-colors"
+              className="p-1.5 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#F2F3F5] transition-colors"
             >
               <X size={18} />
             </button>
@@ -62,7 +62,7 @@ export function Modal({ open, onClose, title, children, size = 'md', footer }: M
         {!title && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700 transition-colors z-10"
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#F2F3F5] transition-colors z-10"
           >
             <X size={18} />
           </button>
@@ -73,7 +73,7 @@ export function Modal({ open, onClose, title, children, size = 'md', footer }: M
 
         {/* Footer */}
         {footer && (
-          <div className="px-6 py-4 border-t border-slate-700 flex justify-end gap-3">
+          <div className="px-6 py-4 border-t border-[#DEE0E3] flex justify-end gap-3">
             {footer}
           </div>
         )}

@@ -18,7 +18,10 @@ export interface ExcelParseResult {
   storyboards?: StoryboardAnalysisResult[]
 }
 
-export async function parseExcel(filePath: string): Promise<ExcelParseResult> {
+export async function parseExcel(
+  filePath: string,
+  onProgress?: (current: number, total: number) => void
+): Promise<ExcelParseResult> {
   console.log('[excel-parser] 开始解析Excel文件...')
   const buffer = readFileSync(filePath)
   const workbook = XLSX.read(buffer, { type: 'buffer', cellDates: true })
@@ -82,7 +85,7 @@ export async function parseExcel(filePath: string): Promise<ExcelParseResult> {
   if (hasStoryboardSheets(sheetNames)) {
     try {
       console.log('[excel-parser] ⚠️ 检测到分镜Sheet，开始提取图片并调用AI分析（这可能需要10-30秒）...')
-      storyboards = await extractAndAnalyzeStoryboardImages(filePath, sheetNames)
+      storyboards = await extractAndAnalyzeStoryboardImages(filePath, sheetNames, onProgress)
       if (storyboards.length > 0) {
         console.log(`[excel-parser] ✅ AI分析完成：${storyboards.reduce((sum, s) => sum + s.frameCount, 0)} 个分镜帧`)
       }

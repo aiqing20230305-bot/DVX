@@ -32,20 +32,20 @@ export function TestingTracker() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
-      <div className="bg-indigo-600 border border-indigo-500 rounded-lg shadow-lg p-3 flex items-center gap-3">
+      <div className="bg-[#3370FF] border border-[#3370FF] rounded-lg shadow-lg p-3 flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
           <span className="text-white text-sm font-medium">测试追踪中</span>
         </div>
         <button
           onClick={handleStop}
-          className="p-1 hover:bg-indigo-700 rounded transition-colors"
+          className="p-1 hover:bg-[#1E4FD9] rounded transition-colors"
           title="停止追踪"
         >
           <XCircle size={16} className="text-white" />
         </button>
       </div>
-      <div className="text-xs text-slate-400 mt-1 text-right">
+      <div className="text-xs text-[#646A73] mt-1 text-right">
         会话: {getSessionId()?.slice(0, 8)}...
       </div>
     </div>

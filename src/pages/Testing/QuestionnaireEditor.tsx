@@ -169,7 +169,7 @@ export function QuestionnaireEditor() {
   if (loading && isEdit) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">加载中...</div>
+        <div className="text-[#646A73]">加载中...</div>
       </div>
     )
   }
@@ -180,22 +180,22 @@ export function QuestionnaireEditor() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/testing/questionnaires')}
-          className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-[#F7F8FA] rounded-lg transition-colors"
         >
-          <ArrowLeft size={20} className="text-slate-400" />
+          <ArrowLeft size={20} className="text-[#646A73]" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">
+          <h1 className="text-2xl font-bold text-[#1F2329]">
             {isEdit ? '编辑问卷' : '创建问卷'}
           </h1>
-          <p className="text-sm text-slate-400 mt-1">配置问卷信息和问题</p>
+          <p className="text-sm text-[#646A73] mt-1">配置问卷信息和问题</p>
         </div>
       </div>
 
       {/* Basic Info */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-4">
+      <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+          <label className="block text-sm font-medium text-[#646A73] mb-2">
             问卷标题 <span className="text-red-500">*</span>
           </label>
           <input
@@ -203,12 +203,12 @@ export function QuestionnaireEditor() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例如: 用户满意度调查"
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg px-4 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+          <label className="block text-sm font-medium text-[#646A73] mb-2">
             问卷描述
           </label>
           <textarea
@@ -216,19 +216,19 @@ export function QuestionnaireEditor() {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="简要说明问卷目的..."
             rows={3}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 resize-none"
+            className="w-full bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg px-4 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF] resize-none"
           />
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[#646A73] mb-2">
               触发方式
             </label>
             <select
               value={triggerType}
               onChange={(e) => setTriggerType(e.target.value as any)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-[#F2F3F5] border border-[#DEE0E3] rounded-lg px-4 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
             >
               <option value="manual">手动触发</option>
               <option value="timed">定时触发（未实现）</option>
@@ -237,9 +237,9 @@ export function QuestionnaireEditor() {
           </div>
 
           {triggerType === 'event' && (
-            <div className="space-y-3 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+            <div className="space-y-3 p-4 bg-[#F2F3F5]/50 rounded-lg border border-[#DEE0E3]">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-[#646A73] mb-2">
                   触发规则类型
                 </label>
                 <select
@@ -260,7 +260,7 @@ export function QuestionnaireEditor() {
                       description: ''
                     }))
                   }}
-                  className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[#F7F8FA] border border-[#C9CDD4] rounded px-3 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
                 >
                   <option value="click">点击特定元素</option>
                   <option value="page">访问特定页面</option>
@@ -273,7 +273,7 @@ export function QuestionnaireEditor() {
                   if (rule.type === 'click') {
                     return (
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label className="block text-sm font-medium text-[#646A73] mb-2">
                           元素选择器 (CSS Selector)
                         </label>
                         <input
@@ -283,14 +283,14 @@ export function QuestionnaireEditor() {
                             setTriggerValue(JSON.stringify({ ...rule, selector: e.target.value }))
                           }}
                           placeholder="例如: button.generate-insights"
-                          className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-[#F7F8FA] border border-[#C9CDD4] rounded px-3 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
                         />
                       </div>
                     )
                   } else if (rule.type === 'page') {
                     return (
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label className="block text-sm font-medium text-[#646A73] mb-2">
                           页面路径
                         </label>
                         <input
@@ -300,7 +300,7 @@ export function QuestionnaireEditor() {
                             setTriggerValue(JSON.stringify({ ...rule, path: e.target.value }))
                           }}
                           placeholder="例如: /insights"
-                          className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-[#F7F8FA] border border-[#C9CDD4] rounded px-3 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
                         />
                       </div>
                     )
@@ -312,7 +312,7 @@ export function QuestionnaireEditor() {
               })()}
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-[#646A73] mb-2">
                   规则描述
                 </label>
                 <input
@@ -334,7 +334,7 @@ export function QuestionnaireEditor() {
                     }
                   }}
                   placeholder="例如: 点击生成洞察按钮后触发"
-                  className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[#F7F8FA] border border-[#C9CDD4] rounded px-3 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF]"
                 />
               </div>
             </div>
@@ -343,12 +343,12 @@ export function QuestionnaireEditor() {
       </div>
 
       {/* Questions */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+      <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-slate-100">问题列表</h2>
+          <h2 className="text-lg font-semibold text-[#1F2329]">问题列表</h2>
           <button
             onClick={addNewQuestion}
-            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm flex items-center gap-1 transition-colors"
+            className="px-3 py-1.5 bg-[#3370FF] hover:bg-[#1E4FD9] text-white rounded text-sm flex items-center gap-1 transition-colors"
           >
             <Plus size={16} />
             添加问题
@@ -356,28 +356,28 @@ export function QuestionnaireEditor() {
         </div>
 
         {questions.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
+          <div className="text-center py-8 text-[#8F959E]">
             暂无问题，点击"添加问题"开始
           </div>
         ) : (
           <div className="space-y-4">
             {questions.map((question, index) => (
-              <div key={index} className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
+              <div key={index} className="bg-[#F2F3F5]/50 border border-[#DEE0E3] rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-slate-400 font-medium">{index + 1}.</span>
+                      <span className="text-[#646A73] font-medium">{index + 1}.</span>
                       <select
                         value={question.question_type}
                         onChange={(e) => updateQuestion(index, 'question_type', e.target.value)}
-                        className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-sm text-slate-300 focus:outline-none focus:border-indigo-500"
+                        className="bg-[#F7F8FA] border border-[#C9CDD4] rounded px-2 py-1 text-sm text-[#646A73] focus:outline-none focus:border-[#3370FF]"
                       >
                         <option value="radio">单选题</option>
                         <option value="checkbox">多选题</option>
                         <option value="text">文本题</option>
                         <option value="rating">评分题</option>
                       </select>
-                      <label className="flex items-center gap-1 text-sm text-slate-400">
+                      <label className="flex items-center gap-1 text-sm text-[#646A73]">
                         <input
                           type="checkbox"
                           checked={question.required}
@@ -393,7 +393,7 @@ export function QuestionnaireEditor() {
                       value={question.question_text}
                       onChange={(e) => updateQuestion(index, 'question_text', e.target.value)}
                       placeholder="输入问题..."
-                      className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 mb-2"
+                      className="w-full bg-[#F7F8FA] border border-[#C9CDD4] rounded px-3 py-2 text-[#1F2329] focus:outline-none focus:border-[#3370FF] mb-2"
                     />
 
                     {/* Options for radio/checkbox */}
@@ -401,14 +401,14 @@ export function QuestionnaireEditor() {
                       <div className="space-y-2 ml-6">
                         {question.options.map((option, optionIndex) => (
                           <div key={optionIndex} className="flex items-center gap-2">
-                            <span className="text-slate-500 text-sm">
+                            <span className="text-[#8F959E] text-sm">
                               {question.question_type === 'radio' ? '○' : '☐'}
                             </span>
                             <input
                               type="text"
                               value={option}
                               onChange={(e) => updateOption(index, optionIndex, e.target.value)}
-                              className="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-sm text-slate-300 focus:outline-none focus:border-indigo-500"
+                              className="flex-1 bg-[#F7F8FA] border border-[#C9CDD4] rounded px-2 py-1 text-sm text-[#646A73] focus:outline-none focus:border-[#3370FF]"
                             />
                             {question.options.length > 2 && (
                               <button
@@ -422,7 +422,7 @@ export function QuestionnaireEditor() {
                         ))}
                         <button
                           onClick={() => addOption(index)}
-                          className="text-sm text-indigo-400 hover:text-indigo-300 ml-6"
+                          className="text-sm text-[#5B8EFF] hover:text-[#5B8EFF] ml-6"
                         >
                           + 添加选项
                         </button>
@@ -431,10 +431,10 @@ export function QuestionnaireEditor() {
 
                     {/* Hint for other types */}
                     {question.question_type === 'text' && (
-                      <p className="text-xs text-slate-500 ml-6">用户将输入文本回答</p>
+                      <p className="text-xs text-[#8F959E] ml-6">用户将输入文本回答</p>
                     )}
                     {question.question_type === 'rating' && (
-                      <p className="text-xs text-slate-500 ml-6">用户将选择1-5星评分</p>
+                      <p className="text-xs text-[#8F959E] ml-6">用户将选择1-5星评分</p>
                     )}
                   </div>
 
@@ -442,7 +442,7 @@ export function QuestionnaireEditor() {
                     <button
                       onClick={() => moveQuestion(index, 'up')}
                       disabled={index === 0}
-                      className="p-1 hover:bg-slate-700 text-slate-400 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1 hover:bg-[#DEE0E3] text-[#646A73] rounded disabled:opacity-30 disabled:cursor-not-allowed"
                       title="上移"
                     >
                       <ChevronUp size={16} />
@@ -450,7 +450,7 @@ export function QuestionnaireEditor() {
                     <button
                       onClick={() => moveQuestion(index, 'down')}
                       disabled={index === questions.length - 1}
-                      className="p-1 hover:bg-slate-700 text-slate-400 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1 hover:bg-[#DEE0E3] text-[#646A73] rounded disabled:opacity-30 disabled:cursor-not-allowed"
                       title="下移"
                     >
                       <ChevronDown size={16} />
@@ -474,14 +474,14 @@ export function QuestionnaireEditor() {
       <div className="flex items-center justify-end gap-3">
         <button
           onClick={() => navigate('/testing/questionnaires')}
-          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+          className="px-4 py-2 bg-[#DEE0E3] hover:bg-[#C9CDD4] text-[#1F2329] rounded-lg transition-colors"
         >
           取消
         </button>
         <button
           onClick={handleSave}
           disabled={loading}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-[#3370FF] hover:bg-[#1E4FD9] text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? '保存中...' : '保存问卷'}
         </button>
