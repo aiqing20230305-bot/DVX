@@ -9,6 +9,10 @@
 
 ### 待优化
 - questionnaire/testing模块参数命名统一（P3优先级）
+  - 状态：已评估，延期至v2.3.0
+  - 工作量：83处修改（questionnaire 41处 + testing 42处）
+  - 原因：需要补充自动化测试，在feature分支中系统性重构
+  - 详见：docs/decisions/2026-04-10-param-naming-postpone.md
 
 ## [2.2.3] - 2026-04-10
 
