@@ -344,23 +344,32 @@ export function Topics() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
-            <FileText size={18} className="text-[#5B8EFF]" />
+          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(99, 91, 255, 0.2)',
+            borderColor: 'rgba(99, 91, 255, 0.3)'
+          }}>
+            <FileText size={18} style={{ color: 'var(--color-primary-light)' }} />
           </div>
-          <h1 className="text-2xl font-bold text-[#1F2329]">选题策划</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>选题策划</h1>
         </div>
-        <p className="text-[#8F959E] text-sm ml-12">基于洞察生成高转化视频选题，覆盖抖音、快手、小红书</p>
+        <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>基于洞察生成高转化视频选题，覆盖抖音、快手、小红书</p>
       </div>
 
       {/* Selected insights summary */}
       {insights.length > 0 && (
-        <div className="mb-4 px-4 py-2.5 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl flex items-center justify-between">
-          <span className="text-xs text-[#8F959E]">
+        <div className="mb-4 px-4 py-2.5 border rounded-xl flex items-center justify-between" style={{
+          backgroundColor: 'var(--color-bg-tertiary)',
+          borderColor: 'var(--color-border)'
+        }}>
+          <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
             已选洞察：{insightSelectedIds.size > 0 ? insightSelectedIds.size : '全部'} 条
           </span>
           <button
             onClick={() => navigate('/insights')}
-            className="text-xs text-[#5B8EFF] hover:text-[#5B8EFF] transition-colors"
+            className="text-xs transition-colors"
+            style={{ color: 'var(--color-primary-light)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-primary-light)'}
           >
             返回修改 →
           </button>
@@ -511,7 +520,11 @@ export function Topics() {
 
       {/* Selection tip */}
       {status === 'success' && topics.length > 0 && (
-        <div className="mb-4 px-4 py-2.5 bg-[#0D3DB8]/20 border border-[#1E4FD9]/30 rounded-xl text-xs text-[#5B8EFF]">
+        <div className="mb-4 px-4 py-2.5 border rounded-xl text-xs" style={{
+          backgroundColor: 'rgba(99, 91, 255, 0.15)',
+          borderColor: 'rgba(99, 91, 255, 0.3)',
+          color: 'var(--color-primary-light)'
+        }}>
           点击选题卡片选择，调整优先级（五星），然后点击「生成脚本」进入脚本创作
         </div>
       )}

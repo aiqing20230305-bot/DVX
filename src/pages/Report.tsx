@@ -68,12 +68,15 @@ export function Report() {
       {/* Header */}
       <div className="report-header mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
-            <Zap size={18} className="text-[#5B8EFF]" />
+          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(99, 91, 255, 0.2)',
+            borderColor: 'rgba(99, 91, 255, 0.3)'
+          }}>
+            <Zap size={18} style={{ color: 'var(--color-primary-light)' }} />
           </div>
-          <h1 className="text-2xl font-bold text-[#1F2329]">战略报告</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>战略报告</h1>
         </div>
-        <p className="text-[#8F959E] text-sm ml-12">汇总洞察、选题、脚本，生成完整的电商内容战略报告</p>
+        <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>汇总洞察、选题、脚本，生成完整的电商内容战略报告</p>
       </div>
 
       {/* Controls */}
@@ -89,7 +92,7 @@ export function Report() {
         </Button>
 
         {reportHtml && (
-          <span className="text-xs text-[#8F959E]">
+          <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
             报告已生成 · 可在下方预览和导出
           </span>
         )}
@@ -119,12 +122,15 @@ export function Report() {
           )}
 
           {/* Tips */}
-          <div className="tips-panel mt-4 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl p-4">
+          <div className="tips-panel mt-4 border rounded-xl p-4" style={{
+            backgroundColor: 'var(--color-bg-tertiary)',
+            borderColor: 'var(--color-border)'
+          }}>
             <div className="flex items-center gap-2 mb-2">
-              <BookOpen size={14} className="text-[#5B8EFF]" />
-              <span className="text-xs font-medium text-[#646A73]">使用提示</span>
+              <BookOpen size={14} style={{ color: 'var(--color-primary-light)' }} />
+              <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>使用提示</span>
             </div>
-            <ul className="space-y-1.5 text-xs text-[#8F959E]">
+            <ul className="space-y-1.5 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
               <li>• 报告涵盖所有洞察和选题</li>
               <li>• HTML 文件可直接在浏览器打开</li>
               <li>• 浏览器打印可导出为 PDF</li>

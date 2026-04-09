@@ -20,7 +20,7 @@ const typeColors: Record<string, string> = {
   template: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
   tone: 'bg-purple-50 text-purple-700 ring-1 ring-purple-200',
   insight: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-  other: 'bg-[#DEE0E3] text-[#646A73]',
+  other: 'bg-gray-700 text-gray-300',
 }
 
 function formatDate(ts: number) {
@@ -82,12 +82,15 @@ export function KnowledgeBase() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
-            <BookOpen size={18} className="text-[#5B8EFF]" />
+          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(99, 91, 255, 0.2)',
+            borderColor: 'rgba(99, 91, 255, 0.3)'
+          }}>
+            <BookOpen size={18} style={{ color: 'var(--color-primary-light)' }} />
           </div>
-          <h1 className="text-2xl font-bold text-[#1F2329]">知识库</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>知识库</h1>
         </div>
-        <p className="text-[#8F959E] text-sm ml-12">存储报告、模板、品牌语气等可复用的内容资产</p>
+        <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>存储报告、模板、品牌语气等可复用的内容资产</p>
       </div>
 
       {/* Project warning */}
@@ -105,23 +108,43 @@ export function KnowledgeBase() {
       <div className="flex flex-wrap gap-3 mb-6">
         {/* Search */}
         <div className="flex-1 min-w-48 relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F959E]" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-text-tertiary)' }} />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="搜索标题、内容、标签..."
-            className="w-full pl-9 pr-3 py-2 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg text-sm text-[#1F2329] placeholder-[#737373] focus:outline-none focus:border-[#3370FF] focus:ring-1 focus:ring-[#3370FF]"
+            className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1"
+            style={{
+              backgroundColor: 'var(--color-bg-tertiary)',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-text-primary)'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
         </div>
 
         {/* Type filter */}
         <div className="relative">
-          <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F959E] pointer-events-none" />
+          <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--color-text-tertiary)' }} />
           <select
             value={filterType}
             onChange={e => setFilterType(e.target.value)}
-            className="pl-8 pr-8 py-2 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg text-sm text-[#1F2329] focus:outline-none focus:border-[#3370FF] appearance-none cursor-pointer"
+            className="pl-8 pr-8 py-2 border rounded-lg text-sm focus:outline-none appearance-none cursor-pointer"
+            style={{
+              backgroundColor: 'var(--color-bg-tertiary)',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-text-primary)'
+            }}
+            onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+            onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
           >
             <option value="">全部类型</option>
             {typeOptions.map(o => (
@@ -140,7 +163,7 @@ export function KnowledgeBase() {
       </div>
 
       {/* Stats */}
-      <div className="flex gap-4 mb-6 text-xs text-[#8F959E]">
+      <div className="flex gap-4 mb-6 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
         <span>共 {items.length} 条记录</span>
         {filterType && <span>· 筛选：{typeOptions.find(t => t.value === filterType)?.label}</span>}
         {search && <span>· 搜索："{search}"</span>}
@@ -155,18 +178,27 @@ export function KnowledgeBase() {
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-[#F7F8FA] border border-[#DEE0E3] flex items-center justify-center mx-auto mb-4">
-            <BookOpen size={28} className="text-[#C9CDD4]" />
+          <div className="w-16 h-16 rounded-2xl border flex items-center justify-center mx-auto mb-4" style={{
+            backgroundColor: 'var(--color-bg-tertiary)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <BookOpen size={28} style={{ color: 'var(--color-text-disabled)' }} />
           </div>
-          <h3 className="text-[#646A73] font-medium mb-2">知识库为空</h3>
-          <p className="text-[#C9CDD4] text-sm">生成报告后可保存到知识库，或点击「新增条目」手动添加</p>
+          <h3 className="font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>知识库为空</h3>
+          <p className="text-sm" style={{ color: 'var(--color-text-disabled)' }}>生成报告后可保存到知识库，或点击「新增条目」手动添加</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {items.map(item => (
             <div
               key={item.id}
-              className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-4 hover:border-[#C9CDD4] transition-all card-hover cursor-pointer"
+              className="border rounded-xl p-4 transition-all card-hover cursor-pointer"
+              style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
               onClick={() => setViewItem(item)}
             >
               <div className="flex items-start justify-between gap-2 mb-2">

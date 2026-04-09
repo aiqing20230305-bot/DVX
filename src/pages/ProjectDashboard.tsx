@@ -81,7 +81,7 @@ export function ProjectDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader className="animate-spin text-[#3370FF]" size={32} />
+        <Loader className="animate-spin" style={{ color: 'var(--color-primary)' }} size={32} />
       </div>
     )
   }
@@ -89,7 +89,7 @@ export function ProjectDashboard() {
   if (!project || !stats) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <div className="text-[#646A73]">项目不存在</div>
+        <div style={{ color: 'var(--color-text-secondary)' }}>项目不存在</div>
         <Button onClick={() => navigate('/')}>返回工作台</Button>
       </div>
     )
@@ -114,9 +114,9 @@ export function ProjectDashboard() {
                 返回
               </Button>
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-bold text-[#1F2329] mb-1">{project.name}</h1>
+                <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>{project.name}</h1>
                 {project.description && (
-                  <p className="text-[#646A73] text-sm">{project.description}</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{project.description}</p>
                 )}
               </div>
             </div>
@@ -129,39 +129,51 @@ export function ProjectDashboard() {
           {/* Project Meta */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {project.brand && (
-              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
-                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
+              <div className="rounded-lg p-4 border" style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border)'
+              }}>
+                <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   <Target size={14} />
                   品牌
                 </div>
-                <div className="text-[#1F2329] font-medium">{project.brand}</div>
+                <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{project.brand}</div>
               </div>
             )}
             {project.category && (
-              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
-                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
+              <div className="rounded-lg p-4 border" style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border)'
+              }}>
+                <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   <TrendingUp size={14} />
                   品类
                 </div>
-                <div className="text-[#1F2329] font-medium">{project.category}</div>
+                <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{project.category}</div>
               </div>
             )}
             {project.target_audience && (
-              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
-                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
+              <div className="rounded-lg p-4 border" style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border)'
+              }}>
+                <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   <Users size={14} />
                   目标人群
                 </div>
-                <div className="text-[#1F2329] font-medium">{project.target_audience}</div>
+                <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{project.target_audience}</div>
               </div>
             )}
             {project.campaign && (
-              <div className="bg-[#F7F8FA] rounded-lg p-4 border border-[#DEE0E3]">
-                <div className="flex items-center gap-2 text-[#646A73] text-xs mb-1">
+              <div className="rounded-lg p-4 border" style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border)'
+              }}>
+                <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
                   <Calendar size={14} />
                   营销活动
                 </div>
-                <div className="text-[#1F2329] font-medium">{project.campaign}</div>
+                <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{project.campaign}</div>
               </div>
             )}
           </div>

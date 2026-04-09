@@ -152,12 +152,15 @@ export function Workbench() {
       {/* Page header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
-            <Database size={18} className="text-[#5B8EFF]" />
+          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(99, 91, 255, 0.2)',
+            borderColor: 'rgba(99, 91, 255, 0.3)'
+          }}>
+            <Database size={18} style={{ color: 'var(--color-primary-light)' }} />
           </div>
-          <h1 className="text-2xl font-bold text-[#1F2329]">数据工作台</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>数据工作台</h1>
         </div>
-        <p className="text-[#8F959E] text-sm ml-12">上传电商数据文件，AI 自动解析并提取结构化信息</p>
+        <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>上传电商数据文件，AI 自动解析并提取结构化信息</p>
       </div>
 
       {/* Project info */}
@@ -170,14 +173,26 @@ export function Workbench() {
           </div>
         </div>
       ) : (
-        <div className="mb-6 px-4 py-3 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl flex items-center justify-between">
+        <div className="mb-6 px-4 py-3 border rounded-xl flex items-center justify-between" style={{
+          backgroundColor: 'var(--color-bg-tertiary)',
+          borderColor: 'var(--color-border)'
+        }}>
           <div>
-            <span className="text-xs text-[#8F959E]">当前项目</span>
-            <div className="text-sm font-medium text-[#1F2329]">{activeProject.name}</div>
+            <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>当前项目</span>
+            <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{activeProject.name}</div>
           </div>
           <button
             onClick={fetchFiles}
-            className="p-2 rounded-lg text-[#8F959E] hover:text-[#646A73] hover:bg-[#DEE0E3] transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--color-text-tertiary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+              e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
             title="刷新"
           >
             <RefreshCw size={14} />
@@ -212,11 +227,14 @@ export function Workbench() {
 
       {/* Video URL analysis */}
       {activeProjectId && (
-        <div className="mb-8 p-4 bg-[#F7F8FA]/50 border border-[#DEE0E3] rounded-xl">
+        <div className="mb-8 p-4 border rounded-xl" style={{
+          backgroundColor: 'var(--color-bg-tertiary)',
+          borderColor: 'var(--color-border)'
+        }}>
           <div className="flex items-center gap-2 mb-3">
             <Film size={16} className="text-purple-400" />
-            <h3 className="text-sm font-medium text-[#1F2329]">视频URL分析</h3>
-            <span className="text-xs text-[#8F959E]">输入视频链接，AI自动提取关键帧并分析</span>
+            <h3 className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>视频URL分析</h3>
+            <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>输入视频链接，AI自动提取关键帧并分析</span>
           </div>
           <div className="flex gap-2">
             <div className="flex-1">
@@ -236,7 +254,11 @@ export function Workbench() {
             <button
               onClick={handleVideoUrlAnalyze}
               disabled={!videoUrl.trim() || videoAnalyzing}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-[#DEE0E3] disabled:text-[#8F959E] text-white text-sm rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+              style={!videoUrl.trim() || videoAnalyzing ? {
+                backgroundColor: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-tertiary)'
+              } : {}}
             >
               {videoAnalyzing ? (
                 <>
@@ -298,7 +320,7 @@ export function Workbench() {
       {initialLoading ? (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-[#1F2329]">
+            <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
               加载中...
             </h2>
           </div>
@@ -307,9 +329,9 @@ export function Workbench() {
       ) : files.length > 0 ? (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-[#1F2329]">
+            <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
               已上传文件
-              <span className="ml-2 text-sm font-normal text-[#8F959E]">
+              <span className="ml-2 text-sm font-normal" style={{ color: 'var(--color-text-tertiary)' }}>
                 ({readyCount}/{files.length} 已解析)
               </span>
             </h2>

@@ -56,8 +56,8 @@ export function Projects() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#1F2329]">项目管理</h1>
-            <p className="text-[#646A73] text-sm mt-1">管理和组织你的所有项目</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>项目管理</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>管理和组织你的所有项目</p>
           </div>
           <Button onClick={() => navigate('/')}>
             <Plus size={16} />
@@ -79,7 +79,10 @@ export function Projects() {
           </div>
 
           {/* Status filter */}
-          <div className="flex gap-1 bg-[#F7F8FA] rounded-lg p-1 border border-[#DEE0E3]">
+          <div className="flex gap-1 rounded-lg p-1 border" style={{
+            backgroundColor: 'var(--color-bg-tertiary)',
+            borderColor: 'var(--color-border)'
+          }}>
             {[
               { key: 'all', label: '全部' },
               { key: 'active', label: '活跃' },
@@ -90,10 +93,20 @@ export function Projects() {
                 onClick={() => setFilter(item.key as typeof filter)}
                 className={[
                   'px-3 py-1.5 rounded text-sm font-medium transition-colors',
-                  filter === item.key
-                    ? 'bg-[#3370FF] text-white'
-                    : 'text-[#646A73] hover:text-[#1F2329]'
+                  filter === item.key ? 'text-white' : ''
                 ].join(' ')}
+                style={filter === item.key ? {
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'white'
+                } : {
+                  color: 'var(--color-text-secondary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (item.key !== filter) e.currentTarget.style.color = 'var(--color-text-primary)';
+                }}
+                onMouseLeave={(e) => {
+                  if (item.key !== filter) e.currentTarget.style.color = 'var(--color-text-secondary)';
+                }}
               >
                 {item.label}
               </button>
@@ -104,8 +117,8 @@ export function Projects() {
         {/* Projects Grid */}
         {filteredProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Folder size={48} className="text-[#C9CDD4] mb-4" />
-            <div className="text-[#646A73] mb-2">
+            <Folder size={48} className="mb-4" style={{ color: 'var(--color-text-disabled)' }} />
+            <div className="mb-2" style={{ color: 'var(--color-text-secondary)' }}>
               {search ? '未找到匹配的项目' : filter === 'archived' ? '暂无归档项目' : '暂无项目'}
             </div>
             {!search && filter === 'all' && (
@@ -120,16 +133,22 @@ export function Projects() {
             {filteredProjects.map(project => (
               <div
                 key={project.id}
-                className="bg-[#F7F8FA] rounded-lg border border-[#DEE0E3] hover:border-[#C9CDD4] transition-all group overflow-hidden"
+                className="rounded-lg border transition-all group overflow-hidden"
+                style={{
+                  backgroundColor: 'var(--color-bg-tertiary)',
+                  borderColor: 'var(--color-border)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
               >
                 {/* Header */}
-                <div className="p-4 border-b border-[#DEE0E3]">
+                <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
                   <div className="flex items-start justify-between gap-2">
                     <button
                       onClick={() => handleOpenProject(project.id)}
                       className="flex-1 text-left"
                     >
-                      <h3 className="font-semibold text-[#1F2329] group-hover:text-[#5B8EFF] transition-colors line-clamp-1">
+                      <h3 className="font-semibold transition-colors line-clamp-1" style={{ color: 'var(--color-text-primary)' }}>
                         {project.name}
                       </h3>
                       {project.description && (

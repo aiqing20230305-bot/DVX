@@ -203,12 +203,15 @@ export function Scripts() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#3370FF]/20 border border-[#3370FF]/30 flex items-center justify-center">
-            <PenTool size={18} className="text-[#5B8EFF]" />
+          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(99, 91, 255, 0.2)',
+            borderColor: 'rgba(99, 91, 255, 0.3)'
+          }}>
+            <PenTool size={18} style={{ color: 'var(--color-primary-light)' }} />
           </div>
-          <h1 className="text-2xl font-bold text-[#1F2329]">脚本创作</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>脚本创作</h1>
         </div>
-        <p className="text-[#8F959E] text-sm ml-12">为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
+        <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
       {/* Batch Toolbar */}
@@ -258,18 +261,21 @@ export function Scripts() {
       {initialLoading ? (
         <div>
           <div className="flex items-center gap-2 mb-5">
-            <div className="w-2 h-2 rounded-full bg-[#C9CDD4] animate-pulse" />
-            <span className="text-sm text-[#8F959E]">加载已有脚本和选题...</span>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-text-disabled)' }} />
+            <span className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>加载已有脚本和选题...</span>
           </div>
           <CardSkeleton count={3} />
         </div>
       ) : selectedTopics.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-[#F7F8FA] border border-[#DEE0E3] flex items-center justify-center mx-auto mb-4">
-            <PenTool size={28} className="text-[#C9CDD4]" />
+          <div className="w-16 h-16 rounded-2xl border flex items-center justify-center mx-auto mb-4" style={{
+            backgroundColor: 'var(--color-bg-tertiary)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <PenTool size={28} style={{ color: 'var(--color-text-disabled)' }} />
           </div>
-          <h3 className="text-[#646A73] font-medium mb-2">没有已选选题</h3>
-          <p className="text-[#C9CDD4] text-sm mb-6">请先在「选题策划」页面选择要创作脚本的选题</p>
+          <h3 className="font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>没有已选选题</h3>
+          <p className="text-sm mb-6" style={{ color: 'var(--color-text-disabled)' }}>请先在「选题策划」页面选择要创作脚本的选题</p>
           <Button variant="secondary" onClick={() => navigate('/topics')}>
             前往选题策划
           </Button>
@@ -299,15 +305,20 @@ export function Scripts() {
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id
 
           return (
-            <div key={topic.id} className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl overflow-hidden">
+            <div key={topic.id} className="border rounded-xl overflow-hidden" style={{
+              backgroundColor: 'var(--color-bg-tertiary)',
+              borderColor: 'var(--color-border)'
+            }}>
               {/* Topic header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#DEE0E3]">
+              <div className="flex items-center justify-between px-5 py-4 border-b" style={{
+                borderColor: 'var(--color-border)'
+              }}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <PlatformBadge platform={topic.platform} />
-                    <span className="text-xs text-[#8F959E]">{topic.estimated_duration}秒</span>
+                    <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{topic.estimated_duration}秒</span>
                   </div>
-                  <h3 className="text-base font-semibold text-[#1F2329] truncate">{topic.title}</h3>
+                  <h3 className="text-base font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>{topic.title}</h3>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <Button
@@ -323,14 +334,25 @@ export function Scripts() {
                     <>
                       <button
                         onClick={() => handleDeleteTopicScripts(topic.id, topic.title)}
-                        className="p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-[#DEE0E3] transition-colors"
+                        className="p-2 rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         title="删除该选题的所有脚本"
                       >
                         <Trash2 size={14} />
                       </button>
                       <button
                         onClick={() => toggleTopicExpand(topic.id)}
-                        className="p-2 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#DEE0E3] transition-colors"
+                        className="p-2 rounded-lg transition-colors"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--color-text-primary)';
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'var(--color-text-secondary)';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
                       >
                         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </button>
@@ -351,12 +373,15 @@ export function Scripts() {
               )}
 
               {topicScripts.length > 0 && !isExpanded && !isGeneratingThis && (
-                <div className="px-5 py-3 flex items-center gap-4 text-xs text-[#C9CDD4]">
+                <div className="px-5 py-3 flex items-center gap-4 text-xs" style={{ color: 'var(--color-text-disabled)' }}>
                   <span>A版 · {topicScripts.find(s => s.variant === 'A')?.word_count ?? 0}字</span>
                   <span>B版 · {topicScripts.find(s => s.variant === 'B')?.word_count ?? 0}字</span>
                   <button
                     onClick={() => toggleTopicExpand(topic.id)}
-                    className="text-[#5B8EFF] hover:text-[#5B8EFF] transition-colors ml-auto"
+                    className="transition-colors ml-auto"
+                    style={{ color: 'var(--color-primary-light)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-primary-light)'}
                   >
                     展开查看 →
                   </button>
