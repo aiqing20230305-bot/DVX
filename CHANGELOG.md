@@ -9,10 +9,40 @@
 
 ### 待优化
 - questionnaire/testing模块参数命名统一（P3优先级）
-  - 状态：已评估，延期至v2.3.0
+  - 状态：已评估，延期至v2.3.0-beta
   - 工作量：83处修改（questionnaire 41处 + testing 42处）
   - 原因：需要补充自动化测试，在feature分支中系统性重构
   - 详见：docs/decisions/2026-04-10-param-naming-postpone.md
+
+- Sidebar和UI组件深色主题适配（P2优先级）
+  - 状态：待完成
+  - 范围：20+组件需要替换硬编码的浅色颜色
+  - 计划：v2.3.0-beta统一改造
+
+## [2.3.0-alpha] - 2026-04-10
+
+### 变更 🎨
+- **深色主题设计系统改造**（阶段一）✨
+  - 切换为深色专业主题（对标Linear/Stripe/Figma）
+  - 主色：#635BFF（Stripe紫蓝渐变）
+  - 背景：#0D0D0D（极深灰）+ #1A1A1A（卡片）
+  - 文字：#FFFFFF（主要）+ #A3A3A3（次要）
+  - 符合"长时间工作友好"的设计目标
+  
+### 修改文件
+- `src/styles/globals.css` - 切换@theme配色变量为深色主题
+- `src/components/layout/Shell.tsx` - 主容器背景使用CSS变量
+
+### 质量指标
+- ✅ TypeScript编译通过（无错误）
+- ✅ 前端Vite构建成功
+- ✅ 后端API正常运行
+- ✅ 配色符合WCAG AA对比度标准（≥4.5:1）
+
+### 下一步
+- v2.3.0-beta: 完成Sidebar和其他UI组件的深色适配
+- v2.3.0-rc: 全面测试和打磨细节
+- v2.3.0: 正式发布深色主题专业版
 
 ## [2.2.3] - 2026-04-10
 

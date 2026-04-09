@@ -1,48 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary Brand Colors - Lark/飞书 Style Blue */
-  --color-primary: #3370FF;
-  --color-primary-hover: #1E4FD9;
-  --color-primary-light: #5B8EFF;
-  --color-primary-dark: #0D3DB8;
+  /* Primary Brand Colors - Stripe/Linear Style Purple-Blue (Dark Theme) */
+  --color-primary: #635BFF;
+  --color-primary-hover: #5449E0;
+  --color-primary-light: #8B85FF;
+  --color-primary-dark: #4A45CC;
 
   /* Legacy brand alias for compatibility */
-  --color-brand: #3370FF;
-  --color-brand-hover: #1E4FD9;
-  --color-brand-light: #5B8EFF;
-  --color-brand-lighter: #5B8EFF;
+  --color-brand: #635BFF;
+  --color-brand-hover: #5449E0;
+  --color-brand-light: #8B85FF;
+  --color-brand-lighter: #8B85FF;
 
-  /* Background Colors - Light Theme (Lark Style) */
-  --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F7F8FA;
-  --color-bg-tertiary: #F2F3F5;
-  --color-bg-elevated: #FFFFFF;
+  /* Background Colors - Dark Theme (Linear/Stripe Style) */
+  --color-bg-primary: #0D0D0D;
+  --color-bg-secondary: #1A1A1A;
+  --color-bg-tertiary: #262626;
+  --color-bg-elevated: #2D2D2D;
 
   /* Legacy surface alias */
-  --color-surface: #F7F8FA;
-  --color-surface-2: #FFFFFF;
-  --color-surface-3: #F2F3F5;
-  --color-surface-hover: #EBEDF0;
+  --color-surface: #1A1A1A;
+  --color-surface-2: #262626;
+  --color-surface-3: #2D2D2D;
+  --color-surface-hover: #333333;
 
-  /* Text Colors - Dark on Light */
-  --color-text-primary: #1F2329;
-  --color-text-secondary: #646A73;
-  --color-text-tertiary: #8F959E;
-  --color-text-disabled: #C9CDD4;
-  --color-text-link: #3370FF;
-  --color-text-link-hover: #1E4FD9;
+  /* Text Colors - Light on Dark */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A3A3A3;
+  --color-text-tertiary: #737373;
+  --color-text-disabled: #525252;
+  --color-text-link: #8B85FF;
+  --color-text-link-hover: #635BFF;
 
   /* Legacy text alias */
-  --color-text: #1F2329;
-  --color-text-muted: #646A73;
-  --color-text-subtle: #8F959E;
+  --color-text: #FFFFFF;
+  --color-text-muted: #A3A3A3;
+  --color-text-subtle: #737373;
 
-  /* Border Colors - Light Theme */
-  --color-border: #DEE0E3;
-  --color-border-light: #E3E5E8;
-  --color-border-lighter: #EBEDF0;
-  --color-divider: rgba(0, 0, 0, 0.06);
+  /* Border Colors - Dark Theme */
+  --color-border: #333333;
+  --color-border-light: #404040;
+  --color-border-lighter: #4D4D4D;
+  --color-divider: rgba(255, 255, 255, 0.06);
 
 
   /* Status Colors */
@@ -56,7 +56,7 @@
   --color-info-bg: rgba(52, 152, 219, 0.1);
 
   /* Gradient */
-  --gradient-primary: linear-gradient(135deg, #3370FF 0%, #5B8EFF 100%);
+  --gradient-primary: linear-gradient(135deg, #635BFF 0%, #8B5CFF 100%);
 
   /* Spacing System (8px base) */
   --space-1: 4px;
@@ -92,8 +92,8 @@ html {
 
 body {
   margin: 0;
-  background-color: #FFFFFF;
-  color: #1F2329;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
@@ -103,16 +103,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #F7F8FA;
+  background: var(--color-bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #DEE0E3;
+  background: var(--color-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C9CDD4;
+  background: var(--color-border-light);
 }
 
 @keyframes pulse-cursor {
@@ -124,7 +124,7 @@ body {
   content: '▋';
   display: inline-block;
   animation: pulse-cursor 0.8s ease-in-out infinite;
-  color: #6366f1;
+  color: var(--color-primary);
   margin-left: 1px;
 }
 
