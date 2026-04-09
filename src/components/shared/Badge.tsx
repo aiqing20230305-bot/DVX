@@ -12,28 +12,28 @@ interface BadgeProps {
   className?: string
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  // Insight types (light theme - darker text on light background)
-  trend: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-  competitor: 'bg-purple-50 text-purple-700 ring-1 ring-purple-200',
-  gap: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-  attribution: 'bg-orange-50 text-orange-700 ring-1 ring-orange-200',
-  anomaly: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+const variantColors: Record<BadgeVariant, { bg: string; text: string; ring: string }> = {
+  // Insight types (dark theme - bright text on dark semi-transparent background)
+  trend: { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA', ring: '#3B82F6' },
+  competitor: { bg: 'rgba(168, 85, 247, 0.15)', text: '#A78BFA', ring: '#A855F7' },
+  gap: { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', ring: '#10B981' },
+  attribution: { bg: 'rgba(251, 146, 60, 0.15)', text: '#FB923C', ring: '#FB923C' },
+  anomaly: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
   // Confidence
-  high: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-  medium: 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200',
-  low: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+  high: { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', ring: '#10B981' },
+  medium: { bg: 'rgba(251, 191, 36, 0.15)', text: '#FCD34D', ring: '#FBBF24' },
+  low: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
   // Platforms
-  douyin: 'bg-pink-50 text-pink-700 ring-1 ring-pink-200',
-  kuaishou: 'bg-orange-50 text-orange-700 ring-1 ring-orange-200',
-  xiaohongshu: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+  douyin: { bg: 'rgba(236, 72, 153, 0.15)', text: '#F472B6', ring: '#EC4899' },
+  kuaishou: { bg: 'rgba(251, 146, 60, 0.15)', text: '#FB923C', ring: '#FB923C' },
+  xiaohongshu: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
   // Generic
-  default: 'bg-[#F7F8FA] text-[#646A73] ring-1 ring-[#DEE0E3]',
-  secondary: 'bg-[#F2F3F5] text-[#1F2329] ring-1 ring-[#E3E5E8]',
-  info: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-  success: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-  warning: 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200',
-  error: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+  default: { bg: 'var(--color-bg-tertiary)', text: 'var(--color-text-secondary)', ring: 'var(--color-border)' },
+  secondary: { bg: 'var(--color-bg-secondary)', text: 'var(--color-text-primary)', ring: 'var(--color-border-light)' },
+  info: { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA', ring: '#3B82F6' },
+  success: { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', ring: '#10B981' },
+  warning: { bg: 'rgba(251, 191, 36, 0.15)', text: '#FCD34D', ring: '#FBBF24' },
+  error: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
 }
 
 const typeLabels: Partial<Record<BadgeVariant, string>> = {
@@ -43,12 +43,19 @@ const typeLabels: Partial<Record<BadgeVariant, string>> = {
 }
 
 export function Badge({ variant = 'default', children, className = '' }: BadgeProps) {
+  const colors = variantColors[variant]
   return (
-    <span className={[
-      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
-      variantClasses[variant],
-      className
-    ].join(' ')}>
+    <span
+      className={[
+        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ring-1',
+        className
+      ].join(' ')}
+      style={{
+        backgroundColor: colors.bg,
+        color: colors.text,
+        borderColor: colors.ring
+      }}
+    >
       {children}
     </span>
   )

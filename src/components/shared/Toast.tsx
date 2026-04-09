@@ -16,28 +16,28 @@ const iconMap = {
 
 const colorMap = {
   success: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    icon: 'text-emerald-600',
-    text: 'text-emerald-900'
+    bg: 'rgba(16, 185, 129, 0.15)',
+    border: '#10B981',
+    icon: '#10B981',
+    text: '#FFFFFF'
   },
   error: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    icon: 'text-red-600',
-    text: 'text-red-900'
+    bg: 'rgba(239, 68, 68, 0.15)',
+    border: '#EF4444',
+    icon: '#EF4444',
+    text: '#FFFFFF'
   },
   warning: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    icon: 'text-amber-600',
-    text: 'text-amber-900'
+    bg: 'rgba(251, 191, 36, 0.15)',
+    border: '#FBBF24',
+    icon: '#FBBF24',
+    text: '#FFFFFF'
   },
   info: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    icon: 'text-blue-600',
-    text: 'text-blue-900'
+    bg: 'rgba(52, 152, 219, 0.15)',
+    border: '#3498DB',
+    icon: '#3498DB',
+    text: '#FFFFFF'
   }
 }
 
@@ -89,34 +89,41 @@ export function Toast({ toast, onClose }: ToastProps) {
   return (
     <div
       className={`
-        ${colors.bg} ${colors.border} border shadow-lg
+        border shadow-lg
         rounded-xl p-4 pr-12 min-w-[320px] max-w-[480px]
         relative overflow-hidden
         ${isExiting ? 'animate-slide-out-right' : 'animate-slide-in-right'}
       `}
+      style={{
+        backgroundColor: colors.bg,
+        borderColor: colors.border
+      }}
       role="alert"
     >
       {/* Progress bar */}
       {toast.duration && toast.duration > 0 && (
         <div
-          className="absolute bottom-0 left-0 h-1 bg-[#3370FF]/30 animate-shrink-width"
-          style={{ animationDuration: `${toast.duration}ms` }}
+          className="absolute bottom-0 left-0 h-1 animate-shrink-width"
+          style={{
+            backgroundColor: 'rgba(99, 91, 255, 0.3)',
+            animationDuration: `${toast.duration}ms`
+          }}
         />
       )}
 
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div className={`flex-shrink-0 ${colors.icon}`}>
+        <div className="flex-shrink-0" style={{ color: colors.icon }}>
           <Icon size={20} strokeWidth={2} />
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h4 className={`text-sm font-medium ${colors.text}`}>
+          <h4 className="text-sm font-medium" style={{ color: colors.text }}>
             {toast.title}
           </h4>
           {formattedMessage && (
-            <p className="text-sm text-[#646A73] mt-1">
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
               {formattedMessage}
             </p>
           )}
@@ -125,7 +132,16 @@ export function Toast({ toast, onClose }: ToastProps) {
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 p-1 rounded-lg text-[#8F959E] hover:text-[#1F2329] hover:bg-[#F2F3F5] transition-colors"
+          className="absolute top-3 right-3 p-1 rounded-lg transition-colors"
+          style={{ color: 'var(--color-text-tertiary)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--color-text-primary)';
+            e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--color-text-tertiary)';
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
           aria-label="Close notification"
         >
           <X size={16} />
