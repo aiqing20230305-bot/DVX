@@ -8,10 +8,32 @@
 ## [Unreleased]
 
 ### 待优化
-- topic/script API响应的JSON控制字符问题（P2优先级）
-  - 影响：jq解析失败，但不影响功能
-  - 建议：参考 report.service.ts v2.2.1 修复方案统一处理
 - questionnaire/testing模块参数命名统一（P3优先级）
+
+## [2.2.3] - 2026-04-10
+
+### 修复 🐛
+- **topic/script API的JSON控制字符问题** ✨ (P2)
+  - 修复位置：
+    - `server/db/repositories/topic.repo.ts` - 存储时清理控制字符
+    - `server/db/repositories/script.repo.ts` - 存储时清理控制字符
+    - `server/routes/topic.route.ts` - API返回时清理控制字符
+    - `server/routes/topic.route.ts` - API返回时清理控制字符
+  - 添加 `cleanControlChars()` 函数移除 U+0000-U+001F 和 U+007F-U+009F 范围的控制字符
+  - 保留换行符(\n)、制表符(\t)、回车符(\r)
+  - 解决jq工具解析失败的问题
+  - 提升JSON响应健壮性和工具链兼容性
+
+### 测试 🧪
+- 验证Topic API的jq解析 ✓
+- 验证Script API的jq解析 ✓
+- 验证Timeline API的jq解析 ✓
+- 所有JSON响应可被jq正常解析
+
+### 影响
+- 解决测试脚本和工具链的jq解析错误
+- 提升API响应的标准兼容性
+- 不影响现有功能和前端显示
 
 ## [2.2.2] - 2026-04-10
 

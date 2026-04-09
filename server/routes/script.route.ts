@@ -4,6 +4,14 @@ import { generateScriptsStream } from '../services/script.service.js'
 
 const router = Router()
 
+/**
+ * Remove control characters that cause JSON parsing issues
+ * Keeps newline, tab, and carriage return as they're safe in JSON strings
+ */
+function cleanControlChars(str: string): string {
+  return str.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+}
+
 // Helper function to extract duration from timing string (e.g., "0-3s" -> 3)
 function extractDuration(timing?: string): number {
   if (!timing) return 0
@@ -32,15 +40,17 @@ router.get('/:projectId', (req: Request, res: Response) => {
       const rawSegments = segmentsData.segments || []
 
       // Map database field names to frontend expected names
+      // Clean control characters to prevent JSON parsing issues
       const mappedSegments = rawSegments.map((seg: any) => ({
         type: seg.type,
-        content: seg.voiceover || seg.content || '',
-        direction: seg.shot || seg.direction || '',
+        content: cleanControlChars(seg.voiceover || seg.content || ''),
+        direction: cleanControlChars(seg.shot || seg.direction || ''),
         duration: extractDuration(seg.timing) || seg.duration || 0
       }))
 
       return {
         ...s,
+        full_text: cleanControlChars(s.full_text),
         segments: mappedSegments
       }
     })
@@ -60,15 +70,17 @@ router.get('/topic/:topicId', (req: Request, res: Response) => {
       const rawSegments = segmentsData.segments || []
 
       // Map database field names to frontend expected names
+      // Clean control characters to prevent JSON parsing issues
       const mappedSegments = rawSegments.map((seg: any) => ({
         type: seg.type,
-        content: seg.voiceover || seg.content || '',
-        direction: seg.shot || seg.direction || '',
+        content: cleanControlChars(seg.voiceover || seg.content || ''),
+        direction: cleanControlChars(seg.shot || seg.direction || ''),
         duration: extractDuration(seg.timing) || seg.duration || 0
       }))
 
       return {
         ...s,
+        full_text: cleanControlChars(s.full_text),
         segments: mappedSegments
       }
     })

@@ -4,6 +4,14 @@ import { generateTopicsStream } from '../services/topic.service.js'
 
 const router = Router()
 
+/**
+ * Remove control characters that cause JSON parsing issues
+ * Keeps newline, tab, and carriage return as they're safe in JSON strings
+ */
+function cleanControlChars(str: string): string {
+  return str.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+}
+
 router.post('/generate', async (req: Request, res: Response) => {
   const { projectId, insightIds = [] } = req.body as { projectId: string; insightIds?: string[] }
   if (!projectId) {
@@ -69,6 +77,12 @@ router.get('/:projectId', (req: Request, res: Response) => {
     const topics = topicRepo.findByProject(projectId)
     const parsed = topics.map(t => ({
       ...t,
+      // Clean control characters from string fields to prevent JSON parsing issues
+      title: cleanControlChars(t.title),
+      angle: cleanControlChars(t.angle),
+      persona: cleanControlChars(t.persona),
+      platform: cleanControlChars(t.platform),
+      cta: cleanControlChars(t.cta),
       insight_ref: JSON.parse(t.insight_ref) as string[],
       selected: t.selected === 1
     }))

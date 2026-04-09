@@ -1,6 +1,14 @@
 import getDb from '../index.js'
 import { genId } from '../../utils/id.js'
 
+/**
+ * Remove control characters that cause JSON parsing issues
+ * Keeps newline, tab, and carriage return as they're safe in JSON strings
+ */
+function cleanControlChars(str: string): string {
+  return str.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+}
+
 export interface TopicRow {
   id: string
   project_id: string
@@ -61,21 +69,22 @@ export const topicRepo = {
     const now = Date.now()
     const id = genId()
     // Normalize: support both new format (name/direction/targetPersona) and legacy (title/angle/persona)
-    const title = data.name || data.title || ''
-    const angle = data.direction || data.angle || ''
-    const persona = data.targetPersona || data.persona || ''
+    // Clean control characters to prevent JSON parsing issues
+    const title = cleanControlChars(data.name || data.title || '')
+    const angle = cleanControlChars(data.direction || data.angle || '')
+    const persona = cleanControlChars(data.targetPersona || data.persona || '')
     const platform = data.platform || 'douyin'
     const estimatedDuration = data.estimatedDuration || 30
-    const cta = data.cta || data.core || ''
+    const cta = cleanControlChars(data.cta || data.core || '')
     const insightRef = data.insightRef || []
     const priorityNum = data.rank || 3
     // Store extra fields as JSON in angle column (append)
     const extraInfo = [
-      data.nameTag ? `[${data.nameTag}]` : '',
-      data.core ? `核心: ${data.core}` : '',
-      data.hookType ? `钩子: ${data.hookType}` : '',
-      data.contentType ? `类型: ${data.contentType}` : '',
-      data.reason ? `理由: ${data.reason}` : '',
+      data.nameTag ? `[${cleanControlChars(data.nameTag)}]` : '',
+      data.core ? `核心: ${cleanControlChars(data.core)}` : '',
+      data.hookType ? `钩子: ${cleanControlChars(data.hookType)}` : '',
+      data.contentType ? `类型: ${cleanControlChars(data.contentType)}` : '',
+      data.reason ? `理由: ${cleanControlChars(data.reason)}` : '',
     ].filter(Boolean).join('\n')
     const fullAngle = extraInfo ? `${angle}\n---\n${extraInfo}` : angle
 

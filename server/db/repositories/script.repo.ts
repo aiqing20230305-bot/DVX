@@ -1,6 +1,14 @@
 import getDb from '../index.js'
 import { genId } from '../../utils/id.js'
 
+/**
+ * Remove control characters that cause JSON parsing issues
+ * Keeps newline, tab, and carriage return as they're safe in JSON strings
+ */
+function cleanControlChars(str: string): string {
+  return str.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+}
+
 export interface ScriptRow {
   id: string
   project_id: string
@@ -59,16 +67,25 @@ export const scriptRepo = {
     const db = getDb()
     const now = Date.now()
     const id = genId()
-    const fullText = data.fullVoiceover || data.fullText || ''
+    // Clean control characters to prevent JSON parsing issues
+    const fullText = cleanControlChars(data.fullVoiceover || data.fullText || '')
     const wordCount = data.wordCount || fullText.length
+    // Clean segments data
+    const cleanedSegments = (data.segments || []).map(seg => ({
+      ...seg,
+      content: seg.content ? cleanControlChars(seg.content) : seg.content,
+      voiceover: seg.voiceover ? cleanControlChars(seg.voiceover) : seg.voiceover,
+      direction: seg.direction ? cleanControlChars(seg.direction) : seg.direction,
+      shot: seg.shot ? cleanControlChars(seg.shot) : seg.shot,
+    }))
     // Store full data including mixCutStrategy, scenes, etc. in segments JSON
     const segmentsPayload = {
-      segments: data.segments || [],
-      positioning: data.positioning,
-      hook: data.hook,
-      hookType: data.hookType,
+      segments: cleanedSegments,
+      positioning: data.positioning ? cleanControlChars(data.positioning) : data.positioning,
+      hook: data.hook ? cleanControlChars(data.hook) : data.hook,
+      hookType: data.hookType ? cleanControlChars(data.hookType) : data.hookType,
       scenes: data.scenes,
-      emotionPath: data.emotionPath,
+      emotionPath: data.emotionPath ? cleanControlChars(data.emotionPath) : data.emotionPath,
       mixCutStrategy: data.mixCutStrategy,
     }
     db.prepare(
