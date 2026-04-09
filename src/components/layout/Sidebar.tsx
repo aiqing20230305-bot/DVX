@@ -70,63 +70,86 @@ export function Sidebar() {
   return (
     <>
       <aside className={[
-        'flex flex-col h-full bg-[#F7F8FA] border-r border-[#DEE0E3] transition-all duration-300 flex-shrink-0',
+        'flex flex-col h-full border-r transition-all duration-300 flex-shrink-0',
         'md:relative fixed left-0 top-0 bottom-0 z-50',
         sidebarCollapsed ? 'w-16 md:w-16 -translate-x-full md:translate-x-0' : 'w-60'
-      ].join(' ')}>
+      ].join(' ')} style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-[#DEE0E3]">
-          <div className="w-8 h-8 rounded-lg bg-[#3370FF] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#0D3DB8]/50">
+        <div className="flex items-center gap-3 px-4 py-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg" style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 15px -3px rgba(99, 91, 255, 0.5)' }}>
             <Zap size={16} className="text-white" />
           </div>
           {!sidebarCollapsed && (
             <div className="min-w-0 animate-fade-in-scale">
-              <div className="font-bold text-[#1F2329] text-sm leading-tight">超级洞察</div>
-              <div className="text-xs text-[#8F959E]">AI 内容战略平台</div>
+              <div className="font-bold text-sm leading-tight" style={{ color: 'var(--color-text-primary)' }}>超级洞察</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>AI 内容战略平台</div>
             </div>
           )}
         </div>
 
         {/* Project selector */}
         {!sidebarCollapsed && (
-          <div className="px-3 py-3 border-b border-[#DEE0E3] animate-fade-in-scale">
+          <div className="px-3 py-3 border-b animate-fade-in-scale" style={{ borderColor: 'var(--color-border)' }}>
             <div className="relative">
               <div className="flex gap-1">
                 <button
                   onClick={() => activeProject && navigate(`/project/${activeProject.id}`)}
-                  className="flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-l-lg bg-[#F7F8FA] border border-[#DEE0E3] hover:border-[#3370FF] transition-colors text-left"
+                  className="flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-l-lg border transition-colors text-left"
+                  style={{
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    borderColor: 'var(--color-border)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
                   title="查看项目详情"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-xs text-[#8F959E] mb-0.5">当前项目</div>
-                    <div className="text-sm font-medium text-[#1F2329] truncate">
+                    <div className="text-xs mb-0.5" style={{ color: 'var(--color-text-tertiary)' }}>当前项目</div>
+                    <div className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
                       {activeProject?.name ?? '选择项目'}
                     </div>
                   </div>
                 </button>
                 <button
                   onClick={() => setProjectDropdown(!projectDropdown)}
-                  className="px-2 rounded-r-lg bg-[#F7F8FA] border border-l-0 border-[#DEE0E3] hover:border-[#C9CDD4] transition-colors flex items-center"
+                  className="px-2 rounded-r-lg border border-l-0 transition-colors flex items-center"
+                  style={{
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    borderColor: 'var(--color-border)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
                 >
-                  <ChevronDown size={14} className={`text-[#646A73] transition-transform ${projectDropdown ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={14} className={`transition-transform ${projectDropdown ? 'rotate-180' : ''}`} style={{ color: 'var(--color-text-secondary)' }} />
                 </button>
               </div>
 
               {projectDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg shadow-xl shadow-black/50 z-50 overflow-hidden animate-fade-in-down">
+                <div className="absolute top-full left-0 right-0 mt-1 border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in-down" style={{ backgroundColor: 'var(--color-bg-elevated)', borderColor: 'var(--color-border)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }}>
                   {projects.map((project, index) => (
                     <div
                       key={project.id}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-[#DEE0E3] cursor-pointer group transition-colors duration-150"
-                      onClick={() => { setActiveProject(project.id); setProjectDropdown(false) }}
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer group transition-colors duration-150"
                       style={{ animationDelay: `${index * 30}ms` }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      onClick={() => { setActiveProject(project.id); setProjectDropdown(false) }}
                     >
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-[#1F2329] truncate">{project.name}</div>
+                        <div className="text-sm truncate" style={{ color: 'var(--color-text-primary)' }}>{project.name}</div>
                       </div>
-                      {activeProjectId === project.id && <Check size={14} className="text-[#5B8EFF] flex-shrink-0" />}
+                      {activeProjectId === project.id && <Check size={14} className="flex-shrink-0" style={{ color: 'var(--color-primary-light)' }} />}
                       <button
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-900/30 hover:text-red-400 text-[#8F959E] transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded transition-all"
+                        style={{ color: 'var(--color-text-tertiary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.3)';
+                          e.currentTarget.style.color = '#EF4444';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'var(--color-text-tertiary)';
+                        }}
                         onClick={(e) => { e.stopPropagation(); removeProject(project.id) }}
                       >
                         <Trash2 size={12} />
@@ -134,7 +157,10 @@ export function Sidebar() {
                     </div>
                   ))}
                   <div
-                    className="flex items-center gap-2 px-3 py-2.5 hover:bg-[#DEE0E3] cursor-pointer border-t border-[#DEE0E3] text-[#5B8EFF]"
+                    className="flex items-center gap-2 px-3 py-2.5 cursor-pointer border-t transition-colors"
+                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-primary-light)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     onClick={() => { setProjectDropdown(false); handleOpenNewProject() }}
                   >
                     <Plus size={14} />
@@ -150,16 +176,41 @@ export function Sidebar() {
         <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
           {navItems.map(({ to, label, icon: Icon, end, divider }) => (
             <React.Fragment key={to}>
-              {divider && <div className="h-px bg-[#DEE0E3] my-2" />}
+              {divider && <div className="h-px my-2" style={{ backgroundColor: 'var(--color-border)' }} />}
               <NavLink
                 to={to}
                 end={end}
                 className={({ isActive }) => [
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative overflow-hidden',
-                  isActive
-                    ? 'bg-[#3370FF]/20 text-[#5B8EFF] border border-[#3370FF]/30 shadow-lg shadow-[#0D3DB8]/20'
-                    : 'text-[#646A73] hover:text-[#1F2329] hover:bg-[#F7F8FA] hover:shadow-md hover:shadow-black/20 border border-transparent hover:border-[#DEE0E3]'
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative overflow-hidden border',
+                  isActive ? '' : ''
                 ].join(' ')}
+                style={({ isActive }) => isActive ? {
+                  backgroundColor: 'rgba(99, 91, 255, 0.2)',
+                  color: 'var(--color-primary-light)',
+                  borderColor: 'rgba(99, 91, 255, 0.3)',
+                  boxShadow: '0 10px 15px -3px rgba(99, 91, 255, 0.2)'
+                } : {
+                  color: 'var(--color-text-secondary)',
+                  borderColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.classList.contains('active')) {
+                    target.style.color = 'var(--color-text-primary)';
+                    target.style.backgroundColor = 'var(--color-bg-tertiary)';
+                    target.style.borderColor = 'var(--color-border)';
+                    target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.classList.contains('active')) {
+                    target.style.color = 'var(--color-text-secondary)';
+                    target.style.backgroundColor = 'transparent';
+                    target.style.borderColor = 'transparent';
+                    target.style.boxShadow = 'none';
+                  }
+                }}
                 title={sidebarCollapsed ? label : undefined}
               >
                 <Icon size={18} className="flex-shrink-0" />
@@ -170,10 +221,19 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom controls */}
-        <div className="px-2 py-3 border-t border-[#DEE0E3] flex items-center gap-1">
+        <div className="px-2 py-3 border-t flex items-center gap-1" style={{ borderColor: 'var(--color-border)' }}>
           <button
             onClick={toggleTheme}
-            className="flex items-center justify-center w-9 h-9 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#F7F8FA] transition-colors"
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
             title={theme === 'dark' ? '切换到亮色' : '切换到暗色'}
           >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
@@ -181,7 +241,16 @@ export function Sidebar() {
           {!sidebarCollapsed && (
             <button
               onClick={handleOpenNewProject}
-              className="flex items-center gap-2 flex-1 px-2 py-2 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#F7F8FA] transition-colors text-sm"
+              className="flex items-center gap-2 flex-1 px-2 py-2 rounded-lg transition-colors text-sm"
+              style={{ color: 'var(--color-text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <Plus size={15} />
               新建项目
@@ -189,7 +258,16 @@ export function Sidebar() {
           )}
           <button
             onClick={toggleSidebar}
-            className="flex items-center justify-center w-9 h-9 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#F7F8FA] transition-colors ml-auto"
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors ml-auto"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
             title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
           >
             {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -229,7 +307,7 @@ export function Sidebar() {
       >
         {newProjectStep === 'template' ? (
           <div>
-            <div className="text-sm text-[#646A73] mb-4">
+            <div className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               选择一个模板快速开始，模板包含预设的知识库和内容基调
             </div>
             <TemplateSelector value={selectedTemplate} onChange={setSelectedTemplate} />
@@ -237,25 +315,51 @@ export function Sidebar() {
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#646A73] mb-1.5">项目名称 *</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>项目名称 *</label>
               <input
                 type="text"
                 value={newProjectName}
                 onChange={e => setNewProjectName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleCreateProject()}
                 placeholder="例如：618大促内容战略"
-                className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm"
+                style={{
+                  backgroundColor: 'var(--color-bg-tertiary)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
                 autoFocus
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#646A73] mb-1.5">项目描述</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>项目描述</label>
               <textarea
                 value={newProjectDesc}
                 onChange={e => setNewProjectDesc(e.target.value)}
                 placeholder="简短描述项目目标（可选）"
                 rows={3}
-                className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm resize-none"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm resize-none"
+                style={{
+                  backgroundColor: 'var(--color-bg-tertiary)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
