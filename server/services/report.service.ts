@@ -33,7 +33,13 @@ function parseScript(s: ReturnType<typeof scriptRepo.findByProject>[0]) {
 }
 
 function esc(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Remove control characters that cause JSON parsing issues
+    // Keep newline (\n), tab (\t), and carriage return (\r) as they're handled by nl2br
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
 }
 
 function nl2br(str: string): string {
