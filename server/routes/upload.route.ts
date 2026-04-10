@@ -120,9 +120,23 @@ router.post('/', authMiddleware, requireProjectMember('editor'), uploadMiddlewar
   }
 })
 
-router.get('/:projectId', (req: Request, res: Response) => {
+router.get('/:projectId', authMiddleware, async (req: Request, res: Response) => {
   try {
     const projectId = req.params.projectId as string
+    const userId = (req as any).userId
+
+    // Permission check with backward compatibility
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')
+
+    if (!hasPermission) {
+      const allMembers = projectMemberRepo.listMembers(projectId)
+      if (allMembers.length > 0) {
+        res.status(403).json({ error: '权限不足，需要viewer权限' })
+        return
+      }
+    }
+
     const uploads = uploadRepo.findByProject(projectId)
     res.json({ uploads })
   } catch (err) {
@@ -131,7 +145,7 @@ router.get('/:projectId', (req: Request, res: Response) => {
   }
 })
 
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', authMiddleware, requireProjectMember('editor'), (req: Request, res: Response) => {
   try {
     const id = req.params.id as string
     uploadRepo.delete(id)

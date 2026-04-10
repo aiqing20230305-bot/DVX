@@ -36,6 +36,13 @@ export const requireProjectMember = (minRole: 'viewer' | 'editor' | 'owner' = 'v
         })
       }
 
+      // Development mode: bypass role checks (but user must be logged in)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[Permission] Development mode - bypassing ${minRole} role check for user ${userId}`)
+        next()
+        return
+      }
+
       // 2. 从请求中提取项目 ID（支持多种参数位置）
       const projectId =
         req.params.id ||           // GET /api/project/:id/...
@@ -56,6 +63,14 @@ export const requireProjectMember = (minRole: 'viewer' | 'editor' | 'owner' = 'v
 
       if (!hasPermission) {
         const member = projectMemberRepo.getMember(projectId, userId)
+
+        // 向后兼容：如果项目没有任何成员（老项目），允许访问
+        const allMembers = projectMemberRepo.listMembers(projectId)
+        if (allMembers.length === 0) {
+          console.log(`[Permission] Project ${projectId} has no members, allowing access for backward compatibility`)
+          next()
+          return
+        }
 
         if (!member) {
           return res.status(403).json({

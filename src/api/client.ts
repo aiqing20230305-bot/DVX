@@ -90,6 +90,35 @@ async function request<T>(
         const message = (errorData as { error?: string })?.error ?? `HTTP ${res.status}`
         const error = new APIError(message, res.status, errorData)
 
+        // Handle 401 Unauthorized - try to refresh token (only if not already on login page)
+        if (res.status === 401 && attempt === 1 && path !== '/auth/refresh' && path !== '/auth/login' && path !== '/auth/register' && !window.location.pathname.includes('/login')) {
+          try {
+            // Try to refresh access token
+            const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+              method: 'POST',
+              credentials: 'include'
+            })
+
+            if (refreshRes.ok) {
+              // Token refreshed, retry original request
+              await sleep(100)
+              continue
+            } else {
+              // Refresh failed, redirect to login (prevent infinite loop)
+              if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login'
+              }
+              throw error
+            }
+          } catch (refreshError) {
+            // Refresh failed, redirect to login (prevent infinite loop)
+            if (!window.location.pathname.includes('/login')) {
+              window.location.href = '/login'
+            }
+            throw error
+          }
+        }
+
         // Check if should retry
         if (cfg.retry && attempt < maxAttempts && isRetryableError(res.status)) {
           lastError = error
@@ -98,7 +127,7 @@ async function request<T>(
         }
 
         // Show error toast for non-retry errors or last attempt
-        if (cfg.showErrorToast) {
+        if (cfg.showErrorToast && res.status !== 401) {
           toast.error('请求失败', message)
         }
         throw error

@@ -53,7 +53,7 @@ export const authService = {
       name: user.name,
       role: user.role
     }
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions)
   },
 
   /**
@@ -64,7 +64,7 @@ export const authService = {
       userId,
       sessionId
     }
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN })
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN } as jwt.SignOptions)
   },
 
   /**

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { kbRepo, KBItem } from '../db/repositories/kb.repo.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
+import { queryKnowledgeBase } from '../services/kb-ai.service.js'
 
 const router = Router()
 
@@ -77,6 +78,48 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
     const item = kbRepo.create({ type, title, content, tags: JSON.stringify(tags), project_id: projectId ?? null })
     res.status(201).json({ item: { ...item, tags } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+router.post('/search', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { query, projectId, limit = 10 } = req.body as {
+      query: string
+      projectId?: string
+      limit?: number
+    }
+
+    if (!query || !query.trim()) {
+      res.status(400).json({ error: '搜索关键词不能为空' })
+      return
+    }
+
+    // Permission check if project-specific search
+    if (projectId) {
+      const userId = (req as any).userId
+      if (!userId) {
+        res.status(401).json({ error: '未登录' })
+        return
+      }
+
+      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+      const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')
+
+      // Backward compatibility: allow if project has no members
+      if (!hasPermission) {
+        const allMembers = projectMemberRepo.listMembers(projectId)
+        if (allMembers.length > 0) {
+          res.status(403).json({ error: '权限不足，需要viewer权限' })
+          return
+        }
+      }
+    }
+
+    const result = queryKnowledgeBase(query, projectId, limit)
+    res.json(result)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     res.status(500).json({ error: message })

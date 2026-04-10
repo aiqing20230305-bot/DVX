@@ -271,8 +271,8 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
   }
 
   return (
-    <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-[#1F2329] mb-4">导出选项</h3>
+    <div className="rounded-xl p-5 border" style={{ backgroundColor: 'var(--color-bg-elevated-1)', borderColor: 'var(--color-border)' }}>
+      <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>导出选项</h3>
       <div className="space-y-3">
         <Button
           variant="primary"
@@ -296,12 +296,25 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
 
         {/* PPT模板选择器 */}
         <div className="space-y-2">
-          <label className="text-xs font-medium text-[#8F959E]">PPT模板</label>
+          <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>PPT模板</label>
           <select
             value={selectedTemplate}
             onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-[#DEE0E3] bg-white text-[#1F2329] focus:outline-none focus:ring-2 focus:ring-[#635BFF] focus:border-transparent"
+            className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent"
+            style={{
+              backgroundColor: 'var(--color-bg-tertiary)',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-text-primary)'
+            }}
             disabled={!reportHtml}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(99, 91, 255, 0.2)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <option value="default">默认深色模板（紫蓝）</option>
             <option value="fmcg">快消品模板（活力红）</option>
@@ -363,8 +376,8 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
         </Button>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-[#DEE0E3]">
-        <p className="text-xs text-[#C9CDD4] text-center">
+      <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+        <p className="text-xs text-center" style={{ color: 'var(--color-text-tertiary)' }}>
           HTML 报告可直接在浏览器中打开，支持打印为 PDF
         </p>
       </div>

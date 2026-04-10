@@ -18,7 +18,39 @@ declare global {
  */
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Get access token from cookie
+    // Development mode: bypass authentication, use mock user
+    if (process.env.NODE_ENV !== 'production') {
+      // Try to get real token first
+      const accessToken = req.cookies?.accessToken
+
+      if (accessToken) {
+        try {
+          const payload = authService.verifyToken(accessToken)
+          req.user = payload
+          req.userId = payload.userId
+          console.log(`[Auth] Development mode - using real user ${payload.userId}`)
+          next()
+          return
+        } catch (error) {
+          // Token invalid, use mock user
+        }
+      }
+
+      // Use mock user for development
+      const mockUser: JWTPayload = {
+        userId: 'dev-user-mock',
+        email: 'dev@example.com',
+        name: '开发测试用户',
+        role: 'admin'
+      }
+      req.user = mockUser
+      req.userId = mockUser.userId
+      console.log('[Auth] Development mode - using mock user')
+      next()
+      return
+    }
+
+    // Production mode: require valid token
     const accessToken = req.cookies?.accessToken
 
     if (!accessToken) {

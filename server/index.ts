@@ -278,9 +278,25 @@ projectRouter.put('/:id', authMiddleware, requireProjectOwner(), (req: Request, 
   }
 })
 
-projectRouter.delete('/:id', authMiddleware, requireProjectOwner(), (req: Request, res: Response) => {
+projectRouter.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
-    projectRepo.delete(req.params.id as string)
+    const projectId = req.params.id as string
+    const userId = (req as any).userId
+
+    // Permission check: owner only (with backward compatibility)
+    const { projectMemberRepo } = await import('./db/repositories/project-member.repo.js')
+    const hasOwnership = projectMemberRepo.hasRole(projectId, userId, 'owner')
+
+    if (!hasOwnership) {
+      // Backward compatibility: if project has no members, allow deletion
+      const allMembers = projectMemberRepo.listMembers(projectId)
+      if (allMembers.length > 0) {
+        res.status(403).json({ error: '权限不足，只有项目所有者可以删除项目' })
+        return
+      }
+    }
+
+    projectRepo.delete(projectId)
     res.json({ success: true })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)

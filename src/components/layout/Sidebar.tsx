@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Database, Lightbulb, FileText, PenTool, BookOpen,
@@ -44,9 +44,16 @@ export function Sidebar() {
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDesc, setNewProjectDesc] = useState('')
   const [creating, setCreating] = useState(false)
+  const [token, setToken] = useState<string>('')
   const navigate = useNavigate()
 
   const activeProject = projects.find(p => p.id === activeProjectId)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token') || '')
+    }
+  }, [])
 
   const handleOpenNewProject = () => {
     setNewProjectModal(true)
@@ -112,7 +119,7 @@ export function Sidebar() {
 
         {/* Project selector */}
         {!sidebarCollapsed && (
-          <div className="px-3 py-3 border-b animate-fade-in-scale" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="px-3 py-3 border-b animate-fade-in-scale space-y-2" style={{ borderColor: 'var(--color-border)' }}>
             <div className="relative">
               <div className="flex gap-1">
                 <button
@@ -192,6 +199,30 @@ export function Sidebar() {
                 </div>
               )}
             </div>
+
+            {/* New Project Button */}
+            <button
+              onClick={handleOpenNewProject}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200"
+              style={{
+                backgroundColor: 'transparent',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                e.currentTarget.style.borderColor = 'var(--color-primary)';
+                e.currentTarget.style.color = 'var(--color-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+              }}
+            >
+              <Plus size={16} />
+              <span className="text-sm font-medium">新建项目</span>
+            </button>
           </div>
         )}
 
@@ -244,10 +275,10 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom controls */}
-        <div className="px-2 py-3 border-t flex items-center gap-1" style={{ borderColor: 'var(--color-border)' }}>
+        <div className="px-2 py-3 border-t flex items-center gap-2" style={{ borderColor: 'var(--color-border)' }}>
           {/* User Avatar & Dropdown */}
           {!sidebarCollapsed && user && (
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
                 className="flex items-center gap-2 w-full px-2 py-2 rounded-lg transition-colors"
@@ -266,7 +297,7 @@ export function Sidebar() {
                   <div className="text-sm font-medium truncate">{user.name}</div>
                   <div className="text-xs truncate" style={{ color: 'var(--color-text-tertiary)' }}>{user.email}</div>
                 </div>
-                <ChevronDown size={14} style={{ color: 'var(--color-text-tertiary)' }} />
+                <ChevronDown size={14} className="flex-shrink-0" style={{ color: 'var(--color-text-tertiary)' }} />
               </button>
 
               {/* User Dropdown */}
@@ -304,29 +335,15 @@ export function Sidebar() {
             </div>
           )}
 
-          {/* Notification Center */}
-          {user && token && <NotificationCenter token={token} />}
+          {/* Right side controls */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Notification Center */}
+            {user && token && <NotificationCenter token={token} />}
 
-          <button
-            onClick={toggleTheme}
-            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
-            style={{ color: 'var(--color-text-secondary)' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--color-text-primary)';
-              e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--color-text-secondary)';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-            title={theme === 'dark' ? '切换到亮色' : '切换到暗色'}
-          >
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          {!sidebarCollapsed && (
+            {/* Theme toggle */}
             <button
-              onClick={handleOpenNewProject}
-              className="flex items-center gap-2 px-2 py-2 rounded-lg transition-colors text-sm"
+              onClick={toggleTheme}
+              className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
               style={{ color: 'var(--color-text-secondary)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = 'var(--color-text-primary)';
@@ -336,27 +353,29 @@ export function Sidebar() {
                 e.currentTarget.style.color = 'var(--color-text-secondary)';
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
+              title={theme === 'dark' ? '切换到亮色' : '切换到暗色'}
             >
-              <Plus size={15} />
-              新建项目
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-          )}
-          <button
-            onClick={toggleSidebar}
-            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors ml-auto"
-            style={{ color: 'var(--color-text-secondary)' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--color-text-primary)';
-              e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--color-text-secondary)';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-            title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
-          >
-            {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
+
+            {/* Sidebar toggle */}
+            <button
+              onClick={toggleSidebar}
+              className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
+              style={{ color: 'var(--color-text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
+            >
+              {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
+          </div>
         </div>
       </aside>
 
