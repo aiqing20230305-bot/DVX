@@ -15,12 +15,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const variantClasses: Record<Variant, string> = {
   // Primary - Linear Purple (#5E6AD2)
   primary: 'bg-[#5E6AD2] hover:bg-[#7B85DB] active:bg-[#4A55B8] text-white border-none',
-  // Secondary - Transparent with border (深色主题)
-  secondary: 'bg-transparent hover:bg-[#2A2A2A] active:bg-[#333333] text-white border border-[#333333] hover:border-[#404040]',
+  // Secondary - 适配明暗主题（深色文字在浅色背景，浅色文字在深色背景）
+  secondary: 'bg-transparent hover:bg-[var(--color-bg-elevated-2)] active:bg-[var(--color-bg-elevated-3)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:border-[var(--color-border-light)]',
   // Danger
   danger: 'bg-[#EF4444] hover:bg-[#DC2626] active:bg-[#B91C1C] text-white border-none',
   // Ghost - Linear style
-  ghost: 'bg-transparent hover:bg-[#2A2A2A] active:bg-[#333333] text-[#A0A0A0] hover:text-white border-none',
+  ghost: 'bg-transparent hover:bg-[var(--color-bg-elevated-2)] active:bg-[var(--color-bg-elevated-3)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border-none',
   // Outline
   outline: 'bg-transparent hover:bg-[rgba(94,106,210,0.1)] active:bg-[rgba(94,106,210,0.2)] text-[#5E6AD2] hover:text-[#7B85DB] border border-[#5E6AD2]/50 hover:border-[#7B85DB]',
   // AI Gradient - 紫→青渐变
