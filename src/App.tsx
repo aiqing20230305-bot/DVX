@@ -6,8 +6,8 @@ import { ErrorBoundary } from './components/shared/ErrorBoundary.js'
 import { TestingTrackerProvider } from './components/testing/TestingTracker.js'
 import { ProtectedRoute } from './components/auth/ProtectedRoute.js'
 import { PublicRoute } from './components/auth/PublicRoute.js'
+import { ThemeProvider } from './contexts/ThemeContext.js'
 import { useProjectStore } from './store/project.store.js'
-import { useUIStore } from './store/ui.store.js'
 import { useAuthStore } from './store/auth.store.js'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js'
 import './styles/print.css'
@@ -52,16 +52,10 @@ function PageLoading() {
 
 export function App() {
   const { fetchProjects } = useProjectStore()
-  const { theme } = useUIStore()
   const { isAuthenticated, fetchCurrentUser } = useAuthStore()
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts()
-
-  useEffect(() => {
-    // Apply theme
-    document.documentElement.classList.toggle('dark', theme === 'dark')
-  }, [theme])
 
   // Try to restore auth state on mount
   useEffect(() => {
@@ -75,10 +69,11 @@ export function App() {
   }, [isAuthenticated])
 
   return (
-    <ErrorBoundary>
-      <ToastContainer />
-      <Suspense fallback={<PageLoading />}>
-        <Routes>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <ToastContainer />
+        <Suspense fallback={<PageLoading />}>
+          <Routes>
           {/* Public routes (login/register) */}
           <Route
             path="/login"
@@ -130,8 +125,9 @@ export function App() {
               </ProtectedRoute>
             }
           />
-        </Routes>
-      </Suspense>
-    </ErrorBoundary>
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </ThemeProvider>
   )
 }

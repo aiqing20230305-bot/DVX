@@ -9,6 +9,7 @@ import {
 import { useUIStore } from '../../store/ui.store.js'
 import { useProjectStore } from '../../store/project.store.js'
 import { useAuthStore } from '../../store/auth.store.js'
+import { useTheme } from '../../contexts/ThemeContext.js'
 import { toast } from '../../store/toast.store.js'
 import { Modal } from '../shared/Modal.js'
 import { Button } from '../shared/Button.js'
@@ -31,9 +32,10 @@ const navItems = [
 ]
 
 export function Sidebar() {
-  const { sidebarCollapsed, theme, toggleSidebar, toggleTheme } = useUIStore()
+  const { sidebarCollapsed, toggleSidebar } = useUIStore()
   const { projects, activeProjectId, setActiveProject, addProject, removeProject } = useProjectStore()
   const { user, logout } = useAuthStore()
+  const { theme, toggleTheme } = useTheme()
   const [projectDropdown, setProjectDropdown] = useState(false)
   const [userDropdown, setUserDropdown] = useState(false)
   const [newProjectModal, setNewProjectModal] = useState(false)
