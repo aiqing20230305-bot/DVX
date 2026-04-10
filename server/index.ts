@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import { mkdirSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -17,7 +18,15 @@ import { kbRouter } from './routes/kb.route.js'
 import { testingRouter } from './routes/testing.route.js'
 import { questionnaireRouter } from './routes/questionnaire.route.js'
 import { timelineRouter } from './routes/timeline.route.js'
+import { projectAssetsRouter } from './routes/project-assets.route.js'
+import { authRouter } from './routes/auth.route.js'
+import projectMembersRouter from './routes/project-members.route.js'
+import commentsRouter from './routes/comments.route.js'
+import approvalRouter from './routes/approval.route.js'
+import notificationRouter from './routes/notification.route.js'
 import { errorMiddleware } from './middleware/error.middleware.js'
+import { authMiddleware } from './middleware/auth.middleware.js'
+import { requireProjectMember, requireProjectOwner } from './middleware/permission.middleware.js'
 import { performanceMonitor } from './middleware/performanceMonitor.js'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
 import { logger } from './utils/logger.js'
@@ -60,6 +69,7 @@ app.use(cors({
 }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+app.use(cookieParser())
 
 // Performance monitoring
 app.use(performanceMonitor)
@@ -77,7 +87,7 @@ projectRouter.get('/', (_req: Request, res: Response) => {
   }
 })
 
-projectRouter.get('/:id', (req: Request, res: Response) => {
+projectRouter.get('/:id', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {
   try {
     const project = projectRepo.findById(req.params.id as string)
     if (!project) {
@@ -91,7 +101,7 @@ projectRouter.get('/:id', (req: Request, res: Response) => {
   }
 })
 
-projectRouter.get('/:id/stats', (req: Request, res: Response) => {
+projectRouter.get('/:id/stats', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {
   try {
     const projectId = req.params.id as string
     const project = projectRepo.findById(projectId)
@@ -107,7 +117,7 @@ projectRouter.get('/:id/stats', (req: Request, res: Response) => {
   }
 })
 
-projectRouter.get('/:id/timeline', (req: Request, res: Response) => {
+projectRouter.get('/:id/timeline', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {
   try {
     const projectId = req.params.id as string
     const limit = parseInt(req.query.limit as string) || 50
@@ -124,7 +134,7 @@ projectRouter.get('/:id/timeline', (req: Request, res: Response) => {
   }
 })
 
-projectRouter.get('/:id/activity', (req: Request, res: Response) => {
+projectRouter.get('/:id/activity', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {
   try {
     const projectId = req.params.id as string
     const days = parseInt(req.query.days as string) || 30
@@ -141,7 +151,7 @@ projectRouter.get('/:id/activity', (req: Request, res: Response) => {
   }
 })
 
-projectRouter.post('/', (req: Request, res: Response) => {
+projectRouter.post('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { name, description, brand, category, target_audience, campaign, start_date, end_date, tags, templateId } = req.body
     if (!name) {
@@ -167,6 +177,18 @@ projectRouter.post('/', (req: Request, res: Response) => {
     }
 
     const project = projectRepo.create(projectData)
+
+    // Auto-add creator as owner (v2.5.0 Phase 2)
+    const userId = (req as any).userId
+    if (userId) {
+      const { projectMemberRepo } = await import('./db/repositories/project-member.repo.js')
+      projectMemberRepo.addMember({
+        project_id: project.id,
+        user_id: userId,
+        role: 'owner'
+      })
+      projectRepo.updateCreatedBy(project.id, userId)
+    }
 
     // Create knowledge base items from template
     if (template && template.knowledgeBase.length > 0) {
@@ -197,7 +219,52 @@ projectRouter.post('/', (req: Request, res: Response) => {
   }
 })
 
-projectRouter.put('/:id', (req: Request, res: Response) => {
+projectRouter.post('/:id/duplicate', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {
+  try {
+    const originalId = req.params.id as string
+    const original = projectRepo.findById(originalId)
+
+    if (!original) {
+      res.status(404).json({ error: '原项目不存在' })
+      return
+    }
+
+    // Create new project with copied data
+    const newProject = projectRepo.create({
+      name: `${original.name}（副本）`,
+      description: original.description,
+      brand: original.brand,
+      category: original.category,
+      target_audience: original.target_audience,
+      campaign: original.campaign,
+      start_date: original.start_date,
+      end_date: original.end_date,
+      tags: original.tags
+    })
+
+    // Copy knowledge base items
+    const originalKbItems = kbRepo.findByProject(originalId)
+    for (const kbItem of originalKbItems) {
+      kbRepo.create({
+        type: kbItem.type,
+        title: kbItem.title,
+        content: kbItem.content,
+        tags: JSON.stringify(kbItem.tags),
+        project_id: newProject.id
+      })
+    }
+
+    // Log project creation
+    logRepo.create(newProject.id, 'create', `复制项目：${newProject.name}（原项目：${original.name}）`)
+
+    res.status(201).json({ project: newProject })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+projectRouter.put('/:id', authMiddleware, requireProjectOwner(), (req: Request, res: Response) => {
   try {
     const project = projectRepo.update(req.params.id as string, req.body)
     if (!project) {
@@ -211,7 +278,7 @@ projectRouter.put('/:id', (req: Request, res: Response) => {
   }
 })
 
-projectRouter.delete('/:id', (req: Request, res: Response) => {
+projectRouter.delete('/:id', authMiddleware, requireProjectOwner(), (req: Request, res: Response) => {
   try {
     projectRepo.delete(req.params.id as string)
     res.json({ success: true })
@@ -248,8 +315,12 @@ templateRouter.get('/:id', (req: Request, res: Response) => {
   }
 })
 
+app.use('/api/auth', authRouter)
 app.use('/api/template', templateRouter)
 app.use('/api/project', projectRouter)
+app.use('/api/project', projectAssetsRouter)
+app.use(projectMembersRouter)
+app.use(commentsRouter)
 app.use('/api/upload', uploadRouter)
 app.use('/api/video', videoRouter)
 app.use('/api/insight', insightRouter)
@@ -260,6 +331,8 @@ app.use('/api/kb', kbRouter)
 app.use('/api/testing', testingRouter)
 app.use('/api/questionnaire', questionnaireRouter)
 app.use('/api/timeline', timelineRouter)
+app.use(approvalRouter)
+app.use(notificationRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() })
@@ -269,7 +342,12 @@ app.get('/api/health', (_req, res) => {
 const clientPath = join(__dirname, '../dist/client')
 if (existsSync(clientPath)) {
   app.use(express.static(clientPath))
-  app.get('*', (_req, res) => {
+  // Catch-all route for SPA - only for non-API routes
+  app.get('*', (req, res, next) => {
+    // Skip API routes - they should have been handled already
+    if (req.path.startsWith('/api/')) {
+      return next()
+    }
     res.sendFile(join(clientPath, 'index.html'))
   })
 }
@@ -281,6 +359,10 @@ app.use(errorMiddleware) // Legacy error handler (fallback)
 
 // Validate environment variables before starting server
 validateEnv()
+
+// Run database migrations
+import { runMigrations } from './db/migrations.js'
+runMigrations()
 
 const isProduction = process.env.NODE_ENV === 'production'
 app.listen(config.port, () => {

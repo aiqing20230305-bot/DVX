@@ -3,28 +3,39 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Database, Lightbulb, FileText, PenTool, BookOpen,
   ChevronLeft, ChevronRight, Sun, Moon, Plus, Zap,
-  ChevronDown, Check, Trash2, ArrowLeft, FolderOpen
+  ChevronDown, Check, Trash2, ArrowLeft, FolderOpen,
+  User, LogOut, GitBranch, Settings
 } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store.js'
 import { useProjectStore } from '../../store/project.store.js'
+import { useAuthStore } from '../../store/auth.store.js'
+import { toast } from '../../store/toast.store.js'
 import { Modal } from '../shared/Modal.js'
 import { Button } from '../shared/Button.js'
 import { TemplateSelector } from '../project/TemplateSelector.js'
+import { NotificationCenter } from '../notifications/NotificationCenter.js'
 
 const navItems = [
+  // 核心工作流
   { to: '/', label: '数据工作台', icon: Database, end: true },
   { to: '/insights', label: '洞察引擎', icon: Lightbulb },
   { to: '/topics', label: '选题策划', icon: FileText },
   { to: '/scripts', label: '脚本创作', icon: PenTool },
-  { to: '/report', label: '战略报告', icon: Zap },
-  { to: '/kb', label: '知识库', icon: BookOpen },
-  { to: '/projects', label: '所有项目', icon: FolderOpen, divider: true },
+  { to: '/report', label: '战略报告', icon: Zap, divider: true },
+  // 协作功能
+  { to: '/approvals', label: '审批管理', icon: GitBranch },
+  { to: '/kb', label: '知识库', icon: BookOpen, divider: true },
+  // 项目管理
+  { to: '/settings', label: '项目设置', icon: Settings },
+  { to: '/projects', label: '所有项目', icon: FolderOpen },
 ]
 
 export function Sidebar() {
   const { sidebarCollapsed, theme, toggleSidebar, toggleTheme } = useUIStore()
   const { projects, activeProjectId, setActiveProject, addProject, removeProject } = useProjectStore()
+  const { user, logout } = useAuthStore()
   const [projectDropdown, setProjectDropdown] = useState(false)
+  const [userDropdown, setUserDropdown] = useState(false)
   const [newProjectModal, setNewProjectModal] = useState(false)
   const [newProjectStep, setNewProjectStep] = useState<'template' | 'details'>('template')
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
@@ -64,6 +75,16 @@ export function Sidebar() {
       navigate('/')
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success('已退出登录')
+      navigate('/login')
+    } catch (error) {
+      toast.error('退出失败')
     }
   }
 
@@ -222,6 +243,68 @@ export function Sidebar() {
 
         {/* Bottom controls */}
         <div className="px-2 py-3 border-t flex items-center gap-1" style={{ borderColor: 'var(--color-border)' }}>
+          {/* User Avatar & Dropdown */}
+          {!sidebarCollapsed && user && (
+            <div className="relative flex-1">
+              <button
+                onClick={() => setUserDropdown(!userDropdown)}
+                className="flex items-center gap-2 w-full px-2 py-2 rounded-lg transition-colors"
+                style={{ color: 'var(--color-text-primary)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--color-primary)' }}>
+                  <span className="text-white text-xs font-medium">{user.name.charAt(0)}</span>
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <div className="text-sm font-medium truncate">{user.name}</div>
+                  <div className="text-xs truncate" style={{ color: 'var(--color-text-tertiary)' }}>{user.email}</div>
+                </div>
+                <ChevronDown size={14} style={{ color: 'var(--color-text-tertiary)' }} />
+              </button>
+
+              {/* User Dropdown */}
+              {userDropdown && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setUserDropdown(false)} />
+                  <div
+                    className="absolute bottom-full left-2 mb-2 w-48 rounded-lg border shadow-lg z-20"
+                    style={{
+                      backgroundColor: 'var(--color-bg-elevated)',
+                      borderColor: 'var(--color-border)'
+                    }}
+                  >
+                    <div className="p-2">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-colors text-sm"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--color-text-primary)';
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'var(--color-text-secondary)';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <LogOut size={16} />
+                        退出登录
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Notification Center */}
+          {user && token && <NotificationCenter token={token} />}
+
           <button
             onClick={toggleTheme}
             className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
@@ -241,7 +324,7 @@ export function Sidebar() {
           {!sidebarCollapsed && (
             <button
               onClick={handleOpenNewProject}
-              className="flex items-center gap-2 flex-1 px-2 py-2 rounded-lg transition-colors text-sm"
+              className="flex items-center gap-2 px-2 py-2 rounded-lg transition-colors text-sm"
               style={{ color: 'var(--color-text-secondary)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = 'var(--color-text-primary)';
