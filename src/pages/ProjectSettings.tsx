@@ -33,7 +33,14 @@ export default function ProjectSettings() {
   // Get current user's role in this project
   const currentUserMember = members.find(m => m.user_id === currentUser?.id)
   const currentUserRole = currentUserMember?.role
-  const token = localStorage.getItem('token') || ''
+  const [token, setToken] = useState<string>('')
+
+  // Initialize token from localStorage (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token') || '')
+    }
+  }, [])
 
   useEffect(() => {
     if (activeProjectId && token) {

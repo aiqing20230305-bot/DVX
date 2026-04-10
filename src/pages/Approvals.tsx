@@ -25,7 +25,14 @@ export default function Approvals() {
     'all'
   )
   const [selectedRequest, setSelectedRequest] = useState<ApprovalRequestWithDetails | null>(null)
-  const token = localStorage.getItem('token') || ''
+  const [token, setToken] = useState<string>('')
+
+  // Initialize token from localStorage (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token') || '')
+    }
+  }, [])
 
   useEffect(() => {
     if (!activeProjectId || !token) return

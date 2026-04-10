@@ -8,7 +8,14 @@ import { toast } from '../store/toast.store.js'
 export function Notifications() {
   const { notifications, unreadCount, loading, fetchNotifications, fetchUnreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAll } = useNotificationStore()
   const [filter, setFilter] = useState<'all' | 'unread'>('all')
-  const token = localStorage.getItem('token') || ''
+  const [token, setToken] = useState<string>('')
+
+  // Initialize token from localStorage (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token') || '')
+    }
+  }, [])
 
   useEffect(() => {
     if (token) {

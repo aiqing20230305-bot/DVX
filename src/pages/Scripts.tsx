@@ -39,13 +39,20 @@ export function Scripts() {
   const { getCommentCount } = useCommentStore()
   const { workflows, fetchWorkflows, createRequest } = useApprovalStore()
   const [submittingApproval, setSubmittingApproval] = useState<string | null>(null)
-  const token = localStorage.getItem('token') || ''
+  const [token, setToken] = useState<string>('')
   const {
     scripts, selectedIds, activeTopicId,
     setScripts, addScript, toggleSelection, selectAll, clearSelection,
     setActiveTopicId, updateScript, batchDelete, setStatus, status
   } = useScriptStore()
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set())
+
+  // Initialize token from localStorage (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token') || '')
+    }
+  }, [])
 
   const { start: startStream } = useSSEStream<Script & { message?: string; variant?: string; topicId?: string }>({
     onEvent: (event, data) => {

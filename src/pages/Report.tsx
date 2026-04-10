@@ -17,9 +17,16 @@ export function Report() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [submittingApproval, setSubmittingApproval] = useState(false)
-  const token = localStorage.getItem('token') || ''
+  const [token, setToken] = useState<string>('')
 
   const activeProject = projects.find(p => p.id === activeProjectId)
+
+  // Initialize token from localStorage (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token') || '')
+    }
+  }, [])
 
   // Load existing report on mount
   useEffect(() => {
