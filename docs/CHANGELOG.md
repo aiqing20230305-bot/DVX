@@ -1,5 +1,558 @@
 # 📋 更新日志
 
+## v2.5.0 Phase 5 - 2026-04-10 ✅ Reports审批功能
+
+### ⭐ 版本定位
+
+**Reports页面审批集成** - 完善审批流程对所有内容类型的覆盖（topic/script/report）
+
+### 🎯 核心工作
+
+#### Reports页面审批集成
+
+**修改文件**: src/pages/Report.tsx (+50行)
+
+**新增功能**:
+1. ✅ 导入approval相关依赖（useApprovalStore, CheckCircle图标, toast）
+2. ✅ 添加状态管理：
+   - workflows, fetchWorkflows, createRequest
+   - submittingApproval状态
+   - token获取
+3. ✅ useEffect加载report类型workflows
+4. ✅ "提交审批"按钮：
+   - 位置：生成按钮旁边
+   - 显示条件：报告已生成 && 有active workflows
+   - Loading状态显示
+5. ✅ handleSubmitForApproval处理函数：
+   - 检查报告是否已生成
+   - 检查是否有active workflows
+   - 使用`report_${projectId}`作为reportId
+   - 调用createRequest API
+   - Toast成功/失败提示
+
+**实现细节**:
+```typescript
+// Report ID使用项目ID（一个项目一个报告）
+const reportId = `report_${activeProjectId}`
+
+// 提交审批
+await createRequest({
+  workflow_id: workflow.id,
+  target_type: 'report',
+  target_id: reportId
+}, token)
+```
+
+### 📊 功能覆盖度
+
+| 内容类型 | API支持 | 页面集成 | 状态 |
+|---------|---------|---------|------|
+| Topic | ✅ | ❌ | 待开发 |
+| Script | ✅ | ✅ | Phase 4完成 |
+| Report | ✅ | ✅ | **Phase 5完成** |
+
+**审批流程现已覆盖核心交付物（Script + Report）！**
+
+### 📊 代码统计
+
+**修改文件**: 1个
+- src/pages/Report.tsx (+50行)
+
+### ✨ 功能亮点
+
+1. **完整的审批闭环** - Scripts和Reports都支持审批（最重要的两个交付物）
+2. **一致的交互体验** - 与Scripts页面相同的审批流程
+3. **智能提示** - 无workflows时提示用户前往项目设置
+4. **乐观更新** - 提交后立即Toast反馈
+
+### 🚀 下一步
+
+**Phase 6: Topics审批功能**（可选）
+- Topics页面集成审批功能
+- 完成所有内容类型的审批覆盖
+
+**Phase 7: 通知系统**（重要）
+- 审批请求提交时通知审批人
+- 审批完成/拒绝时通知提交人
+
+---
+
+## v2.5.0 Phase 4.1 - 2026-04-10 🎨 导航菜单优化
+
+### ⭐ 版本定位
+
+**导航体验优化** - 添加审批管理和项目设置导航入口，优化导航结构分层
+
+### 🎯 核心工作
+
+#### 导航菜单重构
+
+**修改文件**: src/components/layout/Sidebar.tsx
+- ✅ 新增图标导入：GitBranch（审批管理）、Settings（项目设置）
+- ✅ 调整navItems数组，采用三层导航结构：
+  - **核心工作流**（无分隔线）: 数据工作台 → 洞察引擎 → 选题策划 → 脚本创作 → 战略报告
+  - **协作功能**（分隔线）: 审批管理（新增）→ 知识库
+  - **项目管理**（分隔线）: 项目设置（新增）→ 所有项目
+
+#### 新增导航项
+
+**审批管理** (/approvals):
+- 图标：GitBranch（分支符号，象征审批流程）
+- 功能：查看和处理审批请求，管理待审批任务
+- 位置：协作功能分组
+
+**项目设置** (/settings):
+- 图标：Settings（齿轮，标准设置图标）
+- 功能：项目信息、成员管理、审批流程配置
+- 位置：项目管理分组
+
+### 📊 代码统计
+
+**修改文件**: 1个
+- src/components/layout/Sidebar.tsx (+10行)
+
+### ✨ 功能亮点
+
+1. **清晰的信息架构** - 三层结构：工作流 → 协作 → 管理
+2. **直观的功能发现** - 审批管理和项目设置有明确入口
+3. **视觉层次分明** - 两条分隔线划分功能区域
+4. **图标语义化** - GitBranch象征审批流程，Settings象征配置管理
+
+### 🔧 用户体验提升
+
+**Before（Phase 4）**:
+- ❌ 审批管理功能完整，但无导航入口
+- ❌ 项目设置只能通过URL访问
+- ❌ 用户无法发现新功能
+
+**After（Phase 4.1）**:
+- ✅ 审批管理在导航中清晰可见
+- ✅ 项目设置有专属导航入口
+- ✅ 功能分组合理，易于理解
+
+### 🚀 下一步
+
+**Phase 5: 通知系统**（推荐）
+- 审批请求提交时通知审批人
+- 审批完成/拒绝时通知提交人
+- 站内信 + 邮件通知
+
+---
+
+## v2.5.0 Phase 4 - 2026-04-10 🔄 审批流程功能
+
+### ⭐ 版本定位
+
+**审批流程系统** - 完整的多步骤审批工作流，支持topic/script/report三种类型的审批，包含完整的权限控制和状态机逻辑
+
+### 🎯 核心工作
+
+#### 数据库层（3张表）
+
+**新增迁移**（server/db/migrations.ts）:
+- ✅ `approval_workflows` - 审批流程表
+  - 字段：id, project_id, name, description, target_type, steps(JSON), status, created_by
+  - 支持多步骤审批（steps数组，每步包含reviewers[]和rule: 'any'/'all'）
+  - target_type支持：topic、script、report
+- ✅ `approval_requests` - 审批请求表
+  - 字段：id, workflow_id, project_id, target_type, target_id, current_step, status, requester_id
+  - status：pending、approved、rejected、cancelled
+  - CASCADE删除（workflow删除时自动删除所有请求）
+- ✅ `approval_reviews` - 审批记录表
+  - 字段：id, request_id, step, reviewer_id, status, comment
+  - 记录每个审批人的审批意见
+  - CASCADE删除（request删除时自动删除所有review）
+
+#### Repository层（3个repo）
+
+**新增文件**（server/db/repositories/approval.repo.ts，650行）:
+- ✅ `workflowRepo` - 审批流程数据访问
+  - create, findById, findByProject, update, delete
+- ✅ `requestRepo` - 审批请求数据访问
+  - create, findById, findByTarget, findByProject, findPendingByReviewer, updateStatus, delete
+  - findPendingByReviewer: 过滤出当前用户是当前步骤reviewer且未审批的请求
+- ✅ `reviewRepo` - 审批记录数据访问
+  - create, findByRequest, findByReviewerAndStep
+
+#### API层（10个端点）
+
+**新增文件**（server/routes/approval.route.ts，609行）:
+
+**Workflow Management** (4个端点):
+- ✅ POST /api/approval/workflows - 创建审批流程（owner only）
+- ✅ GET /api/approval/workflows - 获取项目流程列表（viewer+）
+- ✅ PUT /api/approval/workflows/:workflowId - 更新流程（owner only）
+- ✅ DELETE /api/approval/workflows/:workflowId - 删除流程（owner only, CASCADE）
+
+**Request Management** (4个端点):
+- ✅ POST /api/approval/requests - 提交审批请求（editor+）
+- ✅ GET /api/approval/requests - 获取审批请求列表（viewer+）
+- ✅ GET /api/approval/requests/pending - 获取待我审批的请求（auth）
+- ✅ PUT /api/approval/requests/:requestId/cancel - 撤销请求（requester或owner）
+
+**Review Management** (2个端点):
+- ✅ POST /api/approval/requests/:requestId/review - 提交审批意见（reviewer only）
+  - **状态机逻辑**:
+    - status='rejected' → request.status='rejected' (终止)
+    - status='approved' → 检查当前步骤是否完成:
+      - rule='any': 任一审批人通过即完成
+      - rule='all': 所有审批人都通过才完成
+    - 步骤完成 && 有下一步 → current_step++, status='pending'
+    - 步骤完成 && 无下一步 → status='approved' (完成)
+    - 步骤未完成 → status='pending', 等待其他审批人
+- ✅ GET /api/approval/requests/:requestId/reviews - 获取审批历史（viewer+）
+
+#### 前端Store层（2个文件）
+
+**新增文件**（src/api/approval.api.ts，290行）:
+- ✅ TypeScript接口：ApprovalWorkflow, ApprovalRequest, ApprovalReview等
+- ✅ API客户端：approvalApi对象，包含所有10个API端点的调用函数
+
+**新增文件**（src/store/approval.store.ts，320行）:
+- ✅ Zustand状态管理：workflows, requests, pendingRequests, reviews
+- ✅ Loading/Error状态管理
+- ✅ 15个Action函数：fetchWorkflows, createWorkflow, updateWorkflow, deleteWorkflow, fetchRequests, fetchPendingRequests, createRequest, cancelRequest, fetchReviews, submitReview等
+- ✅ 乐观更新：提交审批后立即更新本地状态
+
+#### UI组件层（6个组件）
+
+**新增目录**（src/components/approval/）:
+- ✅ `ApprovalBadge.tsx` - 状态指示器
+  - 4种状态：pending(黄色), approved(绿色), rejected(红色), cancelled(灰色)
+  - 3种尺寸：sm, md, lg
+  - 图标 + 文字显示
+- ✅ `WorkflowList.tsx` - 流程列表
+  - 显示流程名称、状态、target_type、步骤数、审批人数
+  - 编辑/删除按钮（owner only）
+  - 步骤详情展示（每步的审批人数量和规则）
+- ✅ `WorkflowForm.tsx` - 流程创建/编辑表单
+  - 基本信息：名称、描述、target_type
+  - 动态步骤管理：添加/删除步骤
+  - 审批人选择：多选项目成员
+  - 审批规则：any（任一通过）或all（全部通过）
+- ✅ `RequestList.tsx` - 请求列表
+  - 显示请求状态、workflow名称、提交人、提交时间
+  - 审批进度条（步骤完成情况可视化）
+  - 点击查看详情
+- ✅ `RequestDetail.tsx` - 请求详情弹窗
+  - 基本信息：提交人、提交时间、审批对象
+  - 审批流程：显示所有步骤及其状态
+  - 审批历史：每个审批人的意见和时间
+  - 操作按钮：撤销请求（requester）、提交审批（reviewer）
+- ✅ `ReviewForm.tsx` - 审批表单
+  - 审批决定：通过/拒绝（大按钮选择）
+  - 审批意见：文本框（拒绝时必填）
+  - 确认提交
+
+#### 页面集成（3个页面）
+
+**修改文件**（src/pages/ProjectSettings.tsx）:
+- ✅ 新增"审批流程"Section（owner only）
+- ✅ 集成WorkflowList和WorkflowForm
+- ✅ 创建/编辑/删除流程功能
+- ✅ 自动加载项目成员列表供选择审批人
+
+**修改文件**（src/pages/Scripts.tsx）:
+- ✅ 导入useApprovalStore
+- ✅ 自动加载script类型的workflows
+- ✅ "提交审批"按钮（topic header，只在有active workflows且已生成脚本时显示）
+- ✅ handleSubmitForApproval处理函数
+
+**新增文件**（src/pages/Approvals.tsx，200行）:
+- ✅ 审批管理页面
+- ✅ 4个筛选tab：全部、待我审批、进行中、已通过
+- ✅ 请求列表显示
+- ✅ 点击查看详情和提交审批
+- ✅ 撤销请求功能
+
+#### 路由配置
+
+**修改文件**（src/App.tsx）:
+- ✅ 新增路由：/approvals → Approvals页面
+- ✅ 新增路由：/settings → ProjectSettings页面
+
+#### E2E测试
+
+**新增文件**（scripts/test-phase4-approval.sh，400行）:
+- ✅ 10组测试场景
+- ✅ 测试覆盖：
+  - 用户注册和项目创建
+  - 创建审批流程
+  - 提交审批请求
+  - 获取待审批列表
+  - 提交审批意见（通过/拒绝）
+  - 获取审批历史
+  - 撤销请求
+  - 时间线记录验证
+  - 权限控制测试
+- ✅ 彩色输出（成功/失败/警告）
+- ✅ 自动清理测试数据
+
+### 📊 代码统计
+
+**新增文件**: 10个
+- 后端：approval.repo.ts (650行), approval.route.ts (609行)
+- 前端API：approval.api.ts (290行)
+- 前端Store：approval.store.ts (320行)
+- 前端组件：6个组件 (~900行)
+- 前端页面：Approvals.tsx (200行)
+- 测试：test-phase4-approval.sh (400行)
+
+**修改文件**: 4个
+- 数据库：migrations.ts (+180行)
+- 页面：ProjectSettings.tsx (+80行), Scripts.tsx (+50行)
+- 路由：App.tsx (+3行)
+
+**总计**: ~3700行代码
+
+### 🧪 测试结果
+
+- ✅ E2E测试：10/10通过 (100%)
+- ✅ 响应时间：<1秒
+- ✅ 状态机逻辑：正确
+- ✅ 权限控制：正确
+- ✅ 时间线记录：完整
+
+### ✨ 功能亮点
+
+1. **完整的多步骤审批** - 支持任意步骤数，每步可配置多个审批人
+2. **灵活的审批规则** - any（任一通过）或all（全部通过）
+3. **状态机逻辑清晰** - pending → approved/rejected，步骤自动推进
+4. **权限控制严格** - owner创建流程，editor+提交请求，指定reviewer审批
+5. **CASCADE删除** - 删除流程或请求时自动清理相关数据
+6. **实时状态同步** - 审批后立即更新请求状态和步骤
+7. **完整的审批历史** - 每个审批意见都有详细记录
+8. **待审批列表** - 自动过滤出需要我审批的请求
+
+### 🚀 下一步
+
+Phase 5：通知系统（可选）
+- 审批请求提交时通知审批人
+- 审批完成时通知提交人
+- 邮件/站内信通知
+
+---
+
+## v2.5.0 Phase 3.1 - 2026-04-10 📝 评论功能完善
+
+### ⭐ 版本定位
+
+**评论功能页面集成** - 完成Topics和Scripts页面的评论功能集成，评论功能全面覆盖核心工作流
+
+### 🎯 核心工作
+
+#### Topics页面评论集成
+
+**修改文件**（2个）:
+- ✅ `src/components/topics/TopicCard.tsx` - 添加评论按钮
+  - 新增props: onCommentClick, commentCount
+  - 底部添加评论按钮（MessageCircle图标）
+  - 评论数量角标显示
+- ✅ `src/components/topics/TopicGrid.tsx` - 传递评论props
+  - 新增props: onCommentClick, getCommentCount
+  - 所有TopicCard渲染处传递props
+- ✅ `src/pages/Topics.tsx` - 集成CommentPanel
+  - 导入CommentPanel和useCommentStore
+  - 添加状态: commentPanelOpen, selectedTopicId
+  - handleCommentClick处理函数
+  - 渲染CommentPanel组件（targetType="topic"）
+
+#### Scripts页面评论集成
+
+**修改文件**（3个）:
+- ✅ `src/components/scripts/ScriptEditor.tsx` - 添加评论按钮
+  - 新增props: onCommentClick, commentCount
+  - Header部分添加评论按钮（在"保存修改"按钮旁边）
+  - 评论数量角标显示
+- ✅ `src/components/scripts/ABVariantPanel.tsx` - 传递评论props
+  - 新增props: onCommentClick, getCommentCount
+  - A/B两个版本ScriptEditor都传递props
+- ✅ `src/pages/Scripts.tsx` - 集成CommentPanel
+  - 导入CommentPanel和useCommentStore
+  - 添加状态: commentPanelOpen, selectedScriptId
+  - handleCommentClick处理函数
+  - ABVariantPanel传递评论props
+  - 渲染CommentPanel组件（targetType="script"）
+
+#### 测试验证
+
+**新增测试脚本**（1个）:
+- ✅ `scripts/test-phase3.1-comments.sh` - Phase 3.1功能测试
+  - 11个测试用例（100%通过）
+  - 测试覆盖：Topics评论 + Scripts评论 + 时间线记录
+  - 总耗时：<1秒
+
+### 📊 代码统计
+
+| 分类 | 新增 | 修改 | 删除 |
+|------|------|------|------|
+| 前端组件 | 0 | 5 | 0 |
+| 前端页面 | 0 | 2 | 0 |
+| 测试文件 | 1 | 0 | 0 |
+| **总计** | **1** | **7** | **0** |
+
+**代码行数**: ~150行新代码（主要是props传递和状态管理）
+
+### 🎊 功能亮点
+
+- ✅ **完整覆盖**: 评论功能覆盖Insights/Topics/Scripts三个核心页面
+- ✅ **统一体验**: 所有页面使用同一CommentPanel组件
+- ✅ **实时显示**: 评论数量实时更新显示在卡片上
+- ✅ **权限一致**: 所有页面评论权限规则一致（viewer可评论，作者/owner可删除）
+
+### ⚡ 性能指标
+
+- Topics评论：响应时间<100ms
+- Scripts评论：响应时间<100ms
+- 与Phase 3性能指标一致
+
+### ✅ 测试结果
+
+- E2E测试：11/11 通过（100%）
+- 测试耗时：<1秒
+- 功能覆盖：Topics + Scripts评论完整流程
+
+### 📝 完成总结
+
+Phase 3.1完成了评论功能在所有核心页面的集成：
+- ✅ **Insights页面**（Phase 3完成）
+- ✅ **Topics页面**（Phase 3.1完成）
+- ✅ **Scripts页面**（Phase 3.1完成）
+
+**评论系统现已全面可用**，支持对工作流中任意节点（洞察/选题/脚本）进行讨论和协作。
+
+---
+
+## v2.5.0 Phase 3 - 2026-04-10 💬 评论功能
+
+### ⭐ 版本定位
+
+**协作增强** - 实现评论系统，支持对洞察/选题/脚本进行讨论，支持嵌套回复和@提及
+
+### 🎯 核心工作
+
+#### 评论系统（v2.5.0 Phase 3）
+
+**数据库层**（3个新文件）:
+- ✅ `server/db/migrations.ts` - 添加comments表迁移
+  - comments表：支持4种target类型（insight/topic/script/report）
+  - 嵌套回复：parent_id实现树形结构
+  - @提及：mentions JSON数组
+  - 4个索引：target, project_id, user_id, parent_id
+- ✅ `server/db/repositories/comment.repo.ts` - 评论数据访问层
+  - 7个方法：create, findById, findByTarget, findByProject, delete, count, findReplies
+  - 自动构建嵌套replies树形结构
+  - JOIN users表返回完整用户信息
+
+**后端API**（1个新文件）:
+- ✅ `server/routes/comments.route.ts` - 评论API路由
+  - GET /api/comments - 获取评论列表（嵌套结构）
+  - POST /api/comments - 创建评论/回复
+  - DELETE /api/comments/:id - 删除评论（级联删除replies）
+  - 权限控制：requireProjectMember('viewer')
+  - @mention验证：被提及用户必须是项目成员
+  - 时间线记录：所有操作记录到project timeline
+
+**前端Store**（1个新文件）:
+- ✅ `src/store/comment.store.ts` - Zustand评论状态管理
+  - 按target缓存：`targetType:targetId`作为key
+  - 乐观更新：立即显示新评论
+  - 4个方法：fetchComments, addComment, deleteComment, getCommentCount
+  - 嵌套replies支持
+
+**前端组件**（4个新文件）:
+- ✅ `src/components/comments/CommentItem.tsx` - 单条评论
+  - 用户头像+名称+时间+内容
+  - 回复/删除按钮（权限控制）
+  - 嵌套replies递归渲染
+  - 相对时间显示
+- ✅ `src/components/comments/CommentList.tsx` - 评论列表
+  - 使用CommentItem渲染
+  - 空状态提示
+- ✅ `src/components/comments/CommentInput.tsx` - 评论输入框
+  - @mention自动完成（输入@弹出成员列表）
+  - 自动扩展textarea
+  - Cmd+Enter快捷键发送
+  - 字数限制（1000字符）
+- ✅ `src/components/comments/CommentPanel.tsx` - 右侧评论面板
+  - 可折叠/展开
+  - 固定右侧，全屏高度
+  - 评论数量角标
+  - Loading/Error状态处理
+
+**页面集成**（1个修改）:
+- ✅ `src/pages/Insights.tsx` - 洞察页面集成评论
+  - InsightCard添加评论图标+数量
+  - CommentPanel组件
+  - 评论点击处理
+
+**测试**（1个新测试脚本）:
+- ✅ `scripts/test-comments.sh` - 评论功能E2E测试
+  - 12个测试用例（100%通过）
+  - 测试覆盖：创建/回复/@mention/查询/删除/权限
+  - 总耗时：1秒
+
+**文档**（2个新文档）:
+- ✅ `docs/api/comment-api.md` - Comment API完整文档
+  - 3个API端点详细说明
+  - 权限矩阵
+  - 使用示例和最佳实践
+- ✅ `docs/test-reports/2026-04-10-phase3-comments-test.md` - E2E测试报告
+  - 12/12测试通过
+  - 详细测试用例说明
+  - 性能指标
+
+### 📊 代码统计
+
+| 分类 | 新增 | 修改 | 删除 |
+|------|------|------|------|
+| 后端文件 | 3 | 2 | 0 |
+| 前端文件 | 5 | 2 | 0 |
+| 测试文件 | 1 | 0 | 0 |
+| 文档文件 | 2 | 1 | 0 |
+| **总计** | **11** | **5** | **0** |
+
+**代码行数**: ~1800行新代码
+
+### 🎊 功能亮点
+
+- ✅ **嵌套回复**: parent_id实现无限层级回复
+- ✅ **@提及**: mentions数组+成员验证
+- ✅ **级联删除**: 删除父评论自动删除所有replies
+- ✅ **权限控制**: viewer可评论，作者/owner可删除
+- ✅ **实时计数**: 评论数量实时显示
+- ✅ **时间线记录**: 所有评论操作记录审计
+- ✅ **自动完成**: @输入自动弹出成员列表
+- ✅ **响应式设计**: 移动端评论面板全屏覆盖
+
+### ⚡ 性能指标
+
+- 创建评论：~80ms
+- 获取评论列表：~60ms
+- 删除评论：~70ms
+- 平均响应时间：<100ms
+
+### 🔒 安全性
+
+- ✅ 评论权限检查（必须是项目成员）
+- ✅ 删除权限检查（只能删除自己的或owner删除任何）
+- ✅ @mention验证（只能@项目成员）
+- ✅ 项目级隔离（不能访问其他项目评论）
+- ✅ CASCADE删除维护数据一致性
+
+### 📖 完整文档
+
+- [Comment API文档](api/comment-api.md)
+- [Phase 3 E2E测试报告](test-reports/2026-04-10-phase3-comments-test.md)
+
+### ✅ 测试结果
+
+- E2E测试：12/12 通过（100%）
+- 测试耗时：1秒
+- 覆盖率：核心功能100%
+
+---
+
 ## v2.0.0 - 2026-04-06 🧪 E2E测试框架
 
 ### ⭐ 版本定位
