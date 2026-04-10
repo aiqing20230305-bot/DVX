@@ -76,6 +76,21 @@ function calculateLogoSize(logoPath: string, maxWidth: number, maxHeight: number
 }
 
 /**
+ * 获取模板对应的过渡动画效果
+ * @param templateId 模板ID
+ * @returns transition配置
+ */
+function getTransitionForTemplate(templateId: string): string {
+  const transitions: Record<string, string> = {
+    'default': 'fade',      // 默认：淡入淡出（专业）
+    'fmcg': 'wipe',         // 快消：擦除（动感活力）
+    'beauty': 'dissolve',   // 美妆：溶解（优雅柔和）
+    'food': 'push'          // 食品：推进（温暖亲近）
+  }
+  return transitions[templateId] || 'fade'
+}
+
+/**
  * 生成项目PPT报告
  */
 export async function generateProjectPPT(options: PPTGeneratorOptions): Promise<Buffer> {
@@ -97,6 +112,9 @@ export async function generateProjectPPT(options: PPTGeneratorOptions): Promise<
   const template = templatesData.templates.find((t: any) => t.id === templateId) || templatesData.templates[0]
   const THEME = { ...template.theme }
 
+  // 获取过渡动画效果
+  const transition = getTransitionForTemplate(templateId)
+
   // 应用项目自定义品牌配色（如果存在）
   if (project.brand_primary_color) {
     THEME.primary = project.brand_primary_color.replace('#', '')
@@ -116,36 +134,36 @@ export async function generateProjectPPT(options: PPTGeneratorOptions): Promise<
   pptx.company = '特赞科技'
 
   // 1. 封面
-  addCoverSlide(pptx, project, THEME)
+  addCoverSlide(pptx, project, THEME, transition)
 
   // 2. 目录
-  addTableOfContents(pptx, insights.length, topics.length, scripts.length, THEME)
+  addTableOfContents(pptx, insights.length, topics.length, scripts.length, THEME, transition)
 
   // 3. 项目概况
-  addProjectOverview(pptx, project, THEME)
+  addProjectOverview(pptx, project, THEME, transition)
 
   // 4. 数据概览（如果有图表）
   if (charts && (charts.insightChart || charts.topicChart || charts.timelineChart)) {
-    addDataOverview(pptx, charts, THEME)
+    addDataOverview(pptx, charts, THEME, transition)
   }
 
   // 5. 洞察章节
   if (insights.length > 0) {
-    addInsightsSection(pptx, insights, THEME)
+    addInsightsSection(pptx, insights, THEME, transition)
   }
 
   // 6. 选题章节
   if (topics.length > 0) {
-    addTopicsSection(pptx, topics, THEME)
+    addTopicsSection(pptx, topics, THEME, transition)
   }
 
   // 7. 脚本章节
   if (scripts.length > 0) {
-    addScriptsSection(pptx, scripts, THEME)
+    addScriptsSection(pptx, scripts, THEME, transition)
   }
 
   // 8. 结尾页
-  addEndingSlide(pptx, project, THEME)
+  addEndingSlide(pptx, project, THEME, transition)
 
   // 生成PPT文件
   const pptBuffer = await pptx.write({ outputType: 'nodebuffer' }) as Buffer
