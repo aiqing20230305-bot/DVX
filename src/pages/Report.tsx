@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Zap, BookOpen, CheckCircle } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Zap, BookOpen, CheckCircle, RefreshCw } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useApprovalStore } from '../store/approval.store.js'
 import { Button } from '../components/shared/Button.js'
@@ -15,6 +15,7 @@ export function Report() {
   const [reportHtml, setReportHtml] = useState('')
   const [generating, setGenerating] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submittingApproval, setSubmittingApproval] = useState(false)
   const [token, setToken] = useState<string>('')
@@ -28,32 +29,55 @@ export function Report() {
     }
   }, [])
 
-  // Load existing report on mount
-  useEffect(() => {
+  // Load existing report function (extracted for reuse)
+  const loadReport = useCallback(async (isRefresh = false) => {
     if (!activeProjectId) {
       setLoading(false)
       return
     }
 
-    setLoading(true)
-    api.get<{ html: string | null }>(`/report/${activeProjectId}`)
-      .then(({ html }) => {
-        if (html) {
-          setReportHtml(html)
+    if (isRefresh) {
+      setRefreshing(true)
+    } else {
+      setLoading(true)
+    }
+
+    try {
+      const { html } = await api.get<{ html: string | null }>(`/report/${activeProjectId}`)
+      if (html) {
+        setReportHtml(html)
+        if (isRefresh) {
+          toast.success('刷新成功', '报告已更新')
         }
-      })
-      .catch((err) => {
-        console.error('Failed to load report:', err)
-      })
-      .finally(() => {
+      } else {
+        setReportHtml('')
+        if (isRefresh) {
+          toast.info('暂无报告', '请先生成报告')
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load report:', err)
+      if (isRefresh) {
+        toast.error('刷新失败', '请重试')
+      }
+    } finally {
+      if (isRefresh) {
+        setRefreshing(false)
+      } else {
         setLoading(false)
-      })
+      }
+    }
+  }, [activeProjectId])
+
+  // Load existing report on mount
+  useEffect(() => {
+    loadReport(false)
 
     // Fetch workflows for approval
     if (token) {
-      fetchWorkflows(activeProjectId, 'report', token)
+      fetchWorkflows(activeProjectId!, 'report', token)
     }
-  }, [activeProjectId, token])
+  }, [activeProjectId, token, loadReport, fetchWorkflows])
 
   const handleGenerate = async () => {
     if (!activeProjectId) return
@@ -144,6 +168,17 @@ export function Report() {
           icon={<Zap size={16} />}
         >
           {generating ? '生成中...' : reportHtml ? '重新生成' : '生成报告'}
+        </Button>
+
+        <Button
+          size="lg"
+          variant="outline"
+          loading={refreshing}
+          disabled={!activeProjectId}
+          onClick={() => loadReport(true)}
+          icon={<RefreshCw size={16} />}
+        >
+          刷新
         </Button>
 
         {reportHtml && workflows.filter(w => w.status === 'active').length > 0 && (

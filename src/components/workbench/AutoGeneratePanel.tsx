@@ -197,7 +197,12 @@ export function AutoGeneratePanel() {
       // Success
       if (!cancelledRef.current) {
         setStatus('success')
-        toast.success('生成完成！', '战略报告已生成，点击"查看报告"查看结果')
+        toast.success('生成完成！', '即将跳转到战略报告页面')
+
+        // Auto-navigate to report page after 1.5s
+        setTimeout(() => {
+          navigate('/report')
+        }, 1500)
       }
 
     } catch (error) {
