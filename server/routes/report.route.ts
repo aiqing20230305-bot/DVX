@@ -5,6 +5,7 @@ import { logRepo } from '../db/repositories/log.repo.js'
 import { reportRepo } from '../db/repositories/report.repo.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requireProjectMember } from '../middleware/permission.middleware.js'
+import { sanitizeObjectForJSON } from '../utils/json.utils.js'
 
 const router = Router()
 
@@ -19,7 +20,9 @@ router.get('/:projectId', authMiddleware, requireProjectMember('viewer'), (req: 
       return
     }
 
-    res.json({ html: report.html_content })
+    // Sanitize HTML content to remove control characters that cause JSON parsing errors
+    const sanitizedResponse = sanitizeObjectForJSON({ html: report.html_content })
+    res.json(sanitizedResponse)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     res.status(500).json({ error: message })
@@ -42,7 +45,9 @@ router.post('/generate', authMiddleware, requireProjectMember('editor'), (req: R
     // Log report generation
     logRepo.create(projectId, 'report', '生成战略报告')
 
-    res.json({ html })
+    // Sanitize HTML content before sending JSON response
+    const sanitizedResponse = sanitizeObjectForJSON({ html })
+    res.json(sanitizedResponse)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     res.status(500).json({ error: message })
