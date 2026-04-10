@@ -73,6 +73,7 @@ async function request<T>(
 
       const res = await fetch(`${BASE_URL}${path}`, {
         headers: { 'Content-Type': 'application/json', ...options.headers },
+        credentials: 'include', // 发送cookies进行认证
         signal: controller.signal,
         ...options
       })

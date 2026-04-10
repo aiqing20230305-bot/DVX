@@ -149,45 +149,48 @@ export function Workbench() {
 
   return (
     <div className="p-6 md:p-8 max-w-4xl mx-auto">
-      {/* Page header */}
-      <div className="mb-8">
+      {/* Page header (设计系统v2.0) */}
+      <div className="mb-16">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
-            backgroundColor: 'rgba(99, 91, 255, 0.2)',
-            borderColor: 'rgba(99, 91, 255, 0.3)'
+          <div className="w-9 h-9 rounded-lg border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(94, 106, 210, 0.1)',
+            borderColor: 'rgba(94, 106, 210, 0.3)'
           }}>
-            <Database size={18} style={{ color: 'var(--color-primary-light)' }} />
+            <Database size={18} style={{ color: 'var(--color-primary)' }} />
           </div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>数据工作台</h1>
+          <h1 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>数据工作台</h1>
         </div>
         <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>上传电商数据文件，AI 自动解析并提取结构化信息</p>
       </div>
 
       {/* Project info */}
       {!activeProject ? (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-          <AlertCircle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-8 p-3 border rounded-lg flex items-start gap-2.5" style={{
+          backgroundColor: 'var(--color-warning-bg)',
+          borderColor: 'var(--color-warning-border)'
+        }}>
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--color-warning)' }} />
           <div>
-            <div className="text-sm font-medium text-amber-900 mb-1">尚未创建项目</div>
-            <p className="text-xs text-amber-700">请先在侧边栏创建一个项目，然后上传文件</p>
+            <div className="text-sm font-semibold mb-1" style={{ color: 'var(--color-warning)' }}>尚未创建项目</div>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>请先在侧边栏创建一个项目，然后上传文件</p>
           </div>
         </div>
       ) : (
-        <div className="mb-6 px-4 py-3 border rounded-xl flex items-center justify-between" style={{
-          backgroundColor: 'var(--color-bg-tertiary)',
+        <div className="mb-8 px-3 py-2.5 border rounded-lg flex items-center justify-between" style={{
+          backgroundColor: 'var(--color-bg-elevated-1)',
           borderColor: 'var(--color-border)'
         }}>
           <div>
-            <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>当前项目</span>
-            <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{activeProject.name}</div>
+            <span className="text-xs font-medium" style={{ color: 'var(--color-text-tertiary)' }}>当前项目</span>
+            <div className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>{activeProject.name}</div>
           </div>
           <button
             onClick={fetchFiles}
-            className="p-2 rounded-lg transition-colors"
+            className="p-1.5 rounded-md transition-all duration-100"
             style={{ color: 'var(--color-text-tertiary)' }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'var(--color-text-secondary)';
-              e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)';
+              e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = 'var(--color-text-tertiary)';
@@ -202,10 +205,20 @@ export function Workbench() {
 
       {/* Error message */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-sm text-red-900">
-          <AlertCircle size={15} className="text-red-600" />
-          {error}
-          <button onClick={() => setError(null)} className="ml-auto text-red-600 hover:text-red-800">✕</button>
+        <div className="mb-6 p-3 border rounded-lg flex items-center gap-2 text-sm" style={{
+          backgroundColor: 'var(--color-error-bg)',
+          borderColor: 'var(--color-error-border)',
+          color: 'var(--color-error)'
+        }}>
+          <AlertCircle size={15} className="flex-shrink-0" />
+          <span className="flex-1">{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="p-1 rounded hover:bg-[rgba(239,68,68,0.2)] transition-colors duration-100"
+            style={{ color: 'var(--color-error)' }}
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -227,13 +240,13 @@ export function Workbench() {
 
       {/* Video URL analysis */}
       {activeProjectId && (
-        <div className="mb-8 p-4 border rounded-xl" style={{
-          backgroundColor: 'var(--color-bg-tertiary)',
+        <div className="mb-8 p-4 border rounded-lg" style={{
+          backgroundColor: 'var(--color-bg-elevated-1)',
           borderColor: 'var(--color-border)'
         }}>
           <div className="flex items-center gap-2 mb-3">
-            <Film size={16} className="text-purple-400" />
-            <h3 className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>视频URL分析</h3>
+            <Film size={16} style={{ color: 'var(--color-primary)' }} />
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>视频URL分析</h3>
             <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>输入视频链接，AI自动提取关键帧并分析</span>
           </div>
           <div className="flex gap-2">
@@ -251,27 +264,18 @@ export function Workbench() {
                 }}
               />
             </div>
-            <button
+            <Button
               onClick={handleVideoUrlAnalyze}
               disabled={!videoUrl.trim() || videoAnalyzing}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
-              style={!videoUrl.trim() || videoAnalyzing ? {
-                backgroundColor: 'var(--color-bg-elevated)',
-                color: 'var(--color-text-tertiary)'
-              } : {}}
+              variant="primary"
+              size="md"
+              loading={videoAnalyzing}
             >
-              {videoAnalyzing ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  分析中...
-                </>
-              ) : (
-                '分析视频'
-              )}
-            </button>
+              {videoAnalyzing ? '分析中...' : '分析视频'}
+            </Button>
           </div>
           {videoError && (
-            <div className="mt-2 text-xs text-red-400 flex items-center gap-1">
+            <div className="mt-2 text-xs flex items-center gap-1" style={{ color: 'var(--color-error)' }}>
               <AlertCircle size={12} />
               {videoError}
             </div>
@@ -284,14 +288,17 @@ export function Workbench() {
 
       {/* Uploading status banner */}
       {uploadingCount > 0 && (
-        <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700/40 rounded-xl">
-          <div className="flex items-center gap-3">
-            <Loader2 size={18} className="text-blue-400 animate-spin flex-shrink-0" />
+        <div className="mb-4 p-3 border rounded-lg" style={{
+          backgroundColor: 'var(--color-info-bg)',
+          borderColor: 'var(--color-info-border)'
+        }}>
+          <div className="flex items-center gap-2.5">
+            <Loader2 size={16} className="animate-spin flex-shrink-0" style={{ color: 'var(--color-info)' }} />
             <div className="flex-1">
-              <div className="text-sm font-medium text-blue-300 mb-0.5">
+              <div className="text-sm font-semibold mb-0.5" style={{ color: 'var(--color-info)' }}>
                 正在上传文件...
               </div>
-              <div className="text-xs text-blue-400/80">
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
                 {uploadingCount} 个文件正在上传中
               </div>
             </div>
@@ -301,14 +308,17 @@ export function Workbench() {
 
       {/* Parsing status banner */}
       {files.some(f => f.status === 'parsing') && (
-        <div className="mb-4 p-4 bg-amber-900/20 border border-amber-700/40 rounded-xl">
-          <div className="flex items-center gap-3">
-            <Loader2 size={18} className="text-amber-400 animate-spin flex-shrink-0" />
+        <div className="mb-4 p-3 border rounded-lg" style={{
+          backgroundColor: 'var(--color-warning-bg)',
+          borderColor: 'var(--color-warning-border)'
+        }}>
+          <div className="flex items-center gap-2.5">
+            <Loader2 size={16} className="animate-spin flex-shrink-0" style={{ color: 'var(--color-warning)' }} />
             <div className="flex-1">
-              <div className="text-sm font-medium text-amber-300 mb-0.5">
+              <div className="text-sm font-semibold mb-0.5" style={{ color: 'var(--color-warning)' }}>
                 AI 正在解析文件...
               </div>
-              <div className="text-xs text-amber-400/80">
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
                 {files.filter(f => f.status === 'parsing').length} 个文件正在解析中，请稍候
               </div>
             </div>
@@ -319,7 +329,7 @@ export function Workbench() {
       {/* Files list */}
       {initialLoading ? (
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
               加载中...
             </h2>
@@ -328,15 +338,15 @@ export function Workbench() {
         </div>
       ) : files.length > 0 ? (
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
               已上传文件
-              <span className="ml-2 text-sm font-normal" style={{ color: 'var(--color-text-tertiary)' }}>
+              <span className="ml-2 text-sm font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
                 ({readyCount}/{files.length} 已解析)
               </span>
             </h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {files.map(file => (
               <FileCard
                 key={file.id}

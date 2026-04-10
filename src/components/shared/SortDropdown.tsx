@@ -38,15 +38,29 @@ export function SortDropdown({ options, value, ascending, onChange }: SortDropdo
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg text-sm text-[#646A73] hover:bg-[#F2F3F5] transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 border rounded-md text-sm transition-all duration-100"
+        style={{
+          backgroundColor: 'var(--color-bg-elevated-1)',
+          borderColor: 'var(--color-border)',
+          color: 'var(--color-text-secondary)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-1)';
+        }}
       >
         <ArrowUpDown size={14} />
         <span>{currentOption?.label || '排序'}</span>
-        <SortIcon size={12} className="text-[#8F959E]" />
+        <SortIcon size={12} style={{ color: 'var(--color-text-tertiary)' }} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg shadow-lg z-10 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-48 border rounded-lg shadow-lg z-10 overflow-hidden" style={{
+          backgroundColor: 'var(--color-bg-elevated-3)',
+          borderColor: 'var(--color-border)'
+        }}>
           {/* Sort field options */}
           <div className="py-1">
             {options.map(option => (
@@ -56,16 +70,25 @@ export function SortDropdown({ options, value, ascending, onChange }: SortDropdo
                   onChange(option.value, ascending)
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-[#646A73] hover:bg-[#F2F3F5] transition-colors flex items-center justify-between"
+                className="w-full px-3 py-2 text-left text-sm transition-colors duration-100 flex items-center justify-between"
+                style={{
+                  color: value === option.value ? 'var(--color-text-primary)' : 'var(--color-text-secondary)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 <span>{option.label}</span>
-                {value === option.value && <Check size={14} className="text-[#3370FF]" />}
+                {value === option.value && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
               </button>
             ))}
           </div>
 
           {/* Divider */}
-          <div className="border-t border-[#DEE0E3]" />
+          <div className="border-t" style={{ borderColor: 'var(--color-border)' }} />
 
           {/* Sort direction */}
           <div className="py-1">
@@ -74,7 +97,14 @@ export function SortDropdown({ options, value, ascending, onChange }: SortDropdo
                 onChange(value, !ascending)
                 setIsOpen(false)
               }}
-              className="w-full px-4 py-2 text-left text-sm text-[#646A73] hover:bg-[#F2F3F5] transition-colors flex items-center gap-2"
+              className="w-full px-3 py-2 text-left text-sm transition-colors duration-100 flex items-center gap-2"
+              style={{ color: 'var(--color-text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <SortIcon size={14} />
               <span>{ascending ? '升序' : '降序'}</span>

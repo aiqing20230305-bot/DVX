@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { X, Mail, UserPlus, Info } from 'lucide-react'
-import Button from '../shared/Button'
+import { Button } from '../shared/Button'
 import { useMemberStore } from '../../store/member.store'
-import { useToast } from '../../hooks/useToast'
+import { toast } from '../../store/toast.store'
 
 interface InviteMemberModalProps {
   projectId: string
@@ -15,30 +15,29 @@ export default function InviteMemberModal({ projectId, isOpen, onClose }: Invite
   const [role, setRole] = useState<'editor' | 'viewer'>('viewer')
   const [loading, setLoading] = useState(false)
   const { inviteMember } = useMemberStore()
-  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!email.trim()) {
-      showToast('error', '请输入邮箱地址')
+      toast.error('请输入邮箱地址')
       return
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showToast('error', '请输入有效的邮箱地址')
+      toast.error('请输入有效的邮箱地址')
       return
     }
 
     try {
       setLoading(true)
       await inviteMember(projectId, email.trim(), role)
-      showToast('success', `邀请已发送给 ${email}`)
+      toast.success(`邀请已发送给 ${email}`)
       setEmail('')
       setRole('viewer')
       onClose()
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : '邀请失败')
+      toast.error(error instanceof Error ? error.message : '邀请失败')
     } finally {
       setLoading(false)
     }
@@ -47,17 +46,31 @@ export default function InviteMemberModal({ projectId, isOpen, onClose }: Invite
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-[#1A1A1A] border border-gray-700 rounded-lg shadow-xl w-full max-w-md mx-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" style={{
+      backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    }}>
+      <div className="border rounded-lg shadow-xl w-full max-w-md mx-4" style={{
+        backgroundColor: 'var(--color-bg-elevated-2)',
+        borderColor: 'var(--color-border)'
+      }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b" style={{
+          borderColor: 'var(--color-border)'
+        }}>
           <div className="flex items-center gap-2">
-            <UserPlus size={20} className="text-primary" />
-            <h2 className="text-lg font-semibold text-white">邀请成员</h2>
+            <UserPlus size={20} style={{ color: 'var(--color-primary)' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>邀请成员</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-white transition-colors"
+            className="p-1 transition-colors duration-100"
+            style={{ color: 'var(--color-text-tertiary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+            }}
           >
             <X size={20} />
           </button>

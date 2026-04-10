@@ -181,7 +181,7 @@ export function ProjectDashboard() {
           {/* Tags */}
           {project.tags.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
-              <Tag size={16} className="text-[#8F959E]" />
+              <Tag size={16} style={{ color: 'var(--color-text-tertiary)' }} />
               {project.tags.map(tag => (
                 <Badge key={tag} variant="secondary">{tag}</Badge>
               ))}
@@ -194,7 +194,19 @@ export function ProjectDashboard() {
               <div
                 key={card.label}
                 onClick={() => navigate(card.to)}
-                className="bg-[#F7F8FA] rounded-lg p-5 border border-[#DEE0E3] hover:border-[#C9CDD4] transition-colors cursor-pointer group"
+                className="rounded-lg p-5 border transition-all duration-100 cursor-pointer group"
+                style={{
+                  backgroundColor: 'var(--color-bg-elevated-1)',
+                  borderColor: 'var(--color-border)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+                  e.currentTarget.style.borderColor = 'var(--color-border-light)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-1)';
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <card.icon className={`${card.color} group-hover:scale-110 transition-transform`} size={24} />
@@ -202,26 +214,32 @@ export function ProjectDashboard() {
                     <Badge variant="secondary" className="text-xs">{card.badge}</Badge>
                   )}
                 </div>
-                <div className="text-3xl font-bold text-[#1F2329] mb-1">{card.value}</div>
-                <div className="text-sm text-[#646A73]">{card.label}</div>
+                <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>{card.value}</div>
+                <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{card.label}</div>
               </div>
             ))}
           </div>
 
           {/* Activity Heatmap */}
-          <div className="bg-[#F7F8FA] rounded-lg p-6 border border-[#DEE0E3]">
+          <div className="rounded-lg p-6 border" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
             <div className="flex items-center gap-2 mb-4">
-              <Activity size={20} className="text-[#5B8EFF]" />
-              <h2 className="text-lg font-semibold text-[#1F2329]">活动趋势（最近30天）</h2>
+              <Activity size={20} style={{ color: 'var(--color-primary)' }} />
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>活动趋势（最近30天）</h2>
             </div>
             <ActivityHeatmap projectId={id!} days={30} />
           </div>
 
           {/* Timeline */}
-          <div className="bg-[#F7F8FA] rounded-lg p-6 border border-[#DEE0E3]">
+          <div className="rounded-lg p-6 border" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
             <div className="flex items-center gap-2 mb-4">
-              <Calendar size={20} className="text-[#5B8EFF]" />
-              <h2 className="text-lg font-semibold text-[#1F2329]">项目时间线</h2>
+              <Calendar size={20} style={{ color: 'var(--color-primary)' }} />
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>项目时间线</h2>
             </div>
             <ProjectTimeline projectId={id!} limit={50} />
           </div>
@@ -242,32 +260,71 @@ export function ProjectDashboard() {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#646A73] mb-1.5">项目名称 *</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>项目名称 *</label>
             <input
               type="text"
               value={editForm.name || ''}
               onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] text-sm"
+              className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm"
+              style={{
+                backgroundColor: 'var(--color-bg-elevated-1)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-primary)';
+                e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#646A73] mb-1.5">项目描述</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>项目描述</label>
             <textarea
               value={editForm.description || ''}
               onChange={e => setEditForm({ ...editForm, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] text-sm resize-none"
+              className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm resize-none"
+              style={{
+                backgroundColor: 'var(--color-bg-elevated-1)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-primary)';
+                e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-[#646A73] mb-1.5">品牌名称</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>品牌名称</label>
               <input
                 type="text"
                 value={editForm.brand || ''}
                 onChange={e => setEditForm({ ...editForm, brand: e.target.value })}
                 placeholder="例如：多芬"
-                className="w-full px-3 py-2 rounded-lg bg-[#F2F3F5] border border-[#DEE0E3] focus:border-[#3370FF] focus:outline-none focus:ring-1 focus:ring-[#3370FF] text-[#1F2329] placeholder-[#737373] text-sm"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm"
+                style={{
+                  backgroundColor: 'var(--color-bg-elevated-1)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               />
             </div>
             <div>

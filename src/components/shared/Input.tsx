@@ -6,10 +6,11 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   error?: string
   success?: boolean
   leftIcon?: LucideIcon
-  rightIcon?: LucideIcon
+  rightIcon?: RightIcon
   onRightIconClick?: () => void
   helperText?: string
   size?: 'sm' | 'md' | 'lg'
+  borderless?: boolean  // Linear风格无边框输入
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -23,6 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onRightIconClick,
       helperText,
       size = 'md',
+      borderless = false,
       className = '',
       disabled,
       ...props
@@ -32,26 +34,45 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const [isFocused, setIsFocused] = useState(false)
     const [hasValue, setHasValue] = useState(!!props.value || !!props.defaultValue)
 
+    // 设计系统v2.0 - Linear风格尺寸
     const sizeClasses = {
-      sm: 'text-sm py-1.5',
-      md: 'text-sm py-2',
-      lg: 'text-base py-2.5'
+      sm: 'text-sm py-1.5',           // 34px高
+      md: 'text-sm py-2.5',            // 38px高 ⭐ Linear标准
+      lg: 'text-base py-3'             // 46px高
     }
 
     const paddingClasses = {
-      left: LeftIcon ? 'pl-9' : 'pl-3',
-      right: RightIcon ? 'pr-9' : 'pr-3'
+      left: LeftIcon ? 'pl-9' : (borderless ? 'pl-1' : 'pl-3'),
+      right: RightIcon ? 'pr-9' : (borderless ? 'pr-1' : 'pr-3')
     }
+
+    // 背景和边框样式（明亮主题）
+    const bgColor = borderless ? 'transparent' : 'var(--color-bg-elevated-1)'
+    const borderColor = error
+      ? 'var(--color-error)'
+      : success
+        ? 'var(--color-success)'
+        : isFocused
+          ? 'var(--color-primary)'
+          : 'var(--color-border)'
+    const textColor = 'var(--color-text-primary)'
+    const placeholderColor = 'var(--color-text-tertiary)'
 
     return (
       <div className="w-full">
         {/* Label */}
         {label && (
           <label
-            className={`
-              block mb-1.5 text-sm font-medium transition-colors duration-200
-              ${error ? 'text-red-400' : success ? 'text-emerald-400' : isFocused ? 'text-[#3370FF]' : 'text-[#1F2329]'}
-            `}
+            className="block mb-1.5 text-sm font-medium transition-colors duration-100"
+            style={{
+              color: error
+                ? 'var(--color-error)'
+                : success
+                  ? 'var(--color-success)'
+                  : isFocused
+                    ? 'var(--color-primary)'
+                    : 'var(--color-text-secondary)'
+            }}
           >
             {label}
           </label>
@@ -63,33 +84,39 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {LeftIcon && (
             <LeftIcon
               size={16}
-              className={`
-                absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-200
-                ${error ? 'text-red-400' : success ? 'text-emerald-400' : isFocused ? 'text-[#3370FF]' : 'text-[#8F959E]'}
-              `}
+              className="absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-100"
+              style={{
+                color: error
+                  ? 'var(--color-error)'
+                  : success
+                    ? 'var(--color-success)'
+                    : isFocused
+                      ? 'var(--color-primary)'
+                      : 'var(--color-text-tertiary)'
+              }}
             />
           )}
 
-          {/* Input */}
+          {/* Input (设计系统v2.1 - 明亮主题) */}
           <input
             ref={ref}
             disabled={disabled}
             className={`
               w-full ${paddingClasses.left} ${paddingClasses.right} ${sizeClasses[size]}
-              rounded-lg bg-[#F7F8FA] text-[#1F2329] placeholder-[#737373]
-              border transition-all duration-200
-              ${
-                error
-                  ? 'border-red-500 focus:border-red-400 focus:ring-2 focus:ring-red-500/20'
-                  : success
-                    ? 'border-emerald-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20'
-                    : 'border-[#DEE0E3] focus:border-[#3370FF] focus:ring-2 focus:ring-[#3370FF]/20'
-              }
-              ${isFocused ? 'shadow-lg shadow-[#3370FF]/10' : 'shadow-sm'}
+              ${borderless ? 'border-none border-b rounded-none px-1' : 'border rounded-md'}
               ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-              focus:outline-none
+              focus:outline-none focus:ring-1
+              transition-all duration-100
               ${className}
             `}
+            style={{
+              backgroundColor: bgColor,
+              borderColor: borderColor,
+              color: textColor,
+              ...(isFocused && !borderless
+                ? { boxShadow: `0 0 0 1px ${borderColor}` }
+                : {})
+            }}
             onFocus={(e) => {
               setIsFocused(true)
               props.onFocus?.(e)
@@ -112,11 +139,31 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               onClick={onRightIconClick}
               disabled={disabled}
               className={`
-                absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-200
-                ${onRightIconClick ? 'cursor-pointer hover:text-[#5B8EFF]' : 'cursor-default'}
-                ${error ? 'text-red-400' : success ? 'text-emerald-400' : 'text-[#8F959E]'}
+                absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-100
+                ${onRightIconClick ? 'cursor-pointer' : 'cursor-default'}
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
               `}
+              style={{
+                color: error
+                  ? 'var(--color-error)'
+                  : success
+                    ? 'var(--color-success)'
+                    : 'var(--color-text-tertiary)'
+              }}
+              onMouseEnter={(e) => {
+                if (onRightIconClick && !disabled) {
+                  e.currentTarget.style.color = 'var(--color-primary-hover)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (onRightIconClick && !disabled) {
+                  e.currentTarget.style.color = error
+                    ? 'var(--color-error)'
+                    : success
+                      ? 'var(--color-success)'
+                      : 'var(--color-text-tertiary)';
+                }
+              }}
               tabIndex={-1}
             >
               <RightIcon size={16} />
@@ -127,10 +174,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {/* Helper Text / Error Message */}
         {(helperText || error) && (
           <p
-            className={`
-              mt-1.5 text-xs transition-colors duration-200
-              ${error ? 'text-red-400 animate-shake' : 'text-[#8F959E]'}
-            `}
+            className={`mt-1.5 text-xs transition-colors duration-100 ${error ? 'animate-shake' : ''}`}
+            style={{
+              color: error ? 'var(--color-error)' : 'var(--color-text-tertiary)'
+            }}
           >
             {error || helperText}
           </p>

@@ -252,15 +252,15 @@ export function Scripts() {
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-16">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
-            backgroundColor: 'rgba(99, 91, 255, 0.2)',
-            borderColor: 'rgba(99, 91, 255, 0.3)'
+          <div className="w-9 h-9 rounded-lg border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(94, 106, 210, 0.1)',
+            borderColor: 'rgba(94, 106, 210, 0.3)'
           }}>
-            <PenTool size={18} style={{ color: 'var(--color-primary-light)' }} />
+            <PenTool size={18} style={{ color: 'var(--color-primary)' }} />
           </div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>脚本创作</h1>
+          <h1 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>脚本创作</h1>
         </div>
         <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
@@ -319,14 +319,14 @@ export function Scripts() {
         </div>
       ) : selectedTopics.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl border flex items-center justify-center mx-auto mb-4" style={{
-            backgroundColor: 'var(--color-bg-tertiary)',
+          <div className="w-16 h-16 rounded-xl border flex items-center justify-center mx-auto mb-4" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
             borderColor: 'var(--color-border)'
           }}>
-            <PenTool size={28} style={{ color: 'var(--color-text-disabled)' }} />
+            <PenTool size={28} style={{ color: 'var(--color-border-light)' }} />
           </div>
-          <h3 className="font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>没有已选选题</h3>
-          <p className="text-sm mb-6" style={{ color: 'var(--color-text-disabled)' }}>请先在「选题策划」页面选择要创作脚本的选题</p>
+          <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>没有已选选题</h3>
+          <p className="text-sm mb-6" style={{ color: 'var(--color-text-tertiary)' }}>请先在「选题策划」页面选择要创作脚本的选题</p>
           <Button variant="secondary" onClick={() => navigate('/topics')}>
             前往选题策划
           </Button>
@@ -356,16 +356,16 @@ export function Scripts() {
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id
 
           return (
-            <div key={topic.id} className="border rounded-xl overflow-hidden" style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
+            <div key={topic.id} className="border rounded-lg overflow-hidden" style={{
+              backgroundColor: 'var(--color-bg-elevated-1)',
               borderColor: 'var(--color-border)'
             }}>
               {/* Topic header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b" style={{
+              <div className="flex items-center justify-between px-4 py-3 border-b" style={{
                 borderColor: 'var(--color-border)'
               }}>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-1.5 mb-1">
                     <PlatformBadge platform={topic.platform} />
                     <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{topic.estimated_duration}秒</span>
                   </div>
@@ -396,20 +396,25 @@ export function Scripts() {
                     <>
                       <button
                         onClick={() => handleDeleteTopicScripts(topic.id, topic.title)}
-                        className="p-2 rounded-lg text-red-400 hover:text-red-300 transition-colors"
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        className="p-1.5 rounded-md transition-all duration-100"
+                        style={{ color: 'var(--color-error)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
                         title="删除该选题的所有脚本"
                       >
                         <Trash2 size={14} />
                       </button>
                       <button
                         onClick={() => toggleTopicExpand(topic.id)}
-                        className="p-2 rounded-lg transition-colors"
+                        className="p-1.5 rounded-md transition-all duration-100"
                         style={{ color: 'var(--color-text-secondary)' }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.color = 'var(--color-text-primary)';
-                          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)';
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.color = 'var(--color-text-secondary)';
@@ -425,7 +430,7 @@ export function Scripts() {
 
               {/* Scripts */}
               {(isExpanded || isGeneratingThis) && (
-                <div className="p-5">
+                <div className="p-4">
                   <ABVariantPanel
                     scripts={topicScripts}
                     loading={isGeneratingThis && topicScripts.length === 0}
@@ -437,15 +442,15 @@ export function Scripts() {
               )}
 
               {topicScripts.length > 0 && !isExpanded && !isGeneratingThis && (
-                <div className="px-5 py-3 flex items-center gap-4 text-xs" style={{ color: 'var(--color-text-disabled)' }}>
+                <div className="px-4 py-2.5 flex items-center gap-4 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
                   <span>A版 · {topicScripts.find(s => s.variant === 'A')?.word_count ?? 0}字</span>
                   <span>B版 · {topicScripts.find(s => s.variant === 'B')?.word_count ?? 0}字</span>
                   <button
                     onClick={() => toggleTopicExpand(topic.id)}
-                    className="transition-colors ml-auto"
-                    style={{ color: 'var(--color-primary-light)' }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-primary-light)'}
+                    className="transition-colors duration-100 ml-auto"
+                    style={{ color: 'var(--color-primary)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
                   >
                     展开查看 →
                   </button>

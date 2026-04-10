@@ -89,6 +89,42 @@ export function NotificationCenter({ token }: NotificationCenterProps) {
     ? notifications.filter(n => !n.read)
     : notifications
 
+  // Group notifications by date
+  const groupNotificationsByDate = (notifications: typeof filteredNotifications) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const lastWeek = new Date(today)
+    lastWeek.setDate(lastWeek.getDate() - 7)
+
+    const groups: Record<string, typeof filteredNotifications> = {
+      '今天': [],
+      '昨天': [],
+      '本周': [],
+      '更早': []
+    }
+
+    notifications.forEach(notification => {
+      const notifDate = new Date(notification.created_at)
+      const notifDay = new Date(notifDate.getFullYear(), notifDate.getMonth(), notifDate.getDate())
+
+      if (notifDay.getTime() === today.getTime()) {
+        groups['今天'].push(notification)
+      } else if (notifDay.getTime() === yesterday.getTime()) {
+        groups['昨天'].push(notification)
+      } else if (notifDate >= lastWeek) {
+        groups['本周'].push(notification)
+      } else {
+        groups['更早'].push(notification)
+      }
+    })
+
+    return groups
+  }
+
+  const groupedNotifications = groupNotificationsByDate(filteredNotifications)
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Trigger Button */}
@@ -222,14 +258,31 @@ export function NotificationCenter({ token }: NotificationCenterProps) {
                 </p>
               </div>
             ) : (
-              filteredNotifications.map(notification => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                  onMarkAsRead={handleMarkAsRead}
-                  onDelete={handleDelete}
-                />
-              ))
+              Object.entries(groupedNotifications).map(([groupName, groupNotifications]) =>
+                groupNotifications.length > 0 ? (
+                  <div key={groupName}>
+                    <div
+                      className="sticky top-0 px-4 py-2 text-xs font-medium border-b"
+                      style={{
+                        backgroundColor: 'var(--color-bg-elevated)',
+                        color: 'var(--color-text-tertiary)',
+                        borderColor: 'var(--color-border)',
+                        zIndex: 10
+                      }}
+                    >
+                      {groupName}
+                    </div>
+                    {groupNotifications.map(notification => (
+                      <NotificationItem
+                        key={notification.id}
+                        notification={notification}
+                        onMarkAsRead={handleMarkAsRead}
+                        onDelete={handleDelete}
+                      />
+                    ))}
+                  </div>
+                ) : null
+              )
             )}
           </div>
 

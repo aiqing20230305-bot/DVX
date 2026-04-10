@@ -18,20 +18,41 @@ export function SearchBar({
     <div className="w-full">
       <div className="relative">
         <Search
-          size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8F959E]"
+          size={16}
+          className="absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-100"
+          style={{ color: value ? 'var(--color-primary)' : 'var(--color-text-tertiary)' }}
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-2.5 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg text-[#1F2329] placeholder-[#737373] focus:outline-none focus:border-[#3370FF] focus:ring-1 focus:ring-[#3370FF] transition-colors"
+          className="w-full pl-10 pr-10 py-2.5 border rounded-md focus:outline-none transition-all duration-100"
+          style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)',
+            color: 'var(--color-text-primary)'
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-primary)';
+            e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-border)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
         {value && (
           <button
             onClick={() => onChange('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F959E] hover:text-[#646A73] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-100"
+            style={{ color: 'var(--color-text-tertiary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+            }}
             title="清空"
           >
             <X size={16} />
@@ -39,8 +60,8 @@ export function SearchBar({
         )}
       </div>
       {value && resultCount !== undefined && (
-        <div className="mt-2 text-xs text-[#8F959E]">
-          找到 <span className="text-[#3370FF] font-medium">{resultCount}</span> 个结果
+        <div className="mt-2 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+          找到 <span className="font-medium" style={{ color: 'var(--color-primary)' }}>{resultCount}</span> 个结果
         </div>
       )}
     </div>

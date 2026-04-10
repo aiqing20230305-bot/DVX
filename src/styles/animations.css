@@ -3,18 +3,19 @@
    现代极简风格 + 流畅交互
    ======================================== */
 
-/* === 动画时长 === */
+/* === 动画时长 (设计系统v2.0 - Linear风格) === */
 :root {
-  --duration-instant: 100ms;
-  --duration-fast: 150ms;
-  --duration-base: 200ms;
-  --duration-slow: 300ms;
-  --duration-slower: 500ms;
+  --duration-instant: 50ms;   /* Linear Micro交互 ⭐ 极速 */
+  --duration-fast: 100ms;      /* hover, focus */
+  --duration-base: 150ms;      /* 点击, 常规交互 */
+  --duration-moderate: 200ms;  /* 卡片, 下拉菜单 */
+  --duration-slow: 300ms;      /* Modal, 页面过渡 */
+  --duration-slower: 500ms;    /* 大型组件 (极少使用) */
 
   /* === 缓动函数 === */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* Linear spring */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);         /* 元素退出 */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);   /* Material标准 */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }

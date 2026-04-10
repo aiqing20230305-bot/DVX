@@ -16,28 +16,28 @@ const iconMap = {
 
 const colorMap = {
   success: {
-    bg: 'rgba(16, 185, 129, 0.15)',
-    border: '#10B981',
-    icon: '#10B981',
-    text: '#FFFFFF'
+    bg: 'var(--color-success-bg)',
+    border: 'var(--color-success)',
+    icon: 'var(--color-success)',
+    text: 'var(--color-text-primary)'
   },
   error: {
-    bg: 'rgba(239, 68, 68, 0.15)',
-    border: '#EF4444',
-    icon: '#EF4444',
-    text: '#FFFFFF'
+    bg: 'var(--color-error-bg)',
+    border: 'var(--color-error)',
+    icon: 'var(--color-error)',
+    text: 'var(--color-text-primary)'
   },
   warning: {
-    bg: 'rgba(251, 191, 36, 0.15)',
-    border: '#FBBF24',
-    icon: '#FBBF24',
-    text: '#FFFFFF'
+    bg: 'var(--color-warning-bg)',
+    border: 'var(--color-warning)',
+    icon: 'var(--color-warning)',
+    text: 'var(--color-text-primary)'
   },
   info: {
-    bg: 'rgba(52, 152, 219, 0.15)',
-    border: '#3498DB',
-    icon: '#3498DB',
-    text: '#FFFFFF'
+    bg: 'var(--color-info-bg)',
+    border: 'var(--color-info)',
+    icon: 'var(--color-info)',
+    text: 'var(--color-text-primary)'
   }
 }
 
@@ -105,7 +105,8 @@ export function Toast({ toast, onClose }: ToastProps) {
         <div
           className="absolute bottom-0 left-0 h-1 animate-shrink-width"
           style={{
-            backgroundColor: 'rgba(99, 91, 255, 0.3)',
+            backgroundColor: colors.border,
+            opacity: 0.3,
             animationDuration: `${toast.duration}ms`
           }}
         />
@@ -132,11 +133,11 @@ export function Toast({ toast, onClose }: ToastProps) {
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 p-1 rounded-lg transition-colors"
+          className="absolute top-3 right-3 p-1 rounded-lg transition-all duration-100"
           style={{ color: 'var(--color-text-tertiary)' }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = 'var(--color-text-primary)';
-            e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+            e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.color = 'var(--color-text-tertiary)';

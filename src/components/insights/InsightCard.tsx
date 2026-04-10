@@ -20,67 +20,78 @@ const typeColors: Record<string, string> = {
 }
 
 function TrendIcon({ trend }: { trend?: string }) {
-  if (trend === 'up') return <TrendingUp size={14} className="text-emerald-400" />
-  if (trend === 'down') return <TrendingDown size={14} className="text-red-400" />
-  return <Minus size={14} className="text-[#8F959E]" />
+  if (trend === 'up') return <TrendingUp size={14} style={{ color: 'var(--color-success)' }} />
+  if (trend === 'down') return <TrendingDown size={14} style={{ color: 'var(--color-error)' }} />
+  return <Minus size={14} style={{ color: 'var(--color-text-tertiary)' }} />
 }
 
 export const InsightCard = React.memo(function InsightCard({ insight, selected = false, onToggleSelect, onCommentClick, commentCount = 0 }: InsightCardProps) {
   return (
     <div
       className={[
-        'relative bg-[#F7F8FA] border rounded-xl p-5 transition-all duration-200 card-hover',
+        'relative border rounded-lg p-4 transition-all duration-100',
         selected
-          ? 'border-[#3370FF]/60 bg-[#0D3DB8]/10 shadow-md shadow-[#0D3DB8]/20'
-          : typeColors[insight.type] ?? 'border-[#DEE0E3]',
+          ? 'shadow-md'
+          : 'hover:shadow-sm',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
+      style={{
+        backgroundColor: 'var(--color-bg-elevated-1)',
+        borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
+        boxShadow: selected ? '0 0 0 1px var(--color-primary)' : undefined
+      }}
       onClick={() => onToggleSelect?.(insight.id)}
     >
       {/* Selection checkbox */}
       {onToggleSelect && (
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-3 right-3">
           {selected
-            ? <CheckSquare size={18} className="text-[#5B8EFF]" />
-            : <Square size={18} className="text-[#C9CDD4]" />
+            ? <CheckSquare size={16} style={{ color: 'var(--color-primary)' }} />
+            : <Square size={16} style={{ color: 'var(--color-border-light)' }} />
           }
         </div>
       )}
 
       {/* Header badges */}
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex flex-wrap gap-1.5 mb-3">
         <InsightTypeBadge type={insight.type} />
         <ConfidenceBadge confidence={insight.confidence} />
         {insight.actionable && (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 ring-1 ring-blue-200">
+          <span className="text-xs px-2 py-0.5 rounded-full ring-1" style={{
+            backgroundColor: 'var(--color-primary-subtle)',
+            color: 'var(--color-primary)',
+            borderColor: 'var(--color-primary)'
+          }}>
             可行动
           </span>
         )}
       </div>
 
       {/* Title */}
-      <h3 className="text-base font-semibold text-[#1F2329] mb-2 pr-6">{insight.title}</h3>
+      <h3 className="text-base font-semibold mb-2 pr-5" style={{ color: 'var(--color-text-primary)' }}>{insight.title}</h3>
 
       {/* Summary */}
-      <p className="text-sm text-[#646A73] leading-relaxed mb-3">{insight.summary}</p>
+      <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--color-text-secondary)' }}>{insight.summary}</p>
 
       {/* Metric */}
       {insight.metric && (
-        <div className="flex items-center gap-2 mb-3 bg-[#F2F3F5] rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 mb-3 rounded-md px-2.5 py-1.5" style={{
+          backgroundColor: 'var(--color-bg-elevated-2)'
+        }}>
           <TrendIcon trend={insight.metric.trend} />
-          <span className="text-xs text-[#8F959E]">{insight.metric.label}</span>
-          <span className="text-sm font-bold text-[#1F2329] ml-auto">{insight.metric.value}</span>
+          <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{insight.metric.label}</span>
+          <span className="text-sm font-semibold ml-auto" style={{ color: 'var(--color-text-primary)' }}>{insight.metric.value}</span>
         </div>
       )}
 
       {/* Evidence */}
       {insight.evidence.length > 0 && (
         <div className="space-y-1.5 mb-3">
-          <div className="text-xs text-[#8F959E] font-medium">支撑证据</div>
+          <div className="text-xs font-medium" style={{ color: 'var(--color-text-tertiary)' }}>支撑证据</div>
           <ul className="space-y-1">
             {insight.evidence.slice(0, 3).map((e, i) => (
-              <li key={i} className="text-xs text-[#646A73] flex items-start gap-1.5">
-                <span className="text-[#3370FF] mt-0.5 flex-shrink-0">•</span>
+              <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: 'var(--color-text-secondary)' }}>
+                <span className="mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }}>•</span>
                 <span>{e}</span>
               </li>
             ))}
@@ -95,12 +106,25 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
             e.stopPropagation()
             onCommentClick(insight.id)
           }}
-          className="flex items-center gap-1.5 text-xs text-[#8F959E] hover:text-[#3370FF] transition-colors mt-auto pt-2 border-t border-[#DEE0E3]"
+          className="flex items-center gap-1.5 text-xs transition-colors duration-100 mt-auto pt-2 border-t"
+          style={{
+            color: 'var(--color-text-tertiary)',
+            borderColor: 'var(--color-border)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--color-primary)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--color-text-tertiary)'
+          }}
         >
           <MessageCircle size={14} />
           <span>评论</span>
           {commentCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[#3370FF]/10 text-[#3370FF] font-medium">
+            <span className="ml-1 px-1.5 py-0.5 rounded-full font-medium" style={{
+              backgroundColor: 'var(--color-primary-subtle)',
+              color: 'var(--color-primary)'
+            }}>
               {commentCount}
             </span>
           )}

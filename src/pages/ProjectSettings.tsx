@@ -9,7 +9,7 @@ import MemberList from '../components/members/MemberList'
 import InviteMemberModal from '../components/members/InviteMemberModal'
 import { WorkflowList, WorkflowForm } from '../components/approval'
 import { ApprovalWorkflow } from '../api/approval.api'
-import Button from '../components/shared/Button'
+import { Button } from '../components/shared/Button'
 
 export default function ProjectSettings() {
   const navigate = useNavigate()
@@ -100,21 +100,33 @@ export default function ProjectSettings() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex-shrink-0 border-b border-gray-700 bg-[#1A1A1A] px-6 py-4">
+      <div className="flex-shrink-0 border-b px-6 py-4" style={{
+        backgroundColor: 'var(--color-bg-elevated-1)',
+        borderColor: 'var(--color-border)'
+      }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="p-2 text-gray-400 hover:text-white transition-colors"
+              className="p-2 rounded-md transition-all duration-100"
+              style={{ color: 'var(--color-text-tertiary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-tertiary)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <ArrowLeft size={20} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <Settings size={20} className="text-primary" />
-                <h1 className="text-xl font-bold text-white">项目设置</h1>
+                <Settings size={20} style={{ color: 'var(--color-primary)' }} />
+                <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>项目设置</h1>
               </div>
-              <p className="text-sm text-gray-400 mt-0.5">
+              <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
                 {activeProject.name}
               </p>
             </div>
@@ -126,46 +138,55 @@ export default function ProjectSettings() {
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
           {/* Project Info Section */}
-          <section className="bg-[rgba(255,255,255,0.03)] border border-gray-700 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">项目信息</h2>
+          <section className="border rounded-lg p-6" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>项目信息</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-400">项目名称</p>
-                <p className="text-white mt-1">{activeProject.name}</p>
+                <p style={{ color: 'var(--color-text-tertiary)' }}>项目名称</p>
+                <p className="mt-1" style={{ color: 'var(--color-text-primary)' }}>{activeProject.name}</p>
               </div>
               <div>
-                <p className="text-gray-400">状态</p>
-                <p className="text-white mt-1">
+                <p style={{ color: 'var(--color-text-tertiary)' }}>状态</p>
+                <p className="mt-1" style={{ color: 'var(--color-text-primary)' }}>
                   {activeProject.status === 'active' ? '进行中' : '已归档'}
                 </p>
               </div>
               {activeProject.brand && (
                 <div>
-                  <p className="text-gray-400">品牌</p>
-                  <p className="text-white mt-1">{activeProject.brand}</p>
+                  <p style={{ color: 'var(--color-text-tertiary)' }}>品牌</p>
+                  <p className="mt-1" style={{ color: 'var(--color-text-primary)' }}>{activeProject.brand}</p>
                 </div>
               )}
               {activeProject.category && (
                 <div>
-                  <p className="text-gray-400">品类</p>
-                  <p className="text-white mt-1">{activeProject.category}</p>
+                  <p style={{ color: 'var(--color-text-tertiary)' }}>品类</p>
+                  <p className="mt-1" style={{ color: 'var(--color-text-primary)' }}>{activeProject.category}</p>
                 </div>
               )}
               {activeProject.description && (
                 <div className="col-span-2">
-                  <p className="text-gray-400">描述</p>
-                  <p className="text-white mt-1">{activeProject.description}</p>
+                  <p style={{ color: 'var(--color-text-tertiary)' }}>描述</p>
+                  <p className="mt-1" style={{ color: 'var(--color-text-primary)' }}>{activeProject.description}</p>
                 </div>
               )}
             </div>
           </section>
 
           {/* Members Section */}
-          <section className="bg-[rgba(255,255,255,0.03)] border border-gray-700 rounded-lg p-6">
+          <section className="border rounded-lg p-6" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
             {loading ? (
               <div className="text-center py-8">
-                <div className="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-gray-400 mt-2">加载中...</p>
+                <div className="inline-block w-8 h-8 border-4 rounded-full animate-spin" style={{
+                  borderColor: 'var(--color-primary)',
+                  borderTopColor: 'transparent'
+                }}></div>
+                <p className="mt-2" style={{ color: 'var(--color-text-tertiary)' }}>加载中...</p>
               </div>
             ) : (
               <MemberList
@@ -179,11 +200,14 @@ export default function ProjectSettings() {
 
           {/* Approval Workflows Section */}
           {currentUserRole === 'owner' && (
-            <section className="bg-[rgba(255,255,255,0.03)] border border-gray-700 rounded-lg p-6">
+            <section className="border rounded-lg p-6" style={{
+              backgroundColor: 'var(--color-bg-elevated-1)',
+              borderColor: 'var(--color-border)'
+            }}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <GitBranch size={20} className="text-blue-500" />
-                  <h2 className="text-lg font-semibold text-white">审批流程</h2>
+                  <GitBranch size={20} style={{ color: 'var(--color-primary)' }} />
+                  <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>审批流程</h2>
                 </div>
                 <Button
                   variant="outline"
@@ -209,15 +233,18 @@ export default function ProjectSettings() {
           )}
 
           {/* Role Description Section */}
-          <section className="bg-[rgba(255,255,255,0.03)] border border-gray-700 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">角色权限说明</h2>
+          <section className="border rounded-lg p-6" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>角色权限说明</h2>
             <div className="space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                  <h3 className="text-sm font-medium text-white">所有者 (Owner)</h3>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-warning)' }}></div>
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>所有者 (Owner)</h3>
                 </div>
-                <ul className="text-xs text-gray-400 space-y-1 ml-4 list-disc list-inside">
+                <ul className="text-xs space-y-1 ml-4 list-disc list-inside" style={{ color: 'var(--color-text-tertiary)' }}>
                   <li>完全控制项目的所有权限</li>
                   <li>可以添加、移除成员和修改成员角色</li>
                   <li>可以修改项目设置</li>
@@ -227,10 +254,10 @@ export default function ProjectSettings() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  <h3 className="text-sm font-medium text-white">编辑者 (Editor)</h3>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }}></div>
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>编辑者 (Editor)</h3>
                 </div>
-                <ul className="text-xs text-gray-400 space-y-1 ml-4 list-disc list-inside">
+                <ul className="text-xs space-y-1 ml-4 list-disc list-inside" style={{ color: 'var(--color-text-tertiary)' }}>
                   <li>可以上传和解析文件</li>
                   <li>可以生成洞察、选题和脚本</li>
                   <li>可以修改和删除内容</li>
@@ -241,10 +268,10 @@ export default function ProjectSettings() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-gray-500"></div>
-                  <h3 className="text-sm font-medium text-white">查看者 (Viewer)</h3>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-text-tertiary)' }}></div>
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>查看者 (Viewer)</h3>
                 </div>
-                <ul className="text-xs text-gray-400 space-y-1 ml-4 list-disc list-inside">
+                <ul className="text-xs space-y-1 ml-4 list-disc list-inside" style={{ color: 'var(--color-text-tertiary)' }}>
                   <li>可以查看项目所有内容</li>
                   <li>可以查看洞察、选题和脚本</li>
                   <li>可以导出报告</li>

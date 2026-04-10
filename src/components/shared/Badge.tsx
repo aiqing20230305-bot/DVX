@@ -13,27 +13,27 @@ interface BadgeProps {
 }
 
 const variantColors: Record<BadgeVariant, { bg: string; text: string; ring: string }> = {
-  // Insight types (dark theme - bright text on dark semi-transparent background)
-  trend: { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA', ring: '#3B82F6' },
-  competitor: { bg: 'rgba(168, 85, 247, 0.15)', text: '#A78BFA', ring: '#A855F7' },
-  gap: { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', ring: '#10B981' },
-  attribution: { bg: 'rgba(251, 146, 60, 0.15)', text: '#FB923C', ring: '#FB923C' },
-  anomaly: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
+  // Insight types (dark theme - slightly more subtle backgrounds)
+  trend: { bg: 'rgba(59, 130, 246, 0.1)', text: '#60A5FA', ring: 'rgba(59, 130, 246, 0.3)' },
+  competitor: { bg: 'rgba(168, 85, 247, 0.1)', text: '#A78BFA', ring: 'rgba(168, 85, 247, 0.3)' },
+  gap: { bg: 'rgba(16, 185, 129, 0.1)', text: '#34D399', ring: 'rgba(16, 185, 129, 0.3)' },
+  attribution: { bg: 'rgba(251, 146, 60, 0.1)', text: '#FB923C', ring: 'rgba(251, 146, 60, 0.3)' },
+  anomaly: { bg: 'rgba(239, 68, 68, 0.1)', text: '#F87171', ring: 'rgba(239, 68, 68, 0.3)' },
   // Confidence
-  high: { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', ring: '#10B981' },
-  medium: { bg: 'rgba(251, 191, 36, 0.15)', text: '#FCD34D', ring: '#FBBF24' },
-  low: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
+  high: { bg: 'var(--color-success-bg)', text: 'var(--color-success)', ring: 'var(--color-success-border)' },
+  medium: { bg: 'var(--color-warning-bg)', text: 'var(--color-warning)', ring: 'var(--color-warning-border)' },
+  low: { bg: 'var(--color-error-bg)', text: 'var(--color-error)', ring: 'var(--color-error-border)' },
   // Platforms
-  douyin: { bg: 'rgba(236, 72, 153, 0.15)', text: '#F472B6', ring: '#EC4899' },
-  kuaishou: { bg: 'rgba(251, 146, 60, 0.15)', text: '#FB923C', ring: '#FB923C' },
-  xiaohongshu: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
+  douyin: { bg: 'rgba(236, 72, 153, 0.1)', text: '#F472B6', ring: 'rgba(236, 72, 153, 0.3)' },
+  kuaishou: { bg: 'rgba(251, 146, 60, 0.1)', text: '#FB923C', ring: 'rgba(251, 146, 60, 0.3)' },
+  xiaohongshu: { bg: 'rgba(239, 68, 68, 0.1)', text: '#F87171', ring: 'rgba(239, 68, 68, 0.3)' },
   // Generic
-  default: { bg: 'var(--color-bg-tertiary)', text: 'var(--color-text-secondary)', ring: 'var(--color-border)' },
-  secondary: { bg: 'var(--color-bg-secondary)', text: 'var(--color-text-primary)', ring: 'var(--color-border-light)' },
-  info: { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA', ring: '#3B82F6' },
-  success: { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', ring: '#10B981' },
-  warning: { bg: 'rgba(251, 191, 36, 0.15)', text: '#FCD34D', ring: '#FBBF24' },
-  error: { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', ring: '#EF4444' },
+  default: { bg: 'var(--color-bg-elevated-2)', text: 'var(--color-text-secondary)', ring: 'var(--color-border)' },
+  secondary: { bg: 'var(--color-bg-elevated-1)', text: 'var(--color-text-primary)', ring: 'var(--color-border)' },
+  info: { bg: 'var(--color-info-bg)', text: 'var(--color-info)', ring: 'var(--color-info-border)' },
+  success: { bg: 'var(--color-success-bg)', text: 'var(--color-success)', ring: 'var(--color-success-border)' },
+  warning: { bg: 'var(--color-warning-bg)', text: 'var(--color-warning)', ring: 'var(--color-warning-border)' },
+  error: { bg: 'var(--color-error-bg)', text: 'var(--color-error)', ring: 'var(--color-error-border)' },
 }
 
 const typeLabels: Partial<Record<BadgeVariant, string>> = {
@@ -47,7 +47,7 @@ export function Badge({ variant = 'default', children, className = '' }: BadgePr
   return (
     <span
       className={[
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ring-1',
+        'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ring-1',
         className
       ].join(' ')}
       style={{

@@ -282,15 +282,15 @@ export function Insights() {
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-16">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl border flex items-center justify-center" style={{
-            backgroundColor: 'rgba(99, 91, 255, 0.2)',
-            borderColor: 'rgba(99, 91, 255, 0.3)'
+          <div className="w-9 h-9 rounded-lg border flex items-center justify-center" style={{
+            backgroundColor: 'rgba(94, 106, 210, 0.1)',
+            borderColor: 'rgba(94, 106, 210, 0.3)'
           }}>
-            <Lightbulb size={18} style={{ color: 'var(--color-primary-light)' }} />
+            <Lightbulb size={18} style={{ color: 'var(--color-primary)' }} />
           </div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>洞察引擎</h1>
+          <h1 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>洞察引擎</h1>
         </div>
         <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>AI 深度分析上传数据，挖掘电商内容机会</p>
       </div>
@@ -386,9 +386,9 @@ export function Insights() {
 
       {/* Insight selection tip */}
       {status === 'success' && insights.length > 0 && (
-        <div className="mb-4 px-4 py-2.5 border rounded-xl text-xs" style={{
-          backgroundColor: 'rgba(99, 91, 255, 0.1)',
-          borderColor: 'rgba(99, 91, 255, 0.2)',
+        <div className="mb-4 px-3 py-2.5 border rounded-lg text-xs" style={{
+          backgroundColor: 'var(--color-primary-subtle)',
+          borderColor: 'rgba(94, 106, 210, 0.2)',
           color: 'var(--color-text-primary)'
         }}>
           点击洞察卡片选择（建议选 3-5 条），然后点击「生成选题」进入下一步

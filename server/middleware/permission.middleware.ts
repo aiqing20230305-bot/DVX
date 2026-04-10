@@ -40,6 +40,7 @@ export const requireProjectMember = (minRole: 'viewer' | 'editor' | 'owner' = 'v
       const projectId =
         req.params.id ||           // GET /api/project/:id/...
         req.params.projectId ||    // GET /api/project/:projectId/...
+        req.query.projectId ||     // Query parameter (for multipart/form-data)
         req.body.projectId ||      // POST body
         req.body.project_id        // POST body (snake_case)
 

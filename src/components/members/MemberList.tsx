@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { User, Crown, Edit2, Eye, Trash2, ArrowRightLeft } from 'lucide-react'
 import { ProjectMember, useMemberStore } from '../../store/member.store'
 import { useAuthStore } from '../../store/auth.store'
-import { useToast } from '../../hooks/useToast'
-import Button from '../shared/Button'
+import { toast } from '../../store/toast.store'
+import { Button } from '../shared/Button'
 
 interface MemberListProps {
   projectId: string
@@ -13,9 +13,9 @@ interface MemberListProps {
 }
 
 const roleIcons = {
-  owner: <Crown size={14} className="text-yellow-500" />,
-  editor: <Edit2 size={14} className="text-blue-500" />,
-  viewer: <Eye size={14} className="text-gray-500" />
+  owner: <Crown size={14} style={{ color: 'var(--color-warning)' }} />,
+  editor: <Edit2 size={14} style={{ color: 'var(--color-primary)' }} />,
+  viewer: <Eye size={14} style={{ color: 'var(--color-text-tertiary)' }} />
 }
 
 const roleLabels = {
@@ -33,7 +33,6 @@ const roleDescriptions = {
 export default function MemberList({ projectId, members, currentUserRole, onInvite }: MemberListProps) {
   const { user: currentUser } = useAuthStore()
   const { updateMemberRole, removeMember, transferOwnership } = useMemberStore()
-  const { showToast } = useToast()
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const handleRoleChange = async (member: ProjectMember, newRole: 'owner' | 'editor' | 'viewer') => {
@@ -49,14 +48,14 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
           return
         }
         await transferOwnership(projectId, member.user_id)
-        showToast('success', '所有权转移成功')
+        toast.success( '所有权转移成功')
       } else {
         // Change role
         await updateMemberRole(member.id, newRole)
-        showToast('success', `已将 ${member.user.name} 的角色更新为 ${roleLabels[newRole]}`)
+        toast.success( `已将 ${member.user.name} 的角色更新为 ${roleLabels[newRole]}`)
       }
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : '操作失败')
+      toast.error( error instanceof Error ? error.message : '操作失败')
     } finally {
       setActionLoading(null)
     }
@@ -76,9 +75,9 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
     try {
       setActionLoading(member.id)
       await removeMember(member.id)
-      showToast('success', isSelf ? '已退出项目' : '成员移除成功')
+      toast.success( isSelf ? '已退出项目' : '成员移除成功')
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : '操作失败')
+      toast.error( error instanceof Error ? error.message : '操作失败')
     } finally {
       setActionLoading(null)
     }
@@ -106,8 +105,8 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-white">项目成员</h3>
-          <p className="text-sm text-gray-400 mt-1">
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>项目成员</h3>
+          <p className="text-sm mt-1" style={{ color: 'var(--color-text-tertiary)' }}>
             共 {members.length} 名成员
           </p>
         </div>
@@ -131,11 +130,23 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
           return (
             <div
               key={member.id}
-              className="flex items-center justify-between p-4 bg-[rgba(255,255,255,0.05)] border border-gray-700 rounded-lg hover:bg-[rgba(255,255,255,0.08)] transition-colors"
+              className="flex items-center justify-between p-4 border rounded-lg transition-all duration-100"
+              style={{
+                backgroundColor: 'var(--color-bg-elevated-2)',
+                borderColor: 'var(--color-border)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+              }}
             >
               {/* User Info */}
               <div className="flex items-center gap-3 flex-1">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{
+                  background: 'linear-gradient(135deg, var(--color-primary) 0%, #3B82F6 100%)'
+                }}>
                   {member.user.avatar ? (
                     <img
                       src={member.user.avatar}
@@ -143,25 +154,28 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
-                    <User size={20} className="text-white" />
+                    <User size={20} style={{ color: 'white' }} />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
                       {member.user.name}
-                      {isSelf && <span className="text-gray-400 ml-1">(您)</span>}
+                      {isSelf && <span className="ml-1" style={{ color: 'var(--color-text-tertiary)' }}>(您)</span>}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-400 truncate">{member.user.email}</p>
+                  <p className="text-xs truncate" style={{ color: 'var(--color-text-tertiary)' }}>{member.user.email}</p>
                 </div>
               </div>
 
               {/* Role Badge */}
               <div className="flex items-center gap-2 mr-4">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(255,255,255,0.05)] border border-gray-600 rounded-md">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 border rounded-md" style={{
+                  backgroundColor: 'var(--color-bg-elevated-1)',
+                  borderColor: 'var(--color-border)'
+                }}>
                   {roleIcons[member.role]}
-                  <span className="text-xs font-medium text-gray-300">
+                  <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                     {roleLabels[member.role]}
                   </span>
                 </div>
@@ -175,7 +189,20 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
                     value={member.role}
                     onChange={(e) => handleRoleChange(member, e.target.value as 'owner' | 'editor' | 'viewer')}
                     disabled={isLoading}
-                    className="px-2 py-1 text-xs bg-[rgba(255,255,255,0.05)] border border-gray-600 rounded text-gray-300 hover:bg-[rgba(255,255,255,0.08)] focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                    className="px-2 py-1 text-xs border rounded transition-all duration-100 focus:outline-none disabled:opacity-50"
+                    style={{
+                      backgroundColor: 'var(--color-bg-elevated-1)',
+                      borderColor: 'var(--color-border)',
+                      color: 'var(--color-text-secondary)'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-primary)';
+                      e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     <option value="viewer">查看者</option>
                     <option value="editor">编辑者</option>
@@ -188,7 +215,16 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
                   <button
                     onClick={() => handleRemoveMember(member)}
                     disabled={isLoading}
-                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors disabled:opacity-50"
+                    className="p-2 rounded transition-all duration-100 disabled:opacity-50"
+                    style={{ color: 'var(--color-text-tertiary)' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--color-danger)';
+                      e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--color-text-tertiary)';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                     title={isSelf ? '退出项目' : '移除成员'}
                   >
                     <Trash2 size={16} />
@@ -202,8 +238,8 @@ export default function MemberList({ projectId, members, currentUserRole, onInvi
 
       {/* Empty State */}
       {members.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
-          <User size={48} className="mx-auto mb-4 opacity-50" />
+        <div className="text-center py-12" style={{ color: 'var(--color-text-tertiary)' }}>
+          <User size={48} className="mx-auto mb-4" style={{ opacity: 0.5 }} />
           <p>暂无成员</p>
         </div>
       )}

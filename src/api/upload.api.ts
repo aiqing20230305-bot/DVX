@@ -53,7 +53,7 @@ export async function uploadFile(
     })
 
     xhr.addEventListener('error', () => reject(new Error('Network error during upload')))
-    xhr.open('POST', '/api/upload')
+    xhr.open('POST', `/api/upload?projectId=${encodeURIComponent(projectId)}`)
     xhr.send(formData)
   })
 }

@@ -13,19 +13,26 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-[#3370FF] hover:bg-[#1E4FD9] active:bg-[#3370FF] text-white border border-[#3370FF] hover:border-[#5B8EFF] shadow-sm shadow-[#3370FF]/30 hover:shadow-md hover:shadow-[#3370FF]/40',
-  secondary: 'bg-[#F7F8FA] hover:bg-[#F2F3F5] active:bg-[#F7F8FA] text-[#1F2329] border border-[#DEE0E3] hover:border-[#E3E5E8]',
-  danger: 'bg-[#EF4444] hover:bg-[#DC2626] active:bg-[#EF4444] text-white border border-[#EF4444] hover:border-[#F87171] shadow-sm shadow-[#EF4444]/30',
-  ghost: 'bg-transparent hover:bg-[#F2F3F5] active:bg-[#F7F8FA] text-[#646A73] hover:text-[#1F2329] border border-transparent hover:border-[#DEE0E3]',
-  outline: 'bg-transparent hover:bg-[#3370FF]/10 active:bg-[#3370FF]/20 text-[#3370FF] hover:text-[#5B8EFF] border border-[#3370FF]/50 hover:border-[#5B8EFF]',
-  ai: 'btn-ai text-white border-none shadow-md'
+  // Primary - Linear Purple (#5E6AD2)
+  primary: 'bg-[#5E6AD2] hover:bg-[#7B85DB] active:bg-[#4A55B8] text-white border-none',
+  // Secondary - Transparent with border (深色主题)
+  secondary: 'bg-transparent hover:bg-[#2A2A2A] active:bg-[#333333] text-white border border-[#333333] hover:border-[#404040]',
+  // Danger
+  danger: 'bg-[#EF4444] hover:bg-[#DC2626] active:bg-[#B91C1C] text-white border-none',
+  // Ghost - Linear style
+  ghost: 'bg-transparent hover:bg-[#2A2A2A] active:bg-[#333333] text-[#A0A0A0] hover:text-white border-none',
+  // Outline
+  outline: 'bg-transparent hover:bg-[rgba(94,106,210,0.1)] active:bg-[rgba(94,106,210,0.2)] text-[#5E6AD2] hover:text-[#7B85DB] border border-[#5E6AD2]/50 hover:border-[#7B85DB]',
+  // AI Gradient - 紫→青渐变
+  ai: 'bg-gradient-to-br from-[#5E6AD2] to-[#06B6D4] hover:from-[#7B85DB] hover:to-[#22D3EE] text-white border-none shadow-md shadow-[#5E6AD2]/30'
 }
 
 const sizeClasses: Record<Size, string> = {
-  xs: 'px-2.5 py-1 text-xs gap-1 rounded-md',
-  sm: 'px-3 py-1.5 text-sm gap-1.5 rounded-lg',
-  md: 'px-4 py-2 text-sm gap-2 rounded-lg',
-  lg: 'px-5 py-2.5 text-base gap-2.5 rounded-xl'
+  // Linear风格：更紧凑的尺寸
+  xs: 'px-2.5 py-1 text-xs gap-1 rounded',          // 28px高, 4px圆角
+  sm: 'px-3 py-1.5 text-sm gap-1.5 rounded-md',      // 34px高, 6px圆角
+  md: 'px-4 py-2.5 text-sm gap-2 rounded-md',        // 38px高, 6px圆角 ⭐ Linear标准
+  lg: 'px-5 py-3 text-base gap-2.5 rounded-lg'       // 46px高, 8px圆角
 }
 
 export function Button({
@@ -55,10 +62,10 @@ export function Button({
 
       setRipples(prev => [...prev, { x, y, id }])
 
-      // Remove ripple after animation
+      // Remove ripple after animation (Linear: 300ms快速反馈)
       setTimeout(() => {
         setRipples(prev => prev.filter(r => r.id !== id))
-      }, 600)
+      }, 300)
     }
 
     onClick?.(e)
@@ -71,30 +78,30 @@ export function Button({
       onClick={handleClick}
       className={[
         // Base styles
-        'relative inline-flex items-center justify-center font-medium overflow-hidden',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3370FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]',
-        'select-none transition-all duration-200',
+        'relative inline-flex items-center justify-center font-semibold overflow-hidden',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E6AD2] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+        'select-none transition-all duration-100',
         // Variant & size
         variantClasses[variant],
         sizeClasses[size],
-        // Interactive states
+        // Interactive states (Linear风格：NO translateY，只用scale)
         isDisabled
           ? 'opacity-50 cursor-not-allowed'
-          : 'cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
+          : 'cursor-pointer active:scale-[0.98]',
         className
       ].join(' ')}
       {...props}
     >
-      {/* Ripple effects */}
+      {/* Ripple effects (Linear风格：更快的反馈) */}
       {ripples.map(ripple => (
         <span
           key={ripple.id}
-          className="absolute w-2 h-2 bg-white/30 rounded-full pointer-events-none"
+          className="absolute w-2 h-2 bg-white/20 rounded-full pointer-events-none"
           style={{
             left: ripple.x,
             top: ripple.y,
             transform: 'translate(-50%, -50%)',
-            animation: 'button-ripple 600ms ease-out'
+            animation: 'button-ripple 300ms ease-out'
           }}
         />
       ))}

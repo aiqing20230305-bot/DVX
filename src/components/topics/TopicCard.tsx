@@ -32,19 +32,22 @@ export const TopicCard = React.memo(function TopicCard({
   return (
     <div
       className={[
-        'bg-[#F7F8FA] border rounded-xl p-5 transition-all duration-200 card-hover',
-        selected
-          ? 'border-[#3370FF]/60 bg-[#0D3DB8]/10'
-          : platformAccent[topic.platform] ?? 'border-[#DEE0E3]',
+        'border rounded-lg p-4 transition-all duration-100',
+        selected ? 'shadow-md' : 'hover:shadow-sm',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
+      style={{
+        backgroundColor: 'var(--color-bg-elevated-1)',
+        borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
+        boxShadow: selected ? '0 0 0 1px var(--color-primary)' : undefined
+      }}
       onClick={() => onToggleSelect?.(topic.id)}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           <PlatformBadge platform={topic.platform} />
-          <span className="inline-flex items-center gap-1 text-xs text-[#8F959E]">
+          <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
             <Clock size={11} />
             {durationStr}
           </span>
@@ -52,47 +55,48 @@ export const TopicCard = React.memo(function TopicCard({
         {onToggleSelect && (
           <div className="flex-shrink-0">
             {selected
-              ? <CheckSquare size={17} className="text-[#5B8EFF]" />
-              : <Square size={17} className="text-[#C9CDD4]" />
+              ? <CheckSquare size={16} style={{ color: 'var(--color-primary)' }} />
+              : <Square size={16} style={{ color: 'var(--color-border-light)' }} />
             }
           </div>
         )}
       </div>
 
       {/* Title */}
-      <h3 className="text-base font-semibold text-[#1F2329] mb-2 leading-snug">{topic.title}</h3>
+      <h3 className="text-base font-semibold mb-2 leading-snug" style={{ color: 'var(--color-text-primary)' }}>{topic.title}</h3>
 
       {/* Angle */}
-      <div className="mb-3">
-        <span className="text-xs text-[#8F959E]">切角：</span>
-        <span className="text-sm text-[#646A73]">{topic.angle}</span>
+      <div className="mb-2.5">
+        <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>切角：</span>
+        <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{topic.angle}</span>
       </div>
 
       {/* Persona */}
-      <div className="flex items-start gap-1.5 mb-3">
-        <Users size={13} className="text-[#8F959E] mt-0.5 flex-shrink-0" />
-        <span className="text-xs text-[#8F959E]">{topic.persona}</span>
+      <div className="flex items-start gap-1.5 mb-2.5">
+        <Users size={13} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--color-text-tertiary)' }} />
+        <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{topic.persona}</span>
       </div>
 
       {/* CTA */}
-      <div className="bg-[#F2F3F5] rounded-lg px-3 py-2 mb-4">
-        <span className="text-xs text-[#8F959E]">CTA：</span>
-        <span className="text-xs text-[#5B8EFF] font-medium">{topic.cta}</span>
+      <div className="rounded-md px-2.5 py-1.5 mb-3" style={{ backgroundColor: 'var(--color-bg-elevated-2)' }}>
+        <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>CTA：</span>
+        <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>{topic.cta}</span>
       </div>
 
       {/* Priority stars */}
       {onPriorityChange && (
-        <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <span className="text-xs text-[#8F959E] mr-1">优先级</span>
+        <div className="flex items-center gap-1 mb-2" onClick={e => e.stopPropagation()}>
+          <span className="text-xs mr-1" style={{ color: 'var(--color-text-tertiary)' }}>优先级</span>
           {[1, 2, 3, 4, 5].map(star => (
             <button
               key={star}
               onClick={() => onPriorityChange(topic.id, star)}
-              className="transition-colors"
+              className="transition-colors duration-100"
             >
               <Star
                 size={14}
-                className={star <= topic.priority ? 'text-amber-400 fill-amber-400' : 'text-[#C9CDD4]'}
+                className={star <= topic.priority ? 'fill-amber-400' : ''}
+                style={{ color: star <= topic.priority ? 'var(--color-warning)' : 'var(--color-border-light)' }}
               />
             </button>
           ))}
@@ -106,12 +110,25 @@ export const TopicCard = React.memo(function TopicCard({
             e.stopPropagation()
             onCommentClick(topic.id)
           }}
-          className="flex items-center gap-1.5 text-xs text-[#8F959E] hover:text-[#3370FF] transition-colors mt-2 pt-2 border-t border-[#DEE0E3]"
+          className="flex items-center gap-1.5 text-xs transition-colors duration-100 pt-2 border-t"
+          style={{
+            color: 'var(--color-text-tertiary)',
+            borderColor: 'var(--color-border)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--color-primary)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--color-text-tertiary)'
+          }}
         >
           <MessageCircle size={14} />
           <span>评论</span>
           {commentCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[#3370FF]/10 text-[#3370FF] font-medium">
+            <span className="ml-1 px-1.5 py-0.5 rounded-full font-medium" style={{
+              backgroundColor: 'var(--color-primary-subtle)',
+              color: 'var(--color-primary)'
+            }}>
               {commentCount}
             </span>
           )}
