@@ -289,7 +289,7 @@ projectRouter.delete('/:id', authMiddleware, async (req: Request, res: Response)
 
     if (!hasOwnership) {
       // Backward compatibility: if project has no members, allow deletion
-      const allMembers = projectMemberRepo.listMembers(projectId)
+      const allMembers = projectMemberRepo.getMembersByProject(projectId)
       if (allMembers.length > 0) {
         res.status(403).json({ error: '权限不足，只有项目所有者可以删除项目' })
         return

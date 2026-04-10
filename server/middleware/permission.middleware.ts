@@ -65,7 +65,7 @@ export const requireProjectMember = (minRole: 'viewer' | 'editor' | 'owner' = 'v
         const member = projectMemberRepo.getMember(projectId, userId)
 
         // 向后兼容：如果项目没有任何成员（老项目），允许访问
-        const allMembers = projectMemberRepo.listMembers(projectId)
+        const allMembers = projectMemberRepo.getMembersByProject(projectId)
         if (allMembers.length === 0) {
           console.log(`[Permission] Project ${projectId} has no members, allowing access for backward compatibility`)
           next()

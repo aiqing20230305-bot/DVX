@@ -130,7 +130,7 @@ router.get('/:projectId', authMiddleware, async (req: Request, res: Response) =>
     const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')
 
     if (!hasPermission) {
-      const allMembers = projectMemberRepo.listMembers(projectId)
+      const allMembers = projectMemberRepo.getMembersByProject(projectId)
       if (allMembers.length > 0) {
         res.status(403).json({ error: '权限不足，需要viewer权限' })
         return
