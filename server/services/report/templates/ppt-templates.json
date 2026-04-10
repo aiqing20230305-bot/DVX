@@ -1,0 +1,70 @@
+{
+  "templates": [
+    {
+      "id": "default",
+      "name": "默认深色模板",
+      "industry": "通用",
+      "description": "专业深色主题，适合所有行业",
+      "theme": {
+        "bg": "0D0D0D",
+        "bgCard": "1A1A1A",
+        "primary": "635BFF",
+        "primaryLight": "8B85FF",
+        "textPrimary": "FFFFFF",
+        "textSecondary": "A3A3A3",
+        "textTertiary": "737373",
+        "border": "333333"
+      }
+    },
+    {
+      "id": "fmcg",
+      "name": "快消品模板",
+      "industry": "快消品",
+      "description": "活力红色主题，传达年轻活力",
+      "theme": {
+        "bg": "0D0D0D",
+        "bgCard": "1A1A1A",
+        "primary": "FF6B6B",
+        "primaryLight": "FF8E8E",
+        "textPrimary": "FFFFFF",
+        "textSecondary": "A3A3A3",
+        "textTertiary": "737373",
+        "border": "333333"
+      }
+    },
+    {
+      "id": "beauty",
+      "name": "美妆模板",
+      "industry": "美妆",
+      "description": "优雅粉色主题，传达精致优雅",
+      "theme": {
+        "bg": "0D0D0D",
+        "bgCard": "1A1A1A",
+        "primary": "E91E63",
+        "primaryLight": "F06292",
+        "textPrimary": "FFFFFF",
+        "textSecondary": "A3A3A3",
+        "textTertiary": "737373",
+        "border": "333333",
+        "accent": "FFC107"
+      }
+    },
+    {
+      "id": "food",
+      "name": "食品模板",
+      "industry": "食品",
+      "description": "温暖橙色主题，传达自然温暖",
+      "theme": {
+        "bg": "0D0D0D",
+        "bgCard": "1A1A1A",
+        "primary": "FF9800",
+        "primaryLight": "FFB74D",
+        "textPrimary": "FFFFFF",
+        "textSecondary": "A3A3A3",
+        "textTertiary": "737373",
+        "border": "333333",
+        "accent": "4CAF50"
+      }
+    }
+  ]
+}
