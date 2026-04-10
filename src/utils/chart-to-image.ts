@@ -3,23 +3,26 @@ import html2canvas from 'html2canvas'
 /**
  * 将图表DOM元素转换为base64图片
  * @param chartElement 图表DOM元素
- * @param scale 渲染缩放比例（默认2，更高更清晰）
+ * @param scale 渲染缩放比例（默认3，支持高DPI投影）
  * @returns base64图片字符串
  */
 export async function chartToImage(
   chartElement: HTMLElement,
-  scale: number = 2
+  scale: number = 3
 ): Promise<string> {
   const canvas = await html2canvas(chartElement, {
-    scale,
+    scale, // 3x scale支持Retina显示和投影
     backgroundColor: '#1A1A1A', // 卡片背景色
     useCORS: true,
     logging: false,
+    allowTaint: true, // 允许跨域图片
+    imageTimeout: 0, // 不限制图片加载时间
     windowWidth: chartElement.scrollWidth,
     windowHeight: chartElement.scrollHeight
   })
 
-  return canvas.toDataURL('image/png')
+  // 使用最高质量PNG编码
+  return canvas.toDataURL('image/png', 1.0)
 }
 
 /**

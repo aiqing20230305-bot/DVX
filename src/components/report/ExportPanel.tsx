@@ -56,41 +56,42 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
       const timelineData = await getTimelineActivity(projectId)
 
       // 2. 生成图表图片（如果有数据）
+      // 优化分辨率：容器尺寸放大 + 3x scale = 高清图表
       if (insights.length > 0) {
         const insightData = getInsightDistribution(insights)
-        const container = createHiddenChartContainer(400, 300)
+        const container = createHiddenChartContainer(900, 600) // 从400x300提升到900x600
         const root = ReactDOM.createRoot(container)
         root.render(<InsightDistributionChart data={insightData} />)
 
         // 等待渲染完成
         await new Promise(resolve => setTimeout(resolve, 500))
 
-        charts.insightChart = await chartToImage(container)
+        charts.insightChart = await chartToImage(container, 3) // 3x scale = 2700x1800px
         root.unmount()
         cleanupChartContainer(container)
       }
 
       if (topics.length > 0) {
         const topicData = getTopicPriorityDistribution(topics)
-        const container = createHiddenChartContainer(400, 300)
+        const container = createHiddenChartContainer(900, 600) // 从400x300提升到900x600
         const root = ReactDOM.createRoot(container)
         root.render(<TopicPriorityChart data={topicData} />)
 
         await new Promise(resolve => setTimeout(resolve, 500))
 
-        charts.topicChart = await chartToImage(container)
+        charts.topicChart = await chartToImage(container, 3) // 3x scale
         root.unmount()
         cleanupChartContainer(container)
       }
 
       if (timelineData.length > 0) {
-        const container = createHiddenChartContainer(600, 300)
+        const container = createHiddenChartContainer(1200, 600) // 从600x300提升到1200x600
         const root = ReactDOM.createRoot(container)
         root.render(<TimelineActivityChart data={timelineData} />)
 
         await new Promise(resolve => setTimeout(resolve, 500))
 
-        charts.timelineChart = await chartToImage(container)
+        charts.timelineChart = await chartToImage(container, 3) // 3x scale = 3600x1800px
         root.unmount()
         cleanupChartContainer(container)
       }

@@ -158,7 +158,7 @@ router.put(
       }
 
       // 获取成员信息
-      const member = projectMemberRepo.getMemberById(memberId)
+      const member = projectMemberRepo.getMemberById(memberId as string)
       if (!member) {
         return res.status(404).json({
           error: '成员不存在',
@@ -184,7 +184,7 @@ router.put(
       }
 
       // 更新角色
-      const success = projectMemberRepo.updateMemberRole(memberId, role as 'viewer' | 'editor' | 'owner')
+      const success = projectMemberRepo.updateMemberRole(memberId as string, role as 'viewer' | 'editor' | 'owner')
       if (!success) {
         return res.status(500).json({
           error: '更新失败',
@@ -233,7 +233,7 @@ router.delete(
       const operatorId = req.userId!
 
       // 获取成员信息
-      const member = projectMemberRepo.getMemberById(memberId)
+      const member = projectMemberRepo.getMemberById(memberId as string)
       if (!member) {
         return res.status(404).json({
           error: '成员不存在',
@@ -267,7 +267,7 @@ router.delete(
       }
 
       // 移除成员
-      const success = projectMemberRepo.removeMember(memberId)
+      const success = projectMemberRepo.removeMember(memberId as string)
       if (!success) {
         return res.status(500).json({
           error: '移除失败',
