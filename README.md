@@ -99,8 +99,8 @@ npm run test:coverage
 
 ## 📊 产品状态
 
-**版本**: v2.5.0  
-**状态**: ✅ **协作功能（Phase 1-6）完成**  
+**版本**: v2.1.0  
+**状态**: ✅ **明亮主题系统上线 + 协作功能完成**  
 **最近更新**: 2026-04-10
 
 ### 核心功能
@@ -121,6 +121,22 @@ npm run test:coverage
 - ✅ 用户体验优化：自动选中洞察 ✨（2026-04-09新增）
 
 ### 最近改进
+
+**v2.1.0 (2026-04-10)** - 明亮主题系统上线 🌟
+- **设计理念转变**：从深色专业工具 → 明亮通透协作平台
+  - 对标：Linear/Notion明亮版
+  - 目标：降低视觉疲劳，适合长时间协作
+- **设计系统升级**：完整的CSS变量体系
+  - 4层背景系统：#FFFFFF → #F9FAFB → #F3F4F6
+  - 4级文字对比：#1A1A1A → #6B7280 → #9CA3AF → #D1D5DB
+  - 2级边框系统：#E5E7EB + #D1D5DB
+- **组件全面迁移**：19个组件和页面完全适配
+  - Input/Modal/Toast/Badge/Button等核心组件
+  - ProjectDashboard/Insights/Topics/Scripts等页面
+- **Bug修复**：Upload API参数传递问题（P1）
+  - permission中间件支持query参数
+  - 文件上传URL添加projectId查询参数
+- **文档新增**：DESIGN-SYSTEM-v2.md + RELEASE-v2.1.0.md + test-report-e2e.md
 
 **v2.4.2 (2026-04-10)** - 路由冲突修复 🐛
 - **Bug修复** 🐛：修复dist/client路由冲突（P1优先级）
