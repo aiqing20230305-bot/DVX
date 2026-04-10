@@ -39,6 +39,7 @@ interface ProjectStore {
   addProject: (input: CreateProjectInput) => Promise<Project>
   updateProject: (id: string, data: UpdateProjectInput) => Promise<void>
   removeProject: (id: string) => Promise<void>
+  duplicateProject: (id: string) => Promise<Project>
 }
 
 export const useProjectStore = create<ProjectStore>()(
@@ -95,6 +96,12 @@ export const useProjectStore = create<ProjectStore>()(
           const activeProjectId = state.activeProjectId === id ? (projects[0]?.id ?? null) : state.activeProjectId
           return { projects, activeProjectId }
         })
+      },
+
+      duplicateProject: async (id) => {
+        const { project } = await api.post<{ project: Project }>(`/project/${id}/duplicate`, {})
+        set(state => ({ projects: [project, ...state.projects], activeProjectId: project.id }))
+        return project
       }
     }),
     {

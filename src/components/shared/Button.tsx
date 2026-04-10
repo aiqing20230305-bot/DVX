@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'ai'
 type Size = 'xs' | 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,7 +17,8 @@ const variantClasses: Record<Variant, string> = {
   secondary: 'bg-[#F7F8FA] hover:bg-[#F2F3F5] active:bg-[#F7F8FA] text-[#1F2329] border border-[#DEE0E3] hover:border-[#E3E5E8]',
   danger: 'bg-[#EF4444] hover:bg-[#DC2626] active:bg-[#EF4444] text-white border border-[#EF4444] hover:border-[#F87171] shadow-sm shadow-[#EF4444]/30',
   ghost: 'bg-transparent hover:bg-[#F2F3F5] active:bg-[#F7F8FA] text-[#646A73] hover:text-[#1F2329] border border-transparent hover:border-[#DEE0E3]',
-  outline: 'bg-transparent hover:bg-[#3370FF]/10 active:bg-[#3370FF]/20 text-[#3370FF] hover:text-[#5B8EFF] border border-[#3370FF]/50 hover:border-[#5B8EFF]'
+  outline: 'bg-transparent hover:bg-[#3370FF]/10 active:bg-[#3370FF]/20 text-[#3370FF] hover:text-[#5B8EFF] border border-[#3370FF]/50 hover:border-[#5B8EFF]',
+  ai: 'btn-ai text-white border-none shadow-md'
 }
 
 const sizeClasses: Record<Size, string> = {

@@ -41,6 +41,10 @@
 
 /* 渐变（用于Hero/主CTA） */
 --gradient-primary: linear-gradient(135deg, #635BFF 0%, #8B5CFF 100%);
+
+/* AI专属渐变（用于AI功能标识） */
+--gradient-ai: linear-gradient(135deg, #635BFF 0%, #06B6D4 100%);
+--gradient-ai-hover: linear-gradient(135deg, #5449E0 0%, #0891B2 100%);
 ```
 
 **为什么这样美？**
@@ -118,6 +122,40 @@
 - 正文 vs 背景: ≥4.5:1
 - 标题 vs 背景: ≥3:1
 - CTA按钮: ≥4.5:1
+
+#### AI渐变使用场景 ⭐ NEW
+
+**何时使用 `--gradient-ai`**:
+- ✅ "生成洞察"按钮（核心AI功能）
+- ✅ "生成选题"按钮
+- ✅ "生成脚本"按钮
+- ✅ AI生成状态标识（Badge/Tag）
+- ✅ SSE流式输出的容器边框
+
+**何时使用 `--gradient-primary`**:
+- ✅ Hero区域背景
+- ✅ 主CTA（非AI功能，如"开始使用"）
+- ✅ 品牌元素装饰
+
+**使用示例**:
+```css
+/* AI功能按钮 */
+.btn-generate {
+  background: var(--gradient-ai);
+}
+
+.btn-generate:hover {
+  background: var(--gradient-ai-hover);
+}
+
+/* AI生成标识 */
+.badge-ai {
+  background: var(--gradient-ai);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+```
 
 ---
 
@@ -244,7 +282,17 @@
 
 /* Header高度 */
 --header-height: 64px;
+
+/* Section间距（对标Notion） */
+--section-spacing: var(--space-16); /* 64px - 提供呼吸感 */
+--section-spacing-large: var(--space-20); /* 80px - 用于Hero区域 */
 ```
+
+**使用建议**:
+- **Page Sections**（大节）: 使用`--section-spacing` (64px)
+- **Card Grid间距**: 使用`--space-6` (24px)
+- **Form元素间距**: 使用`--space-4` (16px)
+- **Hero留白**: 使用`--section-spacing-large` (80px)
 
 ---
 
@@ -418,6 +466,347 @@
   background: rgba(255, 255, 255, 0.1);
   color: var(--color-text-secondary);
 }
+```
+
+---
+
+## 📊 状态设计规范
+
+### 错误状态 (Error States)
+
+#### 表单错误
+```css
+/* 输入框错误状态 */
+.input-error {
+  border: 2px solid var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.input-error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-bg);
+}
+
+/* 错误提示文字 */
+.error-message {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+```
+
+**使用场景**：
+- 表单验证失败
+- 必填字段未填写
+- 格式错误（邮箱、密码等）
+
+**示例**：
+```html
+<input class="input input-error" />
+<div class="error-message">
+  <AlertCircle size={14} />
+  <span>请输入有效的邮箱地址</span>
+</div>
+```
+
+#### Toast错误提示
+```css
+.toast-error {
+  background: var(--color-error-bg);
+  border-left: 4px solid var(--color-error);
+  color: var(--color-text-primary);
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);
+}
+```
+
+**使用场景**：
+- API请求失败
+- 操作失败提示
+- 权限错误
+
+#### 内联错误
+```css
+.inline-error {
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin: 12px 0;
+}
+```
+
+**使用场景**：
+- 页面级错误提示
+- 功能不可用提示
+- 警告信息
+
+---
+
+### 加载状态 (Loading States)
+
+#### 按钮加载
+```css
+.btn-loading {
+  position: relative;
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.btn-loading .btn-content {
+  opacity: 0;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spinner 600ms linear infinite;
+}
+
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+```
+
+**使用场景**：
+- 提交表单
+- 保存数据
+- API请求中
+
+**示例**：
+```jsx
+<Button loading={isLoading}>
+  {isLoading ? '保存中...' : '保存'}
+</Button>
+```
+
+#### 骨架屏 (Skeleton)
+```css
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary) 25%,
+    var(--color-bg-tertiary) 50%,
+    var(--color-bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 不同尺寸 */
+.skeleton-text {
+  height: 16px;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  margin: 12px 0;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  height: 200px;
+  width: 100%;
+}
+```
+
+**使用场景**：
+- 页面首次加载
+- 数据请求中
+- 延迟加载内容
+
+#### AI生成加载动画
+```css
+.ai-generating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--gradient-ai);
+  border-radius: 8px;
+  color: white;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(99, 91, 255, 0.4);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 30px rgba(99, 91, 255, 0.6);
+  }
+}
+
+/* 打字机效果 */
+.streaming-cursor::after {
+  content: '▋';
+  display: inline-block;
+  animation: pulse-cursor 0.8s ease-in-out infinite;
+  color: var(--color-primary);
+  margin-left: 1px;
+}
+
+@keyframes pulse-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+```
+
+**使用场景**：
+- AI洞察生成
+- AI选题生成
+- AI脚本生成
+- SSE流式输出
+
+**示例**：
+```jsx
+{isGenerating && (
+  <div className="ai-generating">
+    <Sparkles size={16} />
+    <span>AI 正在生成洞察...</span>
+  </div>
+)}
+```
+
+---
+
+### 焦点状态 (Focus States)
+
+#### 通用焦点样式
+```css
+/* 所有交互元素的焦点样式 */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 按钮焦点 */
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 输入框焦点（已在上方定义） */
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.1);
+}
+
+/* 链接焦点 */
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* 卡片可点击焦点 */
+.card-clickable:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+```
+
+**可访问性要求**：
+- 焦点样式必须清晰可见（≥2px outline）
+- 对比度符合WCAG AA标准（≥3:1）
+- 不能完全依赖颜色区分
+- 焦点顺序符合逻辑流
+
+---
+
+### 空状态 (Empty States)
+
+```css
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: var(--color-text-tertiary);
+}
+
+.empty-state-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  max-width: 400px;
+  margin-bottom: 24px;
+}
+```
+
+**使用场景**：
+- 列表无数据
+- 搜索无结果
+- 筛选后无内容
+- 初始状态引导
+
+**示例**：
+```html
+<div class="empty-state">
+  <div class="empty-state-icon">
+    <FileText size={28} />
+  </div>
+  <h3 class="empty-state-title">还没有洞察</h3>
+  <p class="empty-state-description">
+    上传数据后，点击「生成洞察」开始分析
+  </p>
+  <Button variant="ai">
+    <Zap size={15} />
+    生成洞察
+  </Button>
+</div>
 ```
 
 ---

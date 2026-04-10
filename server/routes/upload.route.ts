@@ -8,10 +8,12 @@ import { parseImage } from '../services/parser/image.parser.js'
 import { parseVideo } from '../services/parser/video.parser.js'
 import { resolve } from 'path'
 import { config } from '../config.js'
+import { authMiddleware } from '../middleware/auth.middleware.js'
+import { requireProjectMember } from '../middleware/permission.middleware.js'
 
 const router = Router()
 
-router.post('/', uploadMiddleware.single('file'), async (req: Request, res: Response) => {
+router.post('/', authMiddleware, requireProjectMember('editor'), uploadMiddleware.single('file'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       res.status(400).json({ error: '未收到文件' })

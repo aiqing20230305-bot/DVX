@@ -1,5 +1,5 @@
 import React from 'react'
-import { TrendingUp, TrendingDown, Minus, CheckSquare, Square } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, CheckSquare, Square, MessageCircle } from 'lucide-react'
 import { Insight } from '../../types/index.js'
 import { InsightTypeBadge, ConfidenceBadge } from '../shared/Badge.js'
 
@@ -7,6 +7,8 @@ interface InsightCardProps {
   insight: Insight
   selected?: boolean
   onToggleSelect?: (id: string) => void
+  onCommentClick?: (insightId: string) => void
+  commentCount?: number
 }
 
 const typeColors: Record<string, string> = {
@@ -23,7 +25,7 @@ function TrendIcon({ trend }: { trend?: string }) {
   return <Minus size={14} className="text-[#8F959E]" />
 }
 
-export const InsightCard = React.memo(function InsightCard({ insight, selected = false, onToggleSelect }: InsightCardProps) {
+export const InsightCard = React.memo(function InsightCard({ insight, selected = false, onToggleSelect, onCommentClick, commentCount = 0 }: InsightCardProps) {
   return (
     <div
       className={[
@@ -73,7 +75,7 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
 
       {/* Evidence */}
       {insight.evidence.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 mb-3">
           <div className="text-xs text-[#8F959E] font-medium">支撑证据</div>
           <ul className="space-y-1">
             {insight.evidence.slice(0, 3).map((e, i) => (
@@ -84,6 +86,25 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Comment button */}
+      {onCommentClick && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onCommentClick(insight.id)
+          }}
+          className="flex items-center gap-1.5 text-xs text-[#8F959E] hover:text-[#3370FF] transition-colors mt-auto pt-2 border-t border-[#DEE0E3]"
+        >
+          <MessageCircle size={14} />
+          <span>评论</span>
+          {commentCount > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[#3370FF]/10 text-[#3370FF] font-medium">
+              {commentCount}
+            </span>
+          )}
+        </button>
       )}
     </div>
   )

@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
-import { Download, BookOpen, CheckCircle2, FileText, Eye } from 'lucide-react'
+import ReactDOM from 'react-dom/client'
+import { Download, BookOpen, CheckCircle2, FileText, Eye, Presentation, FileDown } from 'lucide-react'
 import { Button } from '../shared/Button.js'
 import { toast } from '../../store/toast.store.js'
+import { exportReportToPDF } from '../../utils/pdf-export.js'
+import { chartToImage, createHiddenChartContainer, cleanupChartContainer } from '../../utils/chart-to-image.js'
+import { getInsightDistribution, getTopicPriorityDistribution, getTimelineActivity } from '../../utils/chart-data.js'
+import { InsightDistributionChart, TopicPriorityChart, TimelineActivityChart } from './ReportCharts.js'
 
 interface ExportPanelProps {
   projectId: string
@@ -11,7 +16,10 @@ interface ExportPanelProps {
 
 export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelProps) {
   const [downloadingHtml, setDownloadingHtml] = useState(false)
+  const [downloadingPPT, setDownloadingPPT] = useState(false)
+  const [downloadingPDF, setDownloadingPDF] = useState(false)
   const [savedToKB, setSavedToKB] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState('default')
 
   const handleExportHTML = async () => {
     setDownloadingHtml(true)
@@ -24,8 +32,120 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
       a.download = `超级洞察_战略报告_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.html`
       a.click()
       URL.revokeObjectURL(url)
+      toast.success('导出成功', 'HTML报告已下载')
+    } catch (error) {
+      console.error('导出HTML失败:', error)
+      toast.error('导出失败', '请重试')
     } finally {
       setDownloadingHtml(false)
+    }
+  }
+
+  const generateChartImages = async (): Promise<{ insightChart?: string; topicChart?: string; timelineChart?: string }> => {
+    const charts: { insightChart?: string; topicChart?: string; timelineChart?: string } = {}
+
+    try {
+      // 1. 获取数据
+      const [insightsRes, topicsRes] = await Promise.all([
+        fetch(`/api/insight/project/${projectId}`),
+        fetch(`/api/topic/project/${projectId}`)
+      ])
+
+      const insights = await insightsRes.json()
+      const topics = await topicsRes.json()
+      const timelineData = await getTimelineActivity(projectId)
+
+      // 2. 生成图表图片（如果有数据）
+      if (insights.length > 0) {
+        const insightData = getInsightDistribution(insights)
+        const container = createHiddenChartContainer(400, 300)
+        const root = ReactDOM.createRoot(container)
+        root.render(<InsightDistributionChart data={insightData} />)
+
+        // 等待渲染完成
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        charts.insightChart = await chartToImage(container)
+        root.unmount()
+        cleanupChartContainer(container)
+      }
+
+      if (topics.length > 0) {
+        const topicData = getTopicPriorityDistribution(topics)
+        const container = createHiddenChartContainer(400, 300)
+        const root = ReactDOM.createRoot(container)
+        root.render(<TopicPriorityChart data={topicData} />)
+
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        charts.topicChart = await chartToImage(container)
+        root.unmount()
+        cleanupChartContainer(container)
+      }
+
+      if (timelineData.length > 0) {
+        const container = createHiddenChartContainer(600, 300)
+        const root = ReactDOM.createRoot(container)
+        root.render(<TimelineActivityChart data={timelineData} />)
+
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        charts.timelineChart = await chartToImage(container)
+        root.unmount()
+        cleanupChartContainer(container)
+      }
+    } catch (error) {
+      console.error('生成图表失败:', error)
+      // 不阻塞PPT生成，继续执行
+    }
+
+    return charts
+  }
+
+  const handleExportPPT = async () => {
+    setDownloadingPPT(true)
+    try {
+      // 生成图表图片
+      const charts = await generateChartImages()
+
+      const response = await fetch(`/api/report/${projectId}/export-ppt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateId: selectedTemplate,
+          charts
+        })
+      })
+      if (!response.ok) {
+        throw new Error('PPT导出失败')
+      }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `超级洞察_战略报告_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.pptx`
+      a.click()
+      URL.revokeObjectURL(url)
+      toast.success('导出成功', 'PPT报告已下载')
+    } catch (error) {
+      console.error('导出PPT失败:', error)
+      toast.error('导出失败', error instanceof Error ? error.message : '请重试')
+    } finally {
+      setDownloadingPPT(false)
+    }
+  }
+
+  const handleExportPDF = async () => {
+    setDownloadingPDF(true)
+    try {
+      const filename = `超级洞察_战略报告_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.pdf`
+      await exportReportToPDF(reportHtml, filename)
+      toast.success('导出成功', 'PDF报告已下载')
+    } catch (error) {
+      console.error('导出PDF失败:', error)
+      toast.error('导出失败', error instanceof Error ? error.message : '请重试')
+    } finally {
+      setDownloadingPDF(false)
     }
   }
 
@@ -172,6 +292,44 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
           className="w-full justify-center"
         >
           打印预览
+        </Button>
+
+        {/* PPT模板选择器 */}
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-[#8F959E]">PPT模板</label>
+          <select
+            value={selectedTemplate}
+            onChange={(e) => setSelectedTemplate(e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-[#DEE0E3] bg-white text-[#1F2329] focus:outline-none focus:ring-2 focus:ring-[#635BFF] focus:border-transparent"
+            disabled={!reportHtml}
+          >
+            <option value="default">默认深色模板（紫蓝）</option>
+            <option value="fmcg">快消品模板（活力红）</option>
+            <option value="beauty">美妆模板（优雅粉）</option>
+            <option value="food">食品模板（温暖橙）</option>
+          </select>
+        </div>
+
+        <Button
+          variant="secondary"
+          icon={<Presentation size={15} />}
+          onClick={handleExportPPT}
+          loading={downloadingPPT}
+          disabled={!reportHtml}
+          className="w-full justify-center"
+        >
+          导出 PPT 报告
+        </Button>
+
+        <Button
+          variant="secondary"
+          icon={<FileDown size={15} />}
+          onClick={handleExportPDF}
+          loading={downloadingPDF}
+          disabled={!reportHtml}
+          className="w-full justify-center"
+        >
+          导出 PDF 报告
         </Button>
 
         <Button

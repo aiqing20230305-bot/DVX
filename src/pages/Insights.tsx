@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Lightbulb, Zap, ArrowRight, Check, RotateCcw, Download, Trash2, CheckCircle, XCircle, FileDown } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
+import { useCommentStore } from '../store/comment.store.js'
 import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
 import { SearchBar } from '../components/shared/SearchBar.js'
@@ -11,6 +12,7 @@ import { InsightStream } from '../components/insights/InsightStream.js'
 import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
+import { CommentPanel } from '../components/comments/CommentPanel.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { useDebounce } from '../hooks/useDebounce.js'
@@ -29,11 +31,15 @@ export function Insights() {
   const [sortAscending, setSortAscending] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
+  const [commentPanelOpen, setCommentPanelOpen] = useState(false)
+  const [selectedInsightId, setSelectedInsightId] = useState<string>('')
   const {
     insights, selectedIds, status, streamBuffer,
     setInsights, addInsight, toggleSelection, selectAll, clearSelection,
     batchUpdateSelected, batchDelete, appendStream, setStatus, reset
   } = useInsightStore()
+
+  const { getCommentCount } = useCommentStore()
 
   const { start: startStream, status: sseStatus } = useSSEStream<Insight & { message?: string }>({
     onEvent: (event, data) => {
@@ -196,6 +202,11 @@ export function Insights() {
     }
   }
 
+  const handleCommentClick = (insightId: string) => {
+    setSelectedInsightId(insightId)
+    setCommentPanelOpen(true)
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -288,6 +299,7 @@ export function Insights() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Button
+            variant="ai"
             onClick={handleGenerate}
             loading={isGenerating}
             disabled={!activeProjectId}
@@ -391,6 +403,8 @@ export function Insights() {
         streamBuffer={streamBuffer}
         onToggleSelect={toggleSelection}
         initialLoading={initialLoading}
+        onCommentClick={handleCommentClick}
+        getCommentCount={getCommentCount}
       />
 
       {/* Confirm Dialog */}
@@ -410,6 +424,17 @@ export function Insights() {
         shortcuts={keyboardShortcuts}
         title="洞察页面快捷键"
       />
+
+      {/* Comment Panel */}
+      {activeProjectId && selectedInsightId && (
+        <CommentPanel
+          projectId={activeProjectId}
+          targetType="insight"
+          targetId={selectedInsightId}
+          isOpen={commentPanelOpen}
+          onToggle={() => setCommentPanelOpen(!commentPanelOpen)}
+        />
+      )}
     </div>
   )
 }

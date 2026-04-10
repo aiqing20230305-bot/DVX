@@ -4,6 +4,7 @@ import { FileText, Zap, ArrowRight, RotateCcw, Download, Trash2, Star, CheckCirc
 import { useProjectStore } from '../store/project.store.js'
 import { useInsightStore } from '../store/insight.store.js'
 import { useTopicStore } from '../store/topic.store.js'
+import { useCommentStore } from '../store/comment.store.js'
 import { topicApi } from '../api/topic.api.js'
 import { insightApi } from '../api/insight.api.js'
 import { Button } from '../components/shared/Button.js'
@@ -14,6 +15,7 @@ import { TopicGrid } from '../components/topics/TopicGrid.js'
 import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
+import { CommentPanel } from '../components/comments/CommentPanel.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { useDebounce } from '../hooks/useDebounce.js'
@@ -35,7 +37,10 @@ export function Topics() {
   const [filterSelected, setFilterSelected] = useState('all')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
+  const [commentPanelOpen, setCommentPanelOpen] = useState(false)
+  const [selectedTopicId, setSelectedTopicId] = useState<string>('')
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
+  const { getCommentCount } = useCommentStore()
   const {
     topics, selectedIds, status,
     setTopics, addTopic, toggleSelection, selectAll, clearSelection, updatePriority,
@@ -245,6 +250,11 @@ export function Topics() {
     }
   }
 
+  const handleCommentClick = (topicId: string) => {
+    setSelectedTopicId(topicId)
+    setCommentPanelOpen(true)
+  }
+
   const isGenerating = status === 'streaming' || status === 'loading'
   const selectedCount = selectedIds.size
 
@@ -380,6 +390,7 @@ export function Topics() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Button
+            variant="ai"
             onClick={handleGenerate}
             loading={isGenerating}
             disabled={!activeProjectId}
@@ -536,6 +547,8 @@ export function Topics() {
         status={status}
         onToggleSelect={handleToggleSelect}
         onPriorityChange={handlePriorityChange}
+        onCommentClick={handleCommentClick}
+        getCommentCount={getCommentCount}
         initialLoading={initialLoading}
       />
 
@@ -556,6 +569,17 @@ export function Topics() {
         shortcuts={keyboardShortcuts}
         title="选题页面快捷键"
       />
+
+      {/* Comment Panel */}
+      {activeProjectId && selectedTopicId && (
+        <CommentPanel
+          projectId={activeProjectId}
+          targetType="topic"
+          targetId={selectedTopicId}
+          isOpen={commentPanelOpen}
+          onToggle={() => setCommentPanelOpen(!commentPanelOpen)}
+        />
+      )}
     </div>
   )
 }

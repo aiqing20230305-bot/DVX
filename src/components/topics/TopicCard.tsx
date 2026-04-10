@@ -1,5 +1,5 @@
 import React from 'react'
-import { Clock, Users, CheckSquare, Square, Star } from 'lucide-react'
+import { Clock, Users, CheckSquare, Square, Star, MessageCircle } from 'lucide-react'
 import { TopicCard as TopicCardType } from '../../types/index.js'
 import { PlatformBadge } from '../shared/Badge.js'
 
@@ -8,6 +8,8 @@ interface TopicCardProps {
   selected?: boolean
   onToggleSelect?: (id: string) => void
   onPriorityChange?: (id: string, priority: number) => void
+  onCommentClick?: (topicId: string) => void
+  commentCount?: number
 }
 
 const platformAccent: Record<string, string> = {
@@ -16,7 +18,14 @@ const platformAccent: Record<string, string> = {
   xiaohongshu: 'border-red-800/40 hover:border-red-700/60',
 }
 
-export const TopicCard = React.memo(function TopicCard({ topic, selected = false, onToggleSelect, onPriorityChange }: TopicCardProps) {
+export const TopicCard = React.memo(function TopicCard({
+  topic,
+  selected = false,
+  onToggleSelect,
+  onPriorityChange,
+  onCommentClick,
+  commentCount = 0
+}: TopicCardProps) {
   const duration = topic.estimated_duration
   const durationStr = duration >= 60 ? `${Math.floor(duration / 60)}分${duration % 60 > 0 ? `${duration % 60}秒` : ''}` : `${duration}秒`
 
@@ -88,6 +97,25 @@ export const TopicCard = React.memo(function TopicCard({ topic, selected = false
             </button>
           ))}
         </div>
+      )}
+
+      {/* Comment button */}
+      {onCommentClick && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onCommentClick(topic.id)
+          }}
+          className="flex items-center gap-1.5 text-xs text-[#8F959E] hover:text-[#3370FF] transition-colors mt-2 pt-2 border-t border-[#DEE0E3]"
+        >
+          <MessageCircle size={14} />
+          <span>评论</span>
+          {commentCount > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[#3370FF]/10 text-[#3370FF] font-medium">
+              {commentCount}
+            </span>
+          )}
+        </button>
       )}
     </div>
   )

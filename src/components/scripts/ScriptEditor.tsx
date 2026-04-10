@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { Script, ScriptSegment } from '../../types/index.js'
 import { Button } from '../shared/Button.js'
-import { Save, Clock } from 'lucide-react'
+import { Save, Clock, MessageCircle } from 'lucide-react'
 
 interface ScriptEditorProps {
   script: Script
   onSave?: (id: string, data: { segments: ScriptSegment[]; fullText: string; wordCount: number }) => void
+  onCommentClick?: (scriptId: string) => void
+  commentCount?: number
 }
 
 const segmentConfig: Record<string, { label: string; color: string; bgColor: string; description: string }> = {
@@ -16,7 +18,7 @@ const segmentConfig: Record<string, { label: string; color: string; bgColor: str
   cta: { label: '行动号召', color: 'text-orange-400', bgColor: 'bg-orange-900/20 border-orange-700/40', description: '促进转化' },
 }
 
-export function ScriptEditor({ script, onSave }: ScriptEditorProps) {
+export function ScriptEditor({ script, onSave, onCommentClick, commentCount = 0 }: ScriptEditorProps) {
   const [segments, setSegments] = useState<ScriptSegment[]>(script.segments)
   const [saving, setSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
@@ -56,18 +58,34 @@ export function ScriptEditor({ script, onSave }: ScriptEditorProps) {
           </span>
           <span className="text-xs text-[#8F959E]">{script.word_count} 字</span>
         </div>
-        {onSave && (
-          <Button
-            size="sm"
-            variant="secondary"
-            loading={saving}
-            disabled={!hasChanges}
-            icon={<Save size={13} />}
-            onClick={handleSave}
-          >
-            保存修改
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {onCommentClick && (
+            <button
+              onClick={() => onCommentClick(script.id)}
+              className="flex items-center gap-1.5 text-xs text-[#8F959E] hover:text-[#3370FF] transition-colors px-2 py-1 rounded"
+            >
+              <MessageCircle size={14} />
+              <span>评论</span>
+              {commentCount > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[#3370FF]/10 text-[#3370FF] font-medium">
+                  {commentCount}
+                </span>
+              )}
+            </button>
+          )}
+          {onSave && (
+            <Button
+              size="sm"
+              variant="secondary"
+              loading={saving}
+              disabled={!hasChanges}
+              icon={<Save size={13} />}
+              onClick={handleSave}
+            >
+              保存修改
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Segments */}

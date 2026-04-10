@@ -12,7 +12,7 @@ import { formatDate } from '../utils/date.js'
 
 export function Projects() {
   const navigate = useNavigate()
-  const { projects, setActiveProject, updateProject, removeProject } = useProjectStore()
+  const { projects, setActiveProject, updateProject, removeProject, duplicateProject } = useProjectStore()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'active' | 'archived'>('all')
   const [dropdown, setDropdown] = useState<string | null>(null)
@@ -32,11 +32,16 @@ export function Projects() {
   }
 
   const handleDuplicate = async (id: string) => {
-    const project = projects.find(p => p.id === id)
-    if (!project) return
-    // TODO: Implement project duplication
-    alert('复制项目功能开发中...')
-    setDropdown(null)
+    try {
+      const newProject = await duplicateProject(id)
+      // Navigate to the new project dashboard
+      navigate(`/project/${newProject.id}`)
+    } catch (error) {
+      console.error('复制项目失败:', error)
+      alert(error instanceof Error ? error.message : '复制项目失败')
+    } finally {
+      setDropdown(null)
+    }
   }
 
   const handleDelete = async (id: string) => {

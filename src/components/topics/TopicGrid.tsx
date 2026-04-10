@@ -11,10 +11,21 @@ interface TopicGridProps {
   status: AsyncStatus
   onToggleSelect: (id: string) => void
   onPriorityChange: (id: string, priority: number) => void
+  onCommentClick?: (topicId: string) => void
+  getCommentCount?: (targetType: string, targetId: string) => number
   initialLoading?: boolean
 }
 
-export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPriorityChange, initialLoading = false }: TopicGridProps) {
+export function TopicGrid({
+  topics,
+  selectedIds,
+  status,
+  onToggleSelect,
+  onPriorityChange,
+  onCommentClick,
+  getCommentCount,
+  initialLoading = false
+}: TopicGridProps) {
   // Show skeleton during initial load
   if (initialLoading) {
     return (
@@ -56,6 +67,8 @@ export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPrior
                 selected={selectedIds.has(t.id)}
                 onToggleSelect={onToggleSelect}
                 onPriorityChange={onPriorityChange}
+                onCommentClick={onCommentClick}
+                commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
               />
             ))}
           </div>
@@ -88,6 +101,8 @@ export function TopicGrid({ topics, selectedIds, status, onToggleSelect, onPrior
           selected={selectedIds.has(t.id)}
           onToggleSelect={onToggleSelect}
           onPriorityChange={onPriorityChange}
+          onCommentClick={onCommentClick}
+          commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
         />
       ))}
     </div>

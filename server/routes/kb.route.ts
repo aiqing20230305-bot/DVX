@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express'
 import { kbRepo, KBItem } from '../db/repositories/kb.repo.js'
+import { authMiddleware } from '../middleware/auth.middleware.js'
 
 const router = Router()
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const projectId = req.query['projectId'] as string | undefined
     const type = req.query['type'] as string | undefined
@@ -12,6 +13,20 @@ router.get('/', (req: Request, res: Response) => {
 
     if (!projectId) {
       res.status(400).json({ error: '缺少必填参数：projectId' })
+      return
+    }
+
+    // Permission check
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要viewer权限' })
       return
     }
 
@@ -29,7 +44,7 @@ router.get('/', (req: Request, res: Response) => {
   }
 })
 
-router.post('/', (req: Request, res: Response) => {
+router.post('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { type, title, content, tags = [], projectId } = req.body as {
       type: KBItem['type']
@@ -44,6 +59,22 @@ router.post('/', (req: Request, res: Response) => {
       return
     }
 
+    // Permission check if project-specific KB item
+    if (projectId) {
+      const userId = (req as any).userId
+      if (!userId) {
+        res.status(401).json({ error: '未登录' })
+        return
+      }
+
+      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+      const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'editor')
+      if (!hasPermission) {
+        res.status(403).json({ error: '权限不足，需要editor权限' })
+        return
+      }
+    }
+
     const item = kbRepo.create({ type, title, content, tags: JSON.stringify(tags), project_id: projectId ?? null })
     res.status(201).json({ item: { ...item, tags } })
   } catch (err) {
@@ -52,9 +83,33 @@ router.post('/', (req: Request, res: Response) => {
   }
 })
 
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string
+
+    // Get KB item to check project_id for permission
+    const item = kbRepo.findById(id)
+    if (!item) {
+      res.status(404).json({ error: '知识库条目不存在' })
+      return
+    }
+
+    // Permission check if project-specific KB item
+    if (item.project_id) {
+      const userId = (req as any).userId
+      if (!userId) {
+        res.status(401).json({ error: '未登录' })
+        return
+      }
+
+      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+      const hasPermission = projectMemberRepo.hasRole(item.project_id, userId, 'editor')
+      if (!hasPermission) {
+        res.status(403).json({ error: '权限不足，需要editor权限' })
+        return
+      }
+    }
+
     kbRepo.delete(id)
     res.json({ success: true })
   } catch (err) {

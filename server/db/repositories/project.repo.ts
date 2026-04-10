@@ -13,6 +13,12 @@ export interface Project {
   end_date?: number
   status: 'active' | 'archived'
   tags: string[]
+  logo_path?: string
+  company_name?: string
+  contact_info?: string
+  brand_primary_color?: string
+  brand_secondary_color?: string
+  created_by?: string
   created_at: number
   updated_at: number
 }
@@ -49,6 +55,11 @@ export interface UpdateProjectInput {
   end_date?: number
   status?: 'active' | 'archived'
   tags?: string[]
+  logo_path?: string
+  company_name?: string
+  contact_info?: string
+  brand_primary_color?: string
+  brand_secondary_color?: string
 }
 
 export const projectRepo = {
@@ -127,6 +138,11 @@ export const projectRepo = {
     if (data.end_date !== undefined) { updates.push('end_date = ?'); values.push(data.end_date) }
     if (data.status !== undefined) { updates.push('status = ?'); values.push(data.status) }
     if (data.tags !== undefined) { updates.push('tags = ?'); values.push(JSON.stringify(data.tags)) }
+    if (data.logo_path !== undefined) { updates.push('logo_path = ?'); values.push(data.logo_path) }
+    if (data.company_name !== undefined) { updates.push('company_name = ?'); values.push(data.company_name) }
+    if (data.contact_info !== undefined) { updates.push('contact_info = ?'); values.push(data.contact_info) }
+    if (data.brand_primary_color !== undefined) { updates.push('brand_primary_color = ?'); values.push(data.brand_primary_color) }
+    if (data.brand_secondary_color !== undefined) { updates.push('brand_secondary_color = ?'); values.push(data.brand_secondary_color) }
 
     updates.push('updated_at = ?')
     values.push(now, id)
@@ -160,5 +176,35 @@ export const projectRepo = {
       selectedInsights: selectedInsights.count,
       selectedTopics: selectedTopics.count
     }
+  },
+
+  /**
+   * 查找多个项目（通过ID列表）
+   * 用于成员管理：查询用户作为成员的所有项目
+   */
+  findByIds(ids: string[]): Project[] {
+    if (ids.length === 0) return []
+
+    const db = getDb()
+    const placeholders = ids.map(() => '?').join(',')
+    const stmt = db.prepare(`SELECT * FROM projects WHERE id IN (${placeholders}) ORDER BY updated_at DESC`)
+    const rows = stmt.all(...ids) as ProjectRow[]
+    return rows.map(parseProjectRow)
+  },
+
+  /**
+   * 设置项目创建者
+   * 用于成员管理：在创建项目时自动设置创建者
+   */
+  updateCreatedBy(id: string, userId: string): boolean {
+    const db = getDb()
+    const stmt = db.prepare(`
+      UPDATE projects
+      SET created_by = ?, updated_at = ?
+      WHERE id = ?
+    `)
+
+    const result = stmt.run(userId, Date.now(), id)
+    return result.changes > 0
   }
 }

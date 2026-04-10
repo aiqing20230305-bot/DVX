@@ -1,9 +1,11 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react'
+import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useTopicStore } from '../store/topic.store.js'
 import { useScriptStore } from '../store/script.store.js'
+import { useCommentStore } from '../store/comment.store.js'
+import { useApprovalStore } from '../store/approval.store.js'
 import { scriptApi } from '../api/script.api.js'
 import { topicApi } from '../api/topic.api.js'
 import { Button } from '../components/shared/Button.js'
@@ -13,6 +15,7 @@ import { ABVariantPanel } from '../components/scripts/ABVariantPanel.js'
 import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
+import { CommentPanel } from '../components/comments/CommentPanel.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { useDebounce } from '../hooks/useDebounce.js'
 import { Script, ScriptSegment, TopicCard } from '../types/index.js'
@@ -30,7 +33,13 @@ export function Scripts() {
   const [sortBy, setSortBy] = useState('created_at')
   const [sortAscending, setSortAscending] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [commentPanelOpen, setCommentPanelOpen] = useState(false)
+  const [selectedScriptId, setSelectedScriptId] = useState<string>('')
   const { topics, selectedIds: topicSelectedIds, setTopics } = useTopicStore()
+  const { getCommentCount } = useCommentStore()
+  const { workflows, fetchWorkflows, createRequest } = useApprovalStore()
+  const [submittingApproval, setSubmittingApproval] = useState<string | null>(null)
+  const token = localStorage.getItem('token') || ''
   const {
     scripts, selectedIds, activeTopicId,
     setScripts, addScript, toggleSelection, selectAll, clearSelection,
@@ -92,7 +101,12 @@ export function Scripts() {
         console.error('Failed to load scripts:', err)
         setInitialLoading(false)
       })
-  }, [activeProjectId])
+
+    // Fetch workflows for approval
+    if (token) {
+      fetchWorkflows(activeProjectId, 'script', token)
+    }
+  }, [activeProjectId, token])
 
   const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id) || t.selected)
   const selectedCount = selectedIds.size
@@ -176,6 +190,38 @@ export function Scripts() {
     }
   }
 
+  const handleSubmitForApproval = async (scriptId: string, topicTitle: string) => {
+    if (!activeProjectId) return
+
+    // Find active workflows for scripts
+    const activeWorkflows = workflows.filter(w => w.status === 'active')
+
+    if (activeWorkflows.length === 0) {
+      toast.error('没有可用的审批流程', '请先在项目设置中创建审批流程')
+      return
+    }
+
+    // If multiple workflows, ask user to choose (for now, use first one)
+    const workflow = activeWorkflows[0]
+
+    try {
+      setSubmittingApproval(scriptId)
+      await createRequest(
+        {
+          workflow_id: workflow.id,
+          target_type: 'script',
+          target_id: scriptId
+        },
+        token
+      )
+      toast.success('审批请求已提交', `「${topicTitle}」脚本已提交审批`)
+    } catch (err: any) {
+      toast.error('提交失败', err.response?.data?.message || '提交审批请求失败')
+    } finally {
+      setSubmittingApproval(null)
+    }
+  }
+
   const handleBatchDeleteConfirm = async () => {
     try {
       const idsToDelete = Array.from(selectedIds)
@@ -185,6 +231,11 @@ export function Scripts() {
     } catch (err) {
       toast.error('删除失败', err instanceof Error ? err.message : String(err))
     }
+  }
+
+  const handleCommentClick = (scriptId: string) => {
+    setSelectedScriptId(scriptId)
+    setCommentPanelOpen(true)
   }
 
   const toggleTopicExpand = (id: string) => {
@@ -323,13 +374,24 @@ export function Scripts() {
                 <div className="flex items-center gap-2 ml-4">
                   <Button
                     size="sm"
-                    variant={topicScripts.length > 0 ? 'secondary' : 'primary'}
+                    variant={topicScripts.length > 0 ? 'secondary' : 'ai'}
                     loading={isGeneratingThis}
                     onClick={() => handleGenerate(topic.id)}
                     icon={<Zap size={13} />}
                   >
                     {topicScripts.length > 0 ? '重新生成' : '生成脚本'}
                   </Button>
+                  {topicScripts.length > 0 && workflows.filter(w => w.status === 'active').length > 0 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      loading={submittingApproval === topicScripts[0]?.id}
+                      onClick={() => handleSubmitForApproval(topicScripts[0]?.id, topic.title)}
+                      icon={<CheckCircle size={13} />}
+                    >
+                      提交审批
+                    </Button>
+                  )}
                   {topicScripts.length > 0 && (
                     <>
                       <button
@@ -368,6 +430,8 @@ export function Scripts() {
                     scripts={topicScripts}
                     loading={isGeneratingThis && topicScripts.length === 0}
                     onSave={handleSaveScript}
+                    onCommentClick={handleCommentClick}
+                    getCommentCount={getCommentCount}
                   />
                 </div>
               )}
@@ -415,6 +479,17 @@ export function Scripts() {
         onCancel={() => setDeleteDialogOpen(false)}
         danger
       />
+
+      {/* Comment Panel */}
+      {activeProjectId && selectedScriptId && (
+        <CommentPanel
+          projectId={activeProjectId}
+          targetType="script"
+          targetId={selectedScriptId}
+          isOpen={commentPanelOpen}
+          onToggle={() => setCommentPanelOpen(!commentPanelOpen)}
+        />
+      )}
     </div>
   )
 }

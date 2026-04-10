@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import { Zap, BookOpen } from 'lucide-react'
+import { Zap, BookOpen, CheckCircle } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
+import { useApprovalStore } from '../store/approval.store.js'
 import { Button } from '../components/shared/Button.js'
 import { ReportPreview } from '../components/report/ReportPreview.js'
 import { ExportPanel } from '../components/report/ExportPanel.js'
 import { api } from '../api/client.js'
 import { kbApi } from '../api/kb.api.js'
+import { toast } from '../store/toast.store.js'
 
 export function Report() {
   const { activeProjectId, projects } = useProjectStore()
+  const { workflows, fetchWorkflows, createRequest } = useApprovalStore()
   const [reportHtml, setReportHtml] = useState('')
   const [generating, setGenerating] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [submittingApproval, setSubmittingApproval] = useState(false)
+  const token = localStorage.getItem('token') || ''
 
   const activeProject = projects.find(p => p.id === activeProjectId)
 
@@ -36,7 +41,12 @@ export function Report() {
       .finally(() => {
         setLoading(false)
       })
-  }, [activeProjectId])
+
+    // Fetch workflows for approval
+    if (token) {
+      fetchWorkflows(activeProjectId, 'report', token)
+    }
+  }, [activeProjectId, token])
 
   const handleGenerate = async () => {
     if (!activeProjectId) return
@@ -63,6 +73,44 @@ export function Report() {
     })
   }
 
+  const handleSubmitForApproval = async () => {
+    if (!activeProjectId || !reportHtml) {
+      toast.error('请先生成报告')
+      return
+    }
+
+    // Find active workflows for reports
+    const activeWorkflows = workflows.filter(w => w.status === 'active')
+
+    if (activeWorkflows.length === 0) {
+      toast.error('没有可用的审批流程', '请先在项目设置中创建审批流程')
+      return
+    }
+
+    // If multiple workflows, use first one (can be extended to let user choose)
+    const workflow = activeWorkflows[0]
+
+    // Use project ID as report ID (one report per project)
+    const reportId = `report_${activeProjectId}`
+
+    try {
+      setSubmittingApproval(true)
+      await createRequest(
+        {
+          workflow_id: workflow.id,
+          target_type: 'report',
+          target_id: reportId
+        },
+        token
+      )
+      toast.success('审批请求已提交', '战略报告已提交审批')
+    } catch (err: any) {
+      toast.error('提交失败', err.response?.data?.message || '提交审批请求失败')
+    } finally {
+      setSubmittingApproval(false)
+    }
+  }
+
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
@@ -80,7 +128,7 @@ export function Report() {
       </div>
 
       {/* Controls */}
-      <div className="report-controls flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div className="report-controls flex flex-wrap items-center gap-3 mb-6">
         <Button
           size="lg"
           loading={generating}
@@ -91,8 +139,20 @@ export function Report() {
           {generating ? '生成中...' : reportHtml ? '重新生成' : '生成报告'}
         </Button>
 
+        {reportHtml && workflows.filter(w => w.status === 'active').length > 0 && (
+          <Button
+            size="lg"
+            variant="outline"
+            loading={submittingApproval}
+            onClick={handleSubmitForApproval}
+            icon={<CheckCircle size={16} />}
+          >
+            提交审批
+          </Button>
+        )}
+
         {reportHtml && (
-          <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+          <span className="text-xs ml-auto" style={{ color: 'var(--color-text-tertiary)' }}>
             报告已生成 · 可在下方预览和导出
           </span>
         )}

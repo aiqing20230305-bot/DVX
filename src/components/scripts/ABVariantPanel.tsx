@@ -7,9 +7,11 @@ interface ABVariantPanelProps {
   scripts: Script[]
   loading?: boolean
   onSave?: (id: string, data: { segments: Script['segments']; fullText: string; wordCount: number }) => void
+  onCommentClick?: (scriptId: string) => void
+  getCommentCount?: (targetType: string, targetId: string) => number
 }
 
-export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPanelProps) {
+export function ABVariantPanel({ scripts, loading = false, onSave, onCommentClick, getCommentCount }: ABVariantPanelProps) {
   const scriptA = scripts.find(s => s.variant === 'A')
   const scriptB = scripts.find(s => s.variant === 'B')
 
@@ -40,7 +42,14 @@ export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPa
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
       <div>
         {scriptA
-          ? <ScriptEditor script={scriptA} onSave={onSave} />
+          ? (
+            <ScriptEditor
+              script={scriptA}
+              onSave={onSave}
+              onCommentClick={onCommentClick}
+              commentCount={getCommentCount ? getCommentCount('script', scriptA.id) : 0}
+            />
+          )
           : (
             <div className="flex items-center justify-center h-40 border border-[#DEE0E3] rounded-xl">
               <Loader2 size={24} className="text-[#3370FF] animate-spin" />
@@ -50,7 +59,14 @@ export function ABVariantPanel({ scripts, loading = false, onSave }: ABVariantPa
       </div>
       <div>
         {scriptB
-          ? <ScriptEditor script={scriptB} onSave={onSave} />
+          ? (
+            <ScriptEditor
+              script={scriptB}
+              onSave={onSave}
+              onCommentClick={onCommentClick}
+              commentCount={getCommentCount ? getCommentCount('script', scriptB.id) : 0}
+            />
+          )
           : (
             <div className="flex items-center justify-center h-40 border border-[#DEE0E3] rounded-xl">
               <Loader2 size={24} className="text-[#3370FF] animate-spin" />

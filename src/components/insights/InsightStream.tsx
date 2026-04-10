@@ -14,9 +14,11 @@ interface InsightStreamProps {
   streamBuffer: string
   onToggleSelect: (id: string) => void
   initialLoading?: boolean
+  onCommentClick?: (insightId: string) => void
+  getCommentCount?: (targetType: string, targetId: string) => number
 }
 
-export function InsightStream({ status, insights, selectedIds, streamBuffer, onToggleSelect, initialLoading = false }: InsightStreamProps) {
+export function InsightStream({ status, insights, selectedIds, streamBuffer, onToggleSelect, initialLoading = false, onCommentClick, getCommentCount }: InsightStreamProps) {
   const navigate = useNavigate()
 
   // Show skeleton during initial load
@@ -80,6 +82,8 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
                   insight={insight}
                   selected={selectedIds.has(insight.id)}
                   onToggleSelect={onToggleSelect}
+                  onCommentClick={onCommentClick}
+                  commentCount={getCommentCount?.('insight', insight.id) || 0}
                 />
               ))}
               {/* Skeleton placeholders */}
@@ -115,6 +119,8 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
               insight={insight}
               selected={selectedIds.has(insight.id)}
               onToggleSelect={onToggleSelect}
+              onCommentClick={onCommentClick}
+              commentCount={getCommentCount?.('insight', insight.id) || 0}
             />
           ))}
         </div>

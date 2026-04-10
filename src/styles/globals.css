@@ -55,8 +55,12 @@
   --color-info: #3498DB;
   --color-info-bg: rgba(52, 152, 219, 0.1);
 
-  /* Gradient */
+  /* Gradients */
   --gradient-primary: linear-gradient(135deg, #635BFF 0%, #8B5CFF 100%);
+
+  /* AI专属渐变 - 紫蓝到青色（用于AI功能标识） */
+  --gradient-ai: linear-gradient(135deg, #635BFF 0%, #06B6D4 100%);
+  --gradient-ai-hover: linear-gradient(135deg, #5449E0 0%, #0891B2 100%);
 
   /* Spacing System (8px base) */
   --space-1: 4px;
@@ -67,6 +71,11 @@
   --space-8: 32px;
   --space-12: 48px;
   --space-16: 64px;
+  --space-20: 80px;
+
+  /* Section间距（对标Notion/Linear） */
+  --section-spacing: 64px;  /* 标准Section间距 */
+  --section-spacing-large: 80px;  /* Hero区域留白 */
 
   /* Animation Durations */
   --duration-fast: 100ms;
@@ -134,7 +143,12 @@ body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #F7F8FA 25%, #F2F3F5 50%, #F7F8FA 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary) 25%,
+    var(--color-bg-tertiary) 50%,
+    var(--color-bg-secondary) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 8px;
@@ -171,4 +185,210 @@ body {
 
 .interactive-element:active {
   transform: scale(0.98);
+}
+
+/* AI渐变按钮样式 */
+.btn-ai {
+  background: var(--gradient-ai);
+  color: white;
+  border: none;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.btn-ai:hover {
+  background: var(--gradient-ai-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
+}
+
+.btn-ai:active {
+  transform: translateY(0);
+}
+
+/* AI标识Badge */
+.badge-ai {
+  background: var(--gradient-ai);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Section间距工具类 */
+.section-spacing {
+  margin-top: var(--section-spacing);
+}
+
+.section-spacing-bottom {
+  margin-bottom: var(--section-spacing);
+}
+
+.section-spacing-y {
+  margin-top: var(--section-spacing);
+  margin-bottom: var(--section-spacing);
+}
+
+/* ========== 状态设计 (State Styles) ========== */
+
+/* 错误状态 - Error States */
+.input-error {
+  border: 2px solid var(--color-error) !important;
+  background: var(--color-error-bg);
+}
+
+.input-error:focus {
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 3px var(--color-error-bg);
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toast-error {
+  background: var(--color-error-bg);
+  border-left: 4px solid var(--color-error);
+  color: var(--color-text-primary);
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);
+}
+
+.inline-error {
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin: 12px 0;
+}
+
+/* 加载状态 - Loading States */
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.btn-loading {
+  position: relative;
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.btn-loading .btn-content {
+  opacity: 0;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spinner 600ms linear infinite;
+}
+
+/* Skeleton variants */
+.skeleton-text {
+  height: 16px;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  margin: 12px 0;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  height: 200px;
+  width: 100%;
+}
+
+/* AI生成加载 */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(99, 91, 255, 0.4);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 30px rgba(99, 91, 255, 0.6);
+  }
+}
+
+.ai-generating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--gradient-ai);
+  border-radius: 8px;
+  color: white;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* 焦点状态 - Focus States */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 空状态 - Empty States */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: var(--color-text-tertiary);
+}
+
+.empty-state-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  max-width: 400px;
+  margin-bottom: 24px;
 }
