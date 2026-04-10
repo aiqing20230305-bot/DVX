@@ -17,18 +17,23 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
       return
     }
 
-    // Permission check
-    const userId = (req as any).userId
-    if (!userId) {
-      res.status(401).json({ error: '未登录' })
-      return
-    }
+    // Development mode: bypass permission checks (本地跑就是最高权限)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[KB] Development mode - bypassing permission check')
+    } else {
+      // Permission check
+      const userId = (req as any).userId
+      if (!userId) {
+        res.status(401).json({ error: '未登录' })
+        return
+      }
 
-    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-    const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')
-    if (!hasPermission) {
-      res.status(403).json({ error: '权限不足，需要viewer权限' })
-      return
+      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+      const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')
+      if (!hasPermission) {
+        res.status(403).json({ error: '权限不足，需要viewer权限' })
+        return
+      }
     }
 
     if (q) {
@@ -61,7 +66,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     }
 
     // Permission check if project-specific KB item
-    if (projectId) {
+    if (projectId && process.env.NODE_ENV === 'production') {
       const userId = (req as any).userId
       if (!userId) {
         res.status(401).json({ error: '未登录' })
@@ -74,6 +79,8 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }
+    } else if (projectId) {
+      console.log('[KB] Development mode - bypassing editor permission check')
     }
 
     const item = kbRepo.create({ type, title, content, tags: JSON.stringify(tags), project_id: projectId ?? null })
@@ -98,7 +105,7 @@ router.post('/search', authMiddleware, async (req: Request, res: Response) => {
     }
 
     // Permission check if project-specific search
-    if (projectId) {
+    if (projectId && process.env.NODE_ENV === 'production') {
       const userId = (req as any).userId
       if (!userId) {
         res.status(401).json({ error: '未登录' })
@@ -116,6 +123,8 @@ router.post('/search', authMiddleware, async (req: Request, res: Response) => {
           return
         }
       }
+    } else if (projectId) {
+      console.log('[KB Search] Development mode - bypassing permission check')
     }
 
     const result = queryKnowledgeBase(query, projectId, limit)
@@ -138,7 +147,7 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
     }
 
     // Permission check if project-specific KB item
-    if (item.project_id) {
+    if (item.project_id && process.env.NODE_ENV === 'production') {
       const userId = (req as any).userId
       if (!userId) {
         res.status(401).json({ error: '未登录' })
@@ -151,6 +160,8 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }
+    } else if (item.project_id) {
+      console.log('[KB Delete] Development mode - bypassing editor permission check')
     }
 
     kbRepo.delete(id)

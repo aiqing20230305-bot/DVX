@@ -26,6 +26,17 @@ export interface AuthRequest extends Request {
 export const requireProjectMember = (minRole: 'viewer' | 'editor' | 'owner' = 'viewer') => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+      // Development mode: ALWAYS bypass in development (本地跑就是最高权限)
+      const isDevelopment = process.env.NODE_ENV !== 'production'
+
+      console.log(`[Permission] Checking permission - minRole: ${minRole}, NODE_ENV: ${process.env.NODE_ENV}, isDevelopment: ${isDevelopment}`)
+
+      if (isDevelopment) {
+        console.log(`[Permission] ✓ Development mode - bypassing all permission checks`)
+        next()
+        return
+      }
+
       // 1. 检查用户是否已登录（authMiddleware 应该在此中间件之前）
       const userId = req.userId
 
@@ -34,13 +45,6 @@ export const requireProjectMember = (minRole: 'viewer' | 'editor' | 'owner' = 'v
           error: '未登录',
           message: '请先登录再访问此资源'
         })
-      }
-
-      // Development mode: bypass role checks (but user must be logged in)
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`[Permission] Development mode - bypassing ${minRole} role check for user ${userId}`)
-        next()
-        return
       }
 
       // 2. 从请求中提取项目 ID（支持多种参数位置）

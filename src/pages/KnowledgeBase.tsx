@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { BookOpen, Search, Plus, Trash2, Tag, Filter, AlertCircle } from 'lucide-react'
+import { BookOpen, Search, Plus, Trash2, Tag, Filter, AlertCircle, Sparkles } from 'lucide-react'
 import { kbApi } from '../api/kb.api.js'
 import { KBItem } from '../types/index.js'
 import { Button } from '../components/shared/Button.js'
 import { Modal } from '../components/shared/Modal.js'
 import { Badge } from '../components/shared/Badge.js'
 import { useProjectStore } from '../store/project.store.js'
+import { KBSearch, KBSearchResult } from '../components/kb/KBSearch.js'
 
 const typeOptions: Array<{ value: KBItem['type']; label: string }> = [
   { value: 'report', label: '战略报告' },
@@ -37,6 +38,7 @@ export function KnowledgeBase() {
   const [viewItem, setViewItem] = useState<KBItem | null>(null)
   const [form, setForm] = useState({ type: 'other' as KBItem['type'], title: '', content: '', tags: '' })
   const [creating, setCreating] = useState(false)
+  const [searchMode, setSearchMode] = useState<'basic' | 'ai'>('basic')
 
   const fetchItems = useCallback(async () => {
     if (!activeProjectId) {
@@ -77,6 +79,21 @@ export function KnowledgeBase() {
     setItems(prev => prev.filter(i => i.id !== id))
   }
 
+  const handleAISearchResult = (result: KBSearchResult) => {
+    // Convert KBSearchResult to KBItem for viewing
+    const item: KBItem = {
+      id: result.id,
+      type: result.type,
+      title: result.title,
+      content: result.content,
+      tags: result.tags,
+      project_id: result.project_id,
+      created_at: result.created_at,
+      updated_at: result.updated_at
+    }
+    setViewItem(item)
+  }
+
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
@@ -104,72 +121,132 @@ export function KnowledgeBase() {
         </div>
       )}
 
-      {/* Controls */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        {/* Search */}
-        <div className="flex-1 min-w-48 relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-text-tertiary)' }} />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="搜索标题、内容、标签..."
-            className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1"
-            style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
-              borderColor: 'var(--color-border)',
-              color: 'var(--color-text-primary)'
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-primary)';
-              e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+      {/* Search Mode Toggle */}
+      <div className="flex items-center gap-2 mb-4">
+        <button
+          onClick={() => setSearchMode('basic')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            searchMode === 'basic'
+              ? 'text-white'
+              : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
+          }`}
+          style={{
+            backgroundColor: searchMode === 'basic' ? 'var(--color-primary)' : 'transparent'
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <Search size={14} />
+            <span>基础搜索</span>
+          </div>
+        </button>
+        <button
+          onClick={() => setSearchMode('ai')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            searchMode === 'ai'
+              ? 'text-white'
+              : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
+          }`}
+          style={{
+            backgroundColor: searchMode === 'ai' ? 'var(--color-primary)' : 'transparent'
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles size={14} />
+            <span>AI智能搜索</span>
+          </div>
+        </button>
+      </div>
+
+      {/* Search Panel */}
+      {searchMode === 'basic' ? (
+        <>
+          {/* Controls */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            {/* Search */}
+            <div className="flex-1 min-w-48 relative">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-text-tertiary)' }} />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="搜索标题、内容、标签..."
+                className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1"
+                style={{
+                  backgroundColor: 'var(--color-bg-tertiary)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            {/* Type filter */}
+            <div className="relative">
+              <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--color-text-tertiary)' }} />
+              <select
+                value={filterType}
+                onChange={e => setFilterType(e.target.value)}
+                className="pl-8 pr-8 py-2 border rounded-lg text-sm focus:outline-none appearance-none cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--color-bg-tertiary)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
+              >
+                <option value="">全部类型</option>
+                {typeOptions.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <Button
+              icon={<Plus size={15} />}
+              onClick={() => setModalOpen(true)}
+              disabled={!activeProjectId}
+            >
+              新增条目
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="mb-6 p-6 rounded-xl border" style={{
+          backgroundColor: 'var(--color-bg-elevated-1)',
+          borderColor: 'var(--color-border)'
+        }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles size={18} style={{ color: 'var(--color-primary)' }} />
+            <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>AI智能搜索</h3>
+          </div>
+          <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+            使用 FTS5 全文检索和 BM25 排序算法，智能匹配知识库内容
+          </p>
+          <KBSearch
+            projectId={activeProjectId}
+            onResultClick={handleAISearchResult}
           />
         </div>
+      )}
 
-        {/* Type filter */}
-        <div className="relative">
-          <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--color-text-tertiary)' }} />
-          <select
-            value={filterType}
-            onChange={e => setFilterType(e.target.value)}
-            className="pl-8 pr-8 py-2 border rounded-lg text-sm focus:outline-none appearance-none cursor-pointer"
-            style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
-              borderColor: 'var(--color-border)',
-              color: 'var(--color-text-primary)'
-            }}
-            onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-            onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
-          >
-            <option value="">全部类型</option>
-            {typeOptions.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+      {/* Stats - Only show in basic search mode */}
+      {searchMode === 'basic' && (
+        <>
+          <div className="flex gap-4 mb-6 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+            <span>共 {items.length} 条记录</span>
+            {filterType && <span>· 筛选：{typeOptions.find(t => t.value === filterType)?.label}</span>}
+            {search && <span>· 搜索："{search}"</span>}
+          </div>
 
-        <Button
-          icon={<Plus size={15} />}
-          onClick={() => setModalOpen(true)}
-          disabled={!activeProjectId}
-        >
-          新增条目
-        </Button>
-      </div>
-
-      {/* Stats */}
-      <div className="flex gap-4 mb-6 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-        <span>共 {items.length} 条记录</span>
-        {filterType && <span>· 筛选：{typeOptions.find(t => t.value === filterType)?.label}</span>}
-        {search && <span>· 搜索："{search}"</span>}
-      </div>
-
-      {/* Items grid */}
+          {/* Items grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[...Array(6)].map((_, i) => (
@@ -233,6 +310,8 @@ export function KnowledgeBase() {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
 
       {/* Create Modal */}

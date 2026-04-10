@@ -125,6 +125,14 @@ router.get('/:projectId', authMiddleware, async (req: Request, res: Response) =>
     const projectId = req.params.projectId as string
     const userId = (req as any).userId
 
+    // Development mode: bypass permission checks (本地跑就是最高权限)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Upload] Development mode - bypassing permission check')
+      const uploads = uploadRepo.findByProject(projectId)
+      res.json({ uploads })
+      return
+    }
+
     // Permission check with backward compatibility
     const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
     const hasPermission = projectMemberRepo.hasRole(projectId, userId, 'viewer')

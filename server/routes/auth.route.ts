@@ -186,6 +186,21 @@ router.post('/refresh', async (req: Request, res: Response) => {
  */
 router.get('/me', authMiddleware, (req: Request, res: Response) => {
   try {
+    // Development mode: return mock user directly
+    if (process.env.NODE_ENV !== 'production' && req.user!.userId === 'dev-user-mock') {
+      res.json({
+        user: {
+          id: 'dev-user-mock',
+          email: 'dev@example.com',
+          name: '开发测试用户',
+          role: 'admin',
+          created_at: Date.now(),
+          updated_at: Date.now()
+        }
+      })
+      return
+    }
+
     const userId = req.user!.userId
     const user = userRepo.findById(userId)
 

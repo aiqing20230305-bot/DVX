@@ -28,7 +28,7 @@ export async function parsePDF(
   let pageCount: number
 
   try {
-    onProgress?.(1, 2) // 步骤1：提取文本
+    onProgress?.(1, 3) // 步骤1/3：提取文本
     const parser = new PDFParse(uint8Array)
     const textResult = await parser.getText()
 
@@ -45,7 +45,7 @@ export async function parsePDF(
   }
 
   // Step 2: 让Claude分析提取的文本（比处理PDF二进制快得多）
-  onProgress?.(2, 2) // 步骤2：AI分析
+  onProgress?.(2, 3) // 步骤2/3：开始AI分析
   const client = getAnthropicClient()
 
   // 如果文本过长，截取前20000字符（约3000 tokens）
@@ -84,6 +84,8 @@ ${textToAnalyze}
 
     const textBlock = response.content.find(b => b.type === 'text')
     const rawText = textBlock?.type === 'text' ? textBlock.text : '{}'
+
+    onProgress?.(3, 3) // 步骤3/3：AI分析完成
 
     try {
       const cleanJson = rawText.replace(/```json\n?|\n?```/g, '').trim()
