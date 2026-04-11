@@ -237,10 +237,10 @@ export function Sidebar() {
                   isActive ? '' : ''
                 ].join(' ')}
                 style={({ isActive }) => isActive ? {
-                  backgroundColor: 'rgba(99, 91, 255, 0.2)',
-                  color: 'var(--color-primary-light)',
-                  borderColor: 'rgba(99, 91, 255, 0.3)',
-                  boxShadow: '0 10px 15px -3px rgba(99, 91, 255, 0.2)'
+                  backgroundColor: 'rgba(94, 106, 210, 0.15)',
+                  color: 'var(--color-primary)',
+                  borderColor: 'rgba(94, 106, 210, 0.3)',
+                  boxShadow: '0 10px 15px -3px rgba(94, 106, 210, 0.2)'
                 } : {
                   color: 'var(--color-text-secondary)',
                   borderColor: 'transparent'

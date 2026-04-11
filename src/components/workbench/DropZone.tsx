@@ -133,7 +133,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
                 </div>
               )}
               <div className="font-medium text-[#1F2329] mb-1">{option.label}</div>
-              <div className="text-xs text-[#8F959E]">{option.description}</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{option.description}</div>
             </button>
           ))}
         </div>
@@ -198,15 +198,15 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
           {/* File type badges */}
           <div className="flex flex-wrap gap-2 mt-2 justify-center">
             {[
-              { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: 'text-emerald-400', bg: 'rgba(16, 185, 129, 0.1)' },
-              { icon: <FileText size={14} />, label: 'PDF', color: 'text-red-400', bg: 'rgba(239, 68, 68, 0.1)' },
-              { icon: <Image size={14} />, label: '图片', color: 'text-blue-400', bg: 'rgba(59, 130, 246, 0.1)' },
-              { icon: <Film size={14} />, label: '视频', color: 'text-purple-400', bg: 'rgba(168, 85, 247, 0.1)' },
+              { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: 'var(--color-success)', bg: 'var(--color-success-bg)' },
+              { icon: <FileText size={14} />, label: 'PDF', color: 'var(--color-error)', bg: 'var(--color-error-bg)' },
+              { icon: <Image size={14} />, label: '图片', color: 'var(--color-info)', bg: 'var(--color-info-bg)' },
+              { icon: <Film size={14} />, label: '视频', color: 'var(--color-primary)', bg: 'var(--color-primary-subtle)' },
             ].map(({ icon, label, color, bg }) => (
               <span
                 key={label}
-                className={`flex items-center gap-1.5 text-xs ${color} px-3 py-1.5 rounded-full`}
-                style={{ backgroundColor: bg }}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                style={{ color, backgroundColor: bg }}
               >
                 {icon}
                 {label}
