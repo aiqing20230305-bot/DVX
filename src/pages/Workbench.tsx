@@ -272,7 +272,7 @@ export function Workbench() {
         }}>
           <div className="flex items-center gap-2 mb-3">
             <Film size={16} style={{ color: 'var(--color-primary)' }} />
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>视频URL分析</h3>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>视频URL分析</h2>
             <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>输入视频链接，AI自动提取关键帧并分析</span>
           </div>
           <div className="flex gap-2">
