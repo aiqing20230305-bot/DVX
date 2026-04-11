@@ -6,7 +6,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   error?: string
   success?: boolean
   leftIcon?: LucideIcon
-  rightIcon?: RightIcon
+  rightIcon?: LucideIcon
   onRightIconClick?: () => void
   helperText?: string
   size?: 'sm' | 'md' | 'lg'

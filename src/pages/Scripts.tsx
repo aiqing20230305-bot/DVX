@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle, Clock, XCircle, RefreshCw, Loader2, AlertCircle } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useTopicStore } from '../store/topic.store.js'
 import { useScriptStore } from '../store/script.store.js'
@@ -23,10 +23,22 @@ import { PlatformBadge } from '../components/shared/Badge.js'
 import { exportScriptsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
 import { persistFilters } from '../utils/storage.js'
+import { toFriendlyError } from '../utils/error-message.js'
 
 // Product detail type for enhanced product selector
 // Product list is simple string array from API
 // Future v2.8.0 will add structured ProductDetail
+
+// v2.5.3 Phase 1: 批量操作进度优化 - 每个选题的独立状态
+interface BatchTopicStatus {
+  topicId: string
+  title: string
+  status: 'pending' | 'generating' | 'success' | 'error'
+  message?: string      // 当前进度消息（如"正在生成A版本..."）
+  error?: string        // 友好错误消息
+  canRetry?: boolean    // 是否可以重试
+  retrying?: boolean    // 是否正在重试
+}
 
 export function Scripts() {
   const navigate = useNavigate()
@@ -53,6 +65,7 @@ export function Scripts() {
   const [batchGenerateDialogOpen, setBatchGenerateDialogOpen] = useState(false)
   const [batchGenerating, setBatchGenerating] = useState(false)
   const [batchProgress, setBatchProgress] = useState({ completed: 0, total: 0, current: '' })
+  const [batchTopicStatuses, setBatchTopicStatuses] = useState<Map<string, BatchTopicStatus>>(new Map())
   const [productList, setProductList] = useState<string[]>([])
   const [selectedProduct, setSelectedProduct] = useState<string>('')
 
@@ -94,9 +107,49 @@ export function Scripts() {
       } else if (event === 'batch_start') {
         setBatchGenerating(true)
         setBatchProgress({ completed: 0, total: (data as any).total || 0, current: '' })
+        // v2.5.3 Phase 1: 初始化所有选题状态为pending
+        const initialStatuses = new Map<string, BatchTopicStatus>()
+        const eventData = data as any
+        if (eventData.topics && Array.isArray(eventData.topics)) {
+          eventData.topics.forEach((topic: { id: string; title: string }) => {
+            initialStatuses.set(topic.id, {
+              topicId: topic.id,
+              title: topic.title,
+              status: 'pending',
+              canRetry: false
+            })
+          })
+        }
+        setBatchTopicStatuses(initialStatuses)
       } else if (event === 'topic_start') {
         setBatchProgress(prev => ({ ...prev, current: (data as any).title || '' }))
         setExpandedTopics(prev => new Set(prev).add((data as any).topicId))
+        // v2.5.3 Phase 1: 更新该选题状态为generating
+        const topicId = (data as any).topicId
+        if (topicId) {
+          setBatchTopicStatuses(prev => {
+            const next = new Map(prev)
+            const current = next.get(topicId)
+            if (current) {
+              next.set(topicId, { ...current, status: 'generating', message: '正在生成...' })
+            }
+            return next
+          })
+        }
+      } else if (event === 'generating') {
+        // v2.5.3 Phase 1: 更新生成进度消息（如"正在生成A版本..."）
+        const topicId = (data as any).topicId
+        const message = (data as any).message
+        if (topicId && message) {
+          setBatchTopicStatuses(prev => {
+            const next = new Map(prev)
+            const current = next.get(topicId)
+            if (current && current.status === 'generating') {
+              next.set(topicId, { ...current, message })
+            }
+            return next
+          })
+        }
       } else if (event === 'script_created') {
         addScript(data as Script)
       } else if (event === 'topic_complete') {
@@ -105,12 +158,47 @@ export function Scripts() {
           completed: (data as any).progress || prev.completed + 1,
           current: ''
         }))
+        // v2.5.3 Phase 1: 更新该选题状态为success
+        const topicId = (data as any).topicId
+        if (topicId) {
+          setBatchTopicStatuses(prev => {
+            const next = new Map(prev)
+            const current = next.get(topicId)
+            if (current) {
+              next.set(topicId, { ...current, status: 'success', message: '生成完成' })
+            }
+            return next
+          })
+        }
       } else if (event === 'batch_complete') {
         setBatchGenerating(false)
         setStatus('success')
         toast.success('批量生成完成', `已生成 ${(data as any).completed}/${(data as any).total} 个选题的脚本`)
       } else if (event === 'topic_error') {
-        toast.error(`生成失败`, `${(data as any).title}: ${(data as any).error}`)
+        // v2.5.3 Phase 1: 保存错误到状态，使用友好错误消息
+        const topicId = (data as any).topicId
+        const error = (data as any).error
+        const friendlyError = toFriendlyError(error)
+
+        if (topicId) {
+          setBatchTopicStatuses(prev => {
+            const next = new Map(prev)
+            const current = next.get(topicId)
+            if (current) {
+              next.set(topicId, {
+                ...current,
+                status: 'error',
+                error: friendlyError.userMessage,
+                canRetry: friendlyError.canRetry,
+                message: undefined
+              })
+            }
+            return next
+          })
+        }
+
+        // 仍然显示toast，但使用友好错误消息
+        toast.error(`生成失败`, `${(data as any).title}: ${friendlyError.userMessage}`)
       } else if (event === 'complete') {
         setStatus('success')
       } else if (event === 'error') {
@@ -231,13 +319,88 @@ export function Scripts() {
       return
     }
 
-    setBatchGenerateDialogOpen(false)
+    // v2.5.3 Phase 1: 初始化所有选题状态为pending
+    const initialStatuses = new Map<string, BatchTopicStatus>()
+    topicsWithoutScripts.forEach(topic => {
+      initialStatuses.set(topic.id, {
+        topicId: topic.id,
+        title: topic.title,
+        status: 'pending',
+        canRetry: false
+      })
+    })
+    setBatchTopicStatuses(initialStatuses)
+
+    // Keep dialog open to show progress
+    // setBatchGenerateDialogOpen(false) // 注释掉，保持对话框打开显示进度
     setStatus('streaming')
     setBatchGenerating(true)
 
     const topicIds = topicsWithoutScripts.map(t => t.id)
     await startStream(scriptApi.generateBatchStream(activeProjectId, topicIds, selectedProduct || undefined))
   }, [activeProjectId, selectedTopics, scripts, startStream, setStatus, selectedProduct])
+
+  // v2.5.3 Phase 1: 单个选题重试功能
+  const handleRetryTopic = useCallback(async (topicId: string) => {
+    if (!activeProjectId) return
+
+    // 更新状态为generating + retrying
+    setBatchTopicStatuses(prev => {
+      const next = new Map(prev)
+      const current = next.get(topicId)
+      if (current) {
+        next.set(topicId, {
+          ...current,
+          status: 'generating',
+          retrying: true,
+          message: '正在重试...',
+          error: undefined
+        })
+      }
+      return next
+    })
+
+    // 调用单个选题生成API（不是批量API）
+    try {
+      setStatus('streaming')
+      setExpandedTopics(prev => new Set(prev).add(topicId))
+      await startStream(scriptApi.generateStream(activeProjectId, topicId))
+
+      // 成功后更新状态
+      setBatchTopicStatuses(prev => {
+        const next = new Map(prev)
+        const current = next.get(topicId)
+        if (current) {
+          next.set(topicId, {
+            ...current,
+            status: 'success',
+            retrying: false,
+            message: '生成完成'
+          })
+        }
+        return next
+      })
+    } catch (error) {
+      // 失败后更新状态
+      const friendlyError = toFriendlyError(error)
+      setBatchTopicStatuses(prev => {
+        const next = new Map(prev)
+        const current = next.get(topicId)
+        if (current) {
+          next.set(topicId, {
+            ...current,
+            status: 'error',
+            retrying: false,
+            error: friendlyError.userMessage,
+            canRetry: friendlyError.canRetry,
+            message: undefined
+          })
+        }
+        return next
+      })
+      toast.error('重试失败', friendlyError.userMessage)
+    }
+  }, [activeProjectId, startStream, setStatus])
 
   const handleSaveScript = async (id: string, data: { segments: ScriptSegment[]; fullText: string; wordCount: number }) => {
     await scriptApi.update(id, data)
@@ -753,41 +916,144 @@ export function Scripts() {
               </div>
             )}
 
-            <div className="mb-6 px-4 py-3 rounded-lg" style={{
-              backgroundColor: 'var(--color-bg-elevated-1)',
-              borderLeft: '3px solid var(--color-primary)'
-            }}>
-              <div className="flex items-center gap-2 mb-2">
-                <Zap size={16} style={{ color: 'var(--color-primary)' }} />
-                <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                  待生成选题
-                </span>
+            {/* v2.5.3 Phase 1: 批量生成进度显示 - 每个选题的独立状态 */}
+            {batchTopicStatuses.size === 0 ? (
+              // 未开始生成：显示静态选题列表
+              <div className="mb-6 px-4 py-3 rounded-lg" style={{
+                backgroundColor: 'var(--color-bg-elevated-1)',
+                borderLeft: '3px solid var(--color-primary)'
+              }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap size={16} style={{ color: 'var(--color-primary)' }} />
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                    待生成选题
+                  </span>
+                </div>
+                <div className="space-y-1.5 mt-3">
+                  {selectedTopics.filter(topic => {
+                    const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                    return topicScripts.length === 0
+                  }).slice(0, 10).map(topic => (
+                    <div key={topic.id} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
+                      <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                        {topic.title}
+                      </span>
+                    </div>
+                  ))}
+                  {selectedTopics.filter(topic => {
+                    const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                    return topicScripts.length === 0
+                  }).length > 10 && (
+                    <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                      ... 还有 {selectedTopics.filter(topic => {
+                        const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                        return topicScripts.length === 0
+                      }).length - 10} 个选题
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="space-y-1.5 mt-3">
-                {selectedTopics.filter(topic => {
-                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
-                  return topicScripts.length === 0
-                }).slice(0, 10).map(topic => (
-                  <div key={topic.id} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
-                    <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                      {topic.title}
-                    </span>
-                  </div>
-                ))}
-                {selectedTopics.filter(topic => {
-                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
-                  return topicScripts.length === 0
-                }).length > 10 && (
-                  <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                    ... 还有 {selectedTopics.filter(topic => {
-                      const topicScripts = scripts.filter(s => s.topic_id === topic.id)
-                      return topicScripts.length === 0
-                    }).length - 10} 个选题
-                  </div>
-                )}
+            ) : (
+              // 生成中或已完成：显示每个选题的实时状态
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Zap size={16} style={{ color: 'var(--color-primary)' }} />
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                    生成进度
+                  </span>
+                </div>
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {Array.from(batchTopicStatuses.values()).map(topicStatus => {
+                    // 状态图标
+                    const StatusIcon =
+                      topicStatus.status === 'pending' ? Clock :
+                      topicStatus.status === 'generating' ? (topicStatus.retrying ? RefreshCw : Loader2) :
+                      topicStatus.status === 'success' ? CheckCircle :
+                      topicStatus.status === 'error' ? XCircle :
+                      Clock
+
+                    // 状态颜色
+                    const statusColor =
+                      topicStatus.status === 'pending' ? 'var(--color-text-tertiary)' :
+                      topicStatus.status === 'generating' ? 'var(--color-primary)' :
+                      topicStatus.status === 'success' ? 'var(--color-success)' :
+                      topicStatus.status === 'error' ? 'var(--color-error)' :
+                      'var(--color-text-tertiary)'
+
+                    return (
+                      <div
+                        key={topicStatus.topicId}
+                        className="px-3 py-2.5 rounded-lg border"
+                        style={{
+                          backgroundColor: 'var(--color-bg-elevated-1)',
+                          borderColor: topicStatus.status === 'error' ? 'var(--color-error-border)' : 'var(--color-border)'
+                        }}
+                      >
+                        <div className="flex items-start gap-2">
+                          {/* 状态图标 */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            <StatusIcon
+                              size={14}
+                              style={{ color: statusColor }}
+                              className={topicStatus.status === 'generating' && !topicStatus.retrying ? 'animate-spin' : ''}
+                            />
+                          </div>
+
+                          {/* 选题标题和状态 */}
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-medium mb-1 truncate" style={{ color: 'var(--color-text-primary)' }}>
+                              {topicStatus.title}
+                            </div>
+
+                            {/* 进度消息或错误消息 */}
+                            {topicStatus.message && (
+                              <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                                {topicStatus.message}
+                              </div>
+                            )}
+
+                            {/* 错误消息 */}
+                            {topicStatus.error && (
+                              <div className="flex items-start gap-1.5 mt-1">
+                                <AlertCircle size={12} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--color-error)' }} />
+                                <div className="text-xs" style={{ color: 'var(--color-error)' }}>
+                                  {topicStatus.error}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 重试按钮（仅失败且可重试时显示） */}
+                          {topicStatus.status === 'error' && topicStatus.canRetry && (
+                            <button
+                              onClick={() => handleRetryTopic(topicStatus.topicId)}
+                              disabled={topicStatus.retrying}
+                              className="flex-shrink-0 px-2 py-1 text-xs rounded-md border transition-all duration-150"
+                              style={{
+                                backgroundColor: 'var(--color-bg-elevated-2)',
+                                borderColor: 'var(--color-border)',
+                                color: 'var(--color-text-secondary)'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--color-primary)'
+                                e.currentTarget.style.color = 'var(--color-primary)'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--color-border)'
+                                e.currentTarget.style.color = 'var(--color-text-secondary)'
+                              }}
+                            >
+                              {topicStatus.retrying ? '重试中...' : '重试'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {selectedTopics.filter(topic => {
               const topicScripts = scripts.filter(s => s.topic_id === topic.id)
@@ -823,31 +1089,50 @@ export function Scripts() {
             )}
 
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setBatchGenerateDialogOpen(false)}
-                className="flex-1"
-              >
-                取消
-              </Button>
-              <Button
-                variant="ai"
-                onClick={handleBatchGenerate}
-                icon={<Zap size={15} />}
-                className="flex-1"
-                disabled={selectedTopics.filter(topic => {
-                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
-                  return topicScripts.length === 0
-                }).length === 0 || selectedTopics.filter(topic => {
-                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
-                  return topicScripts.length === 0
-                }).length > 10}
-              >
-                生成 {selectedTopics.filter(topic => {
-                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
-                  return topicScripts.length === 0
-                }).length} 个选题的脚本
-              </Button>
+              {/* v2.5.3 Phase 1: 根据生成状态显示不同按钮 */}
+              {batchTopicStatuses.size === 0 ? (
+                // 未开始生成：显示取消和生成按钮
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setBatchGenerateDialogOpen(false)}
+                    className="flex-1"
+                  >
+                    取消
+                  </Button>
+                  <Button
+                    variant="ai"
+                    onClick={handleBatchGenerate}
+                    icon={<Zap size={15} />}
+                    className="flex-1"
+                    disabled={selectedTopics.filter(topic => {
+                      const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                      return topicScripts.length === 0
+                    }).length === 0 || selectedTopics.filter(topic => {
+                      const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                      return topicScripts.length === 0
+                    }).length > 10}
+                  >
+                    生成 {selectedTopics.filter(topic => {
+                      const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                      return topicScripts.length === 0
+                    }).length} 个选题的脚本
+                  </Button>
+                </>
+              ) : (
+                // 生成中或已完成：显示关闭按钮
+                <Button
+                  variant={batchGenerating ? 'secondary' : 'primary'}
+                  onClick={() => {
+                    setBatchGenerateDialogOpen(false)
+                    setBatchTopicStatuses(new Map()) // 清空状态
+                  }}
+                  className="flex-1"
+                  disabled={batchGenerating}
+                >
+                  {batchGenerating ? '生成中...' : '关闭'}
+                </Button>
+              )}
             </div>
           </div>
         </div>
