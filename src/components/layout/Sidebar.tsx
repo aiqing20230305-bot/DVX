@@ -101,7 +101,7 @@ export function Sidebar() {
         'flex flex-col h-full border-r transition-all duration-300 flex-shrink-0',
         'md:relative fixed left-0 top-0 bottom-0 z-50',
         sidebarCollapsed ? 'w-16 md:w-16 -translate-x-full md:translate-x-0' : 'w-60'
-      ].join(' ')} style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+      ].join(' ')} style={{ backgroundColor: 'var(--color-bg-elevated-1)', borderColor: 'var(--color-border)' }}>
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg" style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 10px 15px -3px rgba(99, 91, 255, 0.5)' }}>
@@ -124,7 +124,7 @@ export function Sidebar() {
                   onClick={() => activeProject && navigate(`/project/${activeProject.id}`)}
                   className="flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-l-lg border transition-colors text-left"
                   style={{
-                    backgroundColor: 'var(--color-bg-tertiary)',
+                    backgroundColor: 'var(--color-bg-elevated-2)',
                     borderColor: 'var(--color-border)'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
@@ -142,7 +142,7 @@ export function Sidebar() {
                   onClick={() => setProjectDropdown(!projectDropdown)}
                   className="px-2 rounded-r-lg border border-l-0 transition-colors flex items-center"
                   style={{
-                    backgroundColor: 'var(--color-bg-tertiary)',
+                    backgroundColor: 'var(--color-bg-elevated-2)',
                     borderColor: 'var(--color-border)'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}
@@ -161,7 +161,7 @@ export function Sidebar() {
                       key={project.id}
                       className="flex items-center gap-2 px-3 py-2 cursor-pointer group transition-colors duration-150"
                       style={{ animationDelay: `${index * 30}ms` }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       onClick={() => { setActiveProject(project.id); setProjectDropdown(false) }}
                     >
@@ -190,7 +190,7 @@ export function Sidebar() {
                   <div
                     className="flex items-center gap-2 px-3 py-2.5 cursor-pointer border-t transition-colors"
                     style={{ borderColor: 'var(--color-border)', color: 'var(--color-primary-light)' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     onClick={() => { setProjectDropdown(false); handleOpenNewProject() }}
                   >
@@ -211,7 +211,7 @@ export function Sidebar() {
                 color: 'var(--color-text-secondary)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
                 e.currentTarget.style.borderColor = 'var(--color-primary)';
                 e.currentTarget.style.color = 'var(--color-primary)';
               }}
@@ -252,7 +252,7 @@ export function Sidebar() {
                   const target = e.currentTarget;
                   if (!target.classList.contains('active')) {
                     target.style.color = 'var(--color-text-primary)';
-                    target.style.backgroundColor = 'var(--color-bg-tertiary)';
+                    target.style.backgroundColor = 'var(--color-bg-elevated-2)';
                     target.style.borderColor = 'var(--color-border)';
                     target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.2)';
                   }
@@ -285,7 +285,7 @@ export function Sidebar() {
                 className="flex items-center gap-2 w-full px-2 py-2 rounded-lg transition-colors"
                 style={{ color: 'var(--color-text-primary)' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                  e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
@@ -319,7 +319,7 @@ export function Sidebar() {
                         style={{ color: 'var(--color-text-secondary)' }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.color = 'var(--color-text-primary)';
-                          e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.color = 'var(--color-text-secondary)';
@@ -348,7 +348,7 @@ export function Sidebar() {
               style={{ color: 'var(--color-text-secondary)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = 'var(--color-text-primary)';
-                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.color = 'var(--color-text-secondary)';
@@ -411,7 +411,7 @@ export function Sidebar() {
                 placeholder="例如：618大促内容战略"
                 className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm"
                 style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
+                  backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)'
                 }}
@@ -435,7 +435,7 @@ export function Sidebar() {
                 rows={3}
                 className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm resize-none"
                 style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
+                  backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)'
                 }}

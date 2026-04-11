@@ -303,7 +303,7 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
             onChange={(e) => setSelectedTemplate(e.target.value)}
             className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent"
             style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
+              backgroundColor: 'var(--color-bg-elevated-2)',
               borderColor: 'var(--color-border)',
               color: 'var(--color-text-primary)'
             }}

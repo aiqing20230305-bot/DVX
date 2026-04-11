@@ -194,7 +194,7 @@ export function KBSearch({ projectId, onResultClick }: KBSearchProps) {
                           key={idx}
                           className="px-2 py-0.5 rounded-full text-xs"
                           style={{
-                            backgroundColor: 'var(--color-bg-tertiary)',
+                            backgroundColor: 'var(--color-bg-elevated-2)',
                             color: 'var(--color-text-tertiary)'
                           }}
                         >

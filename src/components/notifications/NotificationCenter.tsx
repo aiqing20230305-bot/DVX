@@ -134,7 +134,7 @@ export function NotificationCenter({ token }: NotificationCenterProps) {
         style={{ color: 'var(--color-text-secondary)' }}
         onMouseEnter={(e) => {
           e.currentTarget.style.color = 'var(--color-text-primary)'
-          e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'
+          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)'
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.color = 'var(--color-text-secondary)'
@@ -181,7 +181,7 @@ export function NotificationCenter({ token }: NotificationCenterProps) {
               className="p-1 rounded hover:bg-opacity-10 transition-colors"
               style={{ color: 'var(--color-text-tertiary)' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'
+                e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent'

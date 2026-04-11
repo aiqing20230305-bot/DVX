@@ -34,7 +34,7 @@ export function Shell({ children }: ShellProps) {
   }, [])
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-bg-base)' }}>
       {/* Mobile backdrop */}
       {!sidebarCollapsed && (
         <div

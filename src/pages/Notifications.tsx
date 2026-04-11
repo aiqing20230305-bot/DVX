@@ -160,7 +160,7 @@ export function Notifications() {
       </div>
 
       {/* Notifications List */}
-      <div className="border rounded-xl overflow-hidden" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-secondary)' }}>
+      <div className="border rounded-xl overflow-hidden" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-elevated-1)' }}>
         {loading ? (
           <div className="p-12 text-center">
             <div className="inline-block w-8 h-8 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ color: 'var(--color-primary)' }} />

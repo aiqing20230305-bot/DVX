@@ -128,7 +128,7 @@ export function KnowledgeBase() {
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             searchMode === 'basic'
               ? 'text-white'
-              : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
+              : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated-2)]'
           }`}
           style={{
             backgroundColor: searchMode === 'basic' ? 'var(--color-primary)' : 'transparent'
@@ -144,7 +144,7 @@ export function KnowledgeBase() {
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             searchMode === 'ai'
               ? 'text-white'
-              : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
+              : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated-2)]'
           }`}
           style={{
             backgroundColor: searchMode === 'ai' ? 'var(--color-primary)' : 'transparent'
@@ -172,7 +172,7 @@ export function KnowledgeBase() {
                 placeholder="搜索标题、内容、标签..."
                 className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1"
                 style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
+                  backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)'
                 }}
@@ -195,7 +195,7 @@ export function KnowledgeBase() {
                 onChange={e => setFilterType(e.target.value)}
                 className="pl-8 pr-8 py-2 border rounded-lg text-sm focus:outline-none appearance-none cursor-pointer"
                 style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
+                  backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)'
                 }}
@@ -256,7 +256,7 @@ export function KnowledgeBase() {
       ) : items.length === 0 ? (
         <div className="text-center py-20">
           <div className="w-16 h-16 rounded-2xl border flex items-center justify-center mx-auto mb-4" style={{
-            backgroundColor: 'var(--color-bg-tertiary)',
+            backgroundColor: 'var(--color-bg-elevated-2)',
             borderColor: 'var(--color-border)'
           }}>
             <BookOpen size={28} style={{ color: 'var(--color-text-disabled)' }} />
@@ -271,7 +271,7 @@ export function KnowledgeBase() {
               key={item.id}
               className="border rounded-xl p-4 transition-all card-hover cursor-pointer"
               style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
+                backgroundColor: 'var(--color-bg-elevated-2)',
                 borderColor: 'var(--color-border)'
               }}
               onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}

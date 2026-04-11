@@ -225,7 +225,7 @@ export function Report() {
 
           {/* Tips */}
           <div className="tips-panel mt-4 border rounded-xl p-4" style={{
-            backgroundColor: 'var(--color-bg-tertiary)',
+            backgroundColor: 'var(--color-bg-elevated-2)',
             borderColor: 'var(--color-border)'
           }}>
             <div className="flex items-center gap-2 mb-2">

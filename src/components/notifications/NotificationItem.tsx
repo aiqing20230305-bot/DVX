@@ -65,7 +65,7 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
         backgroundColor: notification.read ? 'transparent' : 'rgba(99, 91, 255, 0.05)'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)'
+        e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)'
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = notification.read ? 'transparent' : 'rgba(99, 91, 255, 0.05)'

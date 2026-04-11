@@ -85,7 +85,7 @@ export function Projects() {
 
           {/* Status filter */}
           <div className="flex gap-1 rounded-lg p-1 border" style={{
-            backgroundColor: 'var(--color-bg-tertiary)',
+            backgroundColor: 'var(--color-bg-elevated-2)',
             borderColor: 'var(--color-border)'
           }}>
             {[
@@ -140,7 +140,7 @@ export function Projects() {
                 key={project.id}
                 className="rounded-lg border transition-all group overflow-hidden"
                 style={{
-                  backgroundColor: 'var(--color-bg-tertiary)',
+                  backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}

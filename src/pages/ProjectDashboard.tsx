@@ -130,7 +130,7 @@ export function ProjectDashboard() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {project.brand && (
               <div className="rounded-lg p-4 border" style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
+                backgroundColor: 'var(--color-bg-elevated-2)',
                 borderColor: 'var(--color-border)'
               }}>
                 <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
@@ -142,7 +142,7 @@ export function ProjectDashboard() {
             )}
             {project.category && (
               <div className="rounded-lg p-4 border" style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
+                backgroundColor: 'var(--color-bg-elevated-2)',
                 borderColor: 'var(--color-border)'
               }}>
                 <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
@@ -154,7 +154,7 @@ export function ProjectDashboard() {
             )}
             {project.target_audience && (
               <div className="rounded-lg p-4 border" style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
+                backgroundColor: 'var(--color-bg-elevated-2)',
                 borderColor: 'var(--color-border)'
               }}>
                 <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
@@ -166,7 +166,7 @@ export function ProjectDashboard() {
             )}
             {project.campaign && (
               <div className="rounded-lg p-4 border" style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
+                backgroundColor: 'var(--color-bg-elevated-2)',
                 borderColor: 'var(--color-border)'
               }}>
                 <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>
