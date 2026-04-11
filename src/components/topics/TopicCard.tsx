@@ -6,6 +6,7 @@ import { PlatformBadge } from '../shared/Badge.js'
 interface TopicCardProps {
   topic: TopicCardType
   selected?: boolean
+  focused?: boolean
   onToggleSelect?: (id: string) => void
   onPriorityChange?: (id: string, priority: number) => void
   onCommentClick?: (topicId: string) => void
@@ -21,6 +22,7 @@ const platformAccent: Record<string, string> = {
 export const TopicCard = React.memo(function TopicCard({
   topic,
   selected = false,
+  focused = false,
   onToggleSelect,
   onPriorityChange,
   onCommentClick,
@@ -53,11 +55,12 @@ export const TopicCard = React.memo(function TopicCard({
       className={[
         'relative border rounded-lg p-4 transition-all duration-200 focus-visible-card',
         selected ? 'shadow-md' : 'hover:shadow-sm hover:-translate-y-0.5',
+        focused && 'ring-2 ring-primary ring-offset-2',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
       style={{
         backgroundColor: 'var(--color-bg-elevated-1)',
-        borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
+        borderColor: selected ? 'var(--color-primary)' : focused ? 'var(--color-primary)' : 'var(--color-border)',
         boxShadow: selected ? '0 0 0 1px var(--color-primary)' : undefined
       }}
       onClick={() => onToggleSelect?.(topic.id)}
@@ -65,9 +68,9 @@ export const TopicCard = React.memo(function TopicCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       tabIndex={onToggleSelect ? 0 : undefined}
-      role={onToggleSelect ? 'button' : undefined}
+      role={onToggleSelect ? 'option' : undefined}
       aria-label={onToggleSelect ? `选择选题: ${topic.title}` : undefined}
-      aria-pressed={onToggleSelect ? selected : undefined}
+      aria-selected={onToggleSelect ? selected : undefined}
     >
       {/* Selection checkbox - show on hover or when selected */}
       {onToggleSelect && (

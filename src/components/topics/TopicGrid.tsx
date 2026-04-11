@@ -14,6 +14,8 @@ interface TopicGridProps {
   onCommentClick?: (topicId: string) => void
   getCommentCount?: (targetType: string, targetId: string) => number
   initialLoading?: boolean
+  focusIndex?: number
+  focusedId?: string | null
 }
 
 export function TopicGrid({
@@ -24,7 +26,9 @@ export function TopicGrid({
   onPriorityChange,
   onCommentClick,
   getCommentCount,
-  initialLoading = false
+  initialLoading = false,
+  focusIndex = 0,
+  focusedId = null
 }: TopicGridProps) {
   // Show skeleton during initial load
   if (initialLoading) {
@@ -63,15 +67,17 @@ export function TopicGrid({
         </div>
         {topics.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {topics.map(t => (
+            {topics.map((t, index) => (
               <TopicCard
                 key={t.id}
                 topic={t}
                 selected={selectedIds.has(t.id)}
+                focused={index === focusIndex}
                 onToggleSelect={onToggleSelect}
                 onPriorityChange={onPriorityChange}
                 onCommentClick={onCommentClick}
                 commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
+                data-keyboard-focus={t.id}
               />
             ))}
           </div>
@@ -96,16 +102,18 @@ export function TopicGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-      {topics.map(t => (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" role="listbox" aria-activedescendant={focusedId || undefined}>
+      {topics.map((t, index) => (
         <TopicCard
           key={t.id}
           topic={t}
           selected={selectedIds.has(t.id)}
+          focused={index === focusIndex}
           onToggleSelect={onToggleSelect}
           onPriorityChange={onPriorityChange}
           onCommentClick={onCommentClick}
           commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
+          data-keyboard-focus={t.id}
         />
       ))}
     </div>

@@ -19,6 +19,7 @@ import { CommentPanel } from '../components/comments/CommentPanel.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { useDebounce } from '../hooks/useDebounce.js'
+import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation.js'
 import { TopicCard } from '../types/index.js'
 import { exportTopicsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
@@ -360,6 +361,15 @@ export function Topics() {
     })
   }, [topics, debouncedSearchQuery, filterPlatform, filterPriority, filterSelected, selectedIds, sortBy, sortAscending])
 
+  // Keyboard navigation for topics list
+  const isGenerating = status === 'streaming' || status === 'loading'
+  const { focusIndex, focusedId } = useKeyboardNavigation({
+    items: sortedTopics,
+    getItemId: (item) => item.id,
+    onSelect: (id) => toggleSelection(id),
+    disabled: isGenerating || sortedTopics.length === 0
+  })
+
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
@@ -572,6 +582,8 @@ export function Topics() {
         onCommentClick={handleCommentClick}
         getCommentCount={getCommentCount}
         initialLoading={initialLoading}
+        focusIndex={focusIndex}
+        focusedId={focusedId}
       />
 
       {/* Confirm Dialog */}

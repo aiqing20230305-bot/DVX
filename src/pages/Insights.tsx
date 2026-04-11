@@ -16,6 +16,7 @@ import { CommentPanel } from '../components/comments/CommentPanel.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { useDebounce } from '../hooks/useDebounce.js'
+import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation.js'
 import { Insight } from '../types/index.js'
 import { exportInsightsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
@@ -279,6 +280,14 @@ export function Insights() {
     })
   }, [insights, debouncedSearchQuery, sortBy, sortAscending])
 
+  // Keyboard navigation for insights list
+  const { focusIndex, focusedId } = useKeyboardNavigation({
+    items: sortedInsights,
+    getItemId: (item) => item.id,
+    onSelect: (id) => toggleSelection(id),
+    disabled: isGenerating || sortedInsights.length === 0
+  })
+
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
@@ -405,6 +414,8 @@ export function Insights() {
         initialLoading={initialLoading}
         onCommentClick={handleCommentClick}
         getCommentCount={getCommentCount}
+        focusIndex={focusIndex}
+        focusedId={focusedId}
       />
 
       {/* Confirm Dialog */}

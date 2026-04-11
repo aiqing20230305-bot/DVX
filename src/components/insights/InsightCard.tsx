@@ -6,6 +6,7 @@ import { InsightTypeBadge, ConfidenceBadge } from '../shared/Badge.js'
 interface InsightCardProps {
   insight: Insight
   selected?: boolean
+  focused?: boolean
   onToggleSelect?: (id: string) => void
   onCommentClick?: (insightId: string) => void
   commentCount?: number
@@ -25,7 +26,7 @@ function TrendIcon({ trend }: { trend?: string }) {
   return <Minus size={14} style={{ color: 'var(--color-text-tertiary)' }} />
 }
 
-export const InsightCard = React.memo(function InsightCard({ insight, selected = false, onToggleSelect, onCommentClick, commentCount = 0 }: InsightCardProps) {
+export const InsightCard = React.memo(function InsightCard({ insight, selected = false, focused = false, onToggleSelect, onCommentClick, commentCount = 0 }: InsightCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isTitleHovered, setIsTitleHovered] = useState(false)
 
@@ -47,11 +48,12 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
         selected
           ? 'shadow-md'
           : 'hover:shadow-sm',
+        focused && 'ring-2 ring-primary ring-offset-2',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
       style={{
         backgroundColor: 'var(--color-bg-elevated-1)',
-        borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
+        borderColor: selected ? 'var(--color-primary)' : focused ? 'var(--color-primary)' : 'var(--color-border)',
         boxShadow: selected ? '0 0 0 1px var(--color-primary)' : undefined
       }}
       onClick={() => onToggleSelect?.(insight.id)}
@@ -59,9 +61,9 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       tabIndex={onToggleSelect ? 0 : undefined}
-      role={onToggleSelect ? 'button' : undefined}
+      role={onToggleSelect ? 'option' : undefined}
       aria-label={onToggleSelect ? `选择洞察: ${insight.title}` : undefined}
-      aria-pressed={onToggleSelect ? selected : undefined}
+      aria-selected={onToggleSelect ? selected : undefined}
     >
       {/* Selection checkbox - show on hover or when selected */}
       {onToggleSelect && (
