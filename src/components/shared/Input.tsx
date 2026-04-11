@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes, forwardRef, useState } from 'react'
-import { LucideIcon } from 'lucide-react'
+import { LucideIcon, AlertCircle } from 'lucide-react'
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string
@@ -11,6 +11,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   helperText?: string
   size?: 'sm' | 'md' | 'lg'
   borderless?: boolean  // Linear风格无边框输入
+  floatingLabel?: boolean  // Phase 3.2: 浮动标签（在focus或有值时向上浮动）
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -25,6 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       helperText,
       size = 'md',
       borderless = false,
+      floatingLabel = false,
       className = '',
       disabled,
       ...props
@@ -33,6 +35,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const [isFocused, setIsFocused] = useState(false)
     const [hasValue, setHasValue] = useState(!!props.value || !!props.defaultValue)
+
+    // Phase 3.2: 浮动标签激活条件
+    const isLabelFloating = floatingLabel && (isFocused || hasValue)
 
     // 设计系统v2.0 - Linear风格尺寸
     const sizeClasses = {
@@ -60,26 +65,47 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="w-full">
-        {/* Label */}
-        {label && (
-          <label
-            className="block mb-1.5 text-sm font-medium transition-colors duration-100"
-            style={{
-              color: error
-                ? 'var(--color-error)'
-                : success
-                  ? 'var(--color-success)'
-                  : isFocused
-                    ? 'var(--color-primary)'
-                    : 'var(--color-text-secondary)'
-            }}
-          >
-            {label}
-          </label>
-        )}
+        {/* Input Container (Phase 3.2: 浮动标签需要包含label) */}
+        <div className={`relative ${floatingLabel ? 'pt-2' : ''}`}>
+          {/* Label - 两种模式 */}
+          {label && !floatingLabel && (
+            <label
+              className="block mb-1.5 text-sm font-medium transition-colors duration-100"
+              style={{
+                color: error
+                  ? 'var(--color-error)'
+                  : success
+                    ? 'var(--color-success)'
+                    : isFocused
+                      ? 'var(--color-primary)'
+                      : 'var(--color-text-secondary)'
+              }}
+            >
+              {label}
+            </label>
+          )}
 
-        {/* Input Container */}
-        <div className="relative">
+          {/* Floating Label (Phase 3.2) */}
+          {label && floatingLabel && (
+            <label
+              className="absolute left-3 transition-all duration-150 pointer-events-none"
+              style={{
+                top: isLabelFloating ? '-8px' : '50%',
+                transform: isLabelFloating ? 'translateY(0) scale(0.85)' : 'translateY(-50%)',
+                transformOrigin: 'left',
+                fontSize: isLabelFloating ? '12px' : '14px',
+                backgroundColor: isLabelFloating ? 'var(--color-bg-elevated-1)' : 'transparent',
+                padding: isLabelFloating ? '0 4px' : '0',
+                color: error
+                  ? 'var(--color-error)'
+                  : isLabelFloating
+                    ? 'var(--color-primary)'
+                    : 'var(--color-text-tertiary)'
+              }}
+            >
+              {label}
+            </label>
+          )}
           {/* Left Icon */}
           {LeftIcon && (
             <LeftIcon
@@ -132,15 +158,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
 
-          {/* Right Icon */}
-          {RightIcon && (
+          {/* Right Icon / Error Icon (Phase 3.2) */}
+          {(RightIcon || error) && (
             <button
               type="button"
               onClick={onRightIconClick}
-              disabled={disabled}
+              disabled={disabled || error}
               className={`
                 absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-100
-                ${onRightIconClick ? 'cursor-pointer' : 'cursor-default'}
+                ${onRightIconClick && !error ? 'cursor-pointer' : 'cursor-default'}
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               style={{
@@ -151,12 +177,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     : 'var(--color-text-tertiary)'
               }}
               onMouseEnter={(e) => {
-                if (onRightIconClick && !disabled) {
+                if (onRightIconClick && !disabled && !error) {
                   e.currentTarget.style.color = 'var(--color-primary-hover)';
                 }
               }}
               onMouseLeave={(e) => {
-                if (onRightIconClick && !disabled) {
+                if (onRightIconClick && !disabled && !error) {
                   e.currentTarget.style.color = error
                     ? 'var(--color-error)'
                     : success
@@ -166,7 +192,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               }}
               tabIndex={-1}
             >
-              <RightIcon size={16} />
+              {error ? <AlertCircle size={16} /> : RightIcon && <RightIcon size={16} />}
             </button>
           )}
         </div>

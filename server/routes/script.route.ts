@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { scriptRepo, ScriptData } from '../db/repositories/script.repo.js'
-import { generateScriptsStream } from '../services/script.service.js'
+import { generateScriptsStream, generateScriptsBatchStream, extractProductList, extractProductListWithDetails } from '../services/script.service.js'
+import { productRepo } from '../db/repositories/product.repo.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requireProjectMember } from '../middleware/permission.middleware.js'
 
@@ -31,6 +32,74 @@ router.post('/generate', authMiddleware, requireProjectMember('editor'), async (
     return
   }
   await generateScriptsStream(projectId, topicId, res)
+})
+
+/**
+ * POST /generate-batch - 批量生成脚本
+ * Body: { projectId, topicIds, product? }
+ * topicIds: 选题ID数组，建议1-10个
+ * product: 可选，指定产品名称以统一脚本内容（如果不提供，将自动检测）
+ *
+ * 与 /generate 的区别：
+ * - 接受多个topicId，一次生成多个选题的脚本
+ * - 控制并发（2个topic同时处理），避免API过载
+ * - 实时返回每个topic的生成进度
+ * - 支持产品统一性控制
+ */
+router.post('/generate-batch', authMiddleware, requireProjectMember('editor'), async (req: Request, res: Response) => {
+  const { projectId, topicIds, product } = req.body as { projectId: string; topicIds: string[]; product?: string }
+
+  if (!projectId) {
+    res.status(400).json({ error: '缺少 projectId' })
+    return
+  }
+
+  if (!topicIds || !Array.isArray(topicIds) || topicIds.length === 0) {
+    res.status(400).json({ error: '缺少有效的 topicIds 数组' })
+    return
+  }
+
+  if (topicIds.length > 10) {
+    res.status(400).json({ error: 'topicIds 数量不能超过 10 个' })
+    return
+  }
+
+  await generateScriptsBatchStream(projectId, topicIds, res, product)
+})
+
+/**
+ * GET /products/:projectId - 获取项目的产品列表
+ * 用于批量生成脚本时的产品选择器
+ * v2.7.0: 优先从products表读取（包含手动添加的产品），如果为空则降级到文件提取
+ */
+router.get('/products/:projectId', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {
+  try {
+    const projectId = req.params.projectId as string
+
+    // 1. 优先从products表读取
+    const dbProducts = productRepo.findByProject(projectId)
+
+    if (dbProducts.length > 0) {
+      // 转换为前端期望的格式
+      const products = dbProducts.map(p => ({
+        name: p.name,
+        fileCount: p.file_count || 0,
+        source: p.source, // 'auto_extracted' | 'manual'
+        files: p.file_count > 0 ? [
+          { name: `关联${p.file_count}个文件`, type: '数据文件' }
+        ] : []
+      }))
+
+      return res.json({ products })
+    }
+
+    // 2. 降级到旧逻辑：从文件提取
+    const products = extractProductListWithDetails(projectId)
+    res.json({ products })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
 })
 
 router.get('/:projectId', authMiddleware, requireProjectMember('viewer'), (req: Request, res: Response) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Database, RefreshCw, ArrowRight, AlertCircle, Film, Link, Loader2 } from 'lucide-react'
+import { Database, RefreshCw, ArrowRight, AlertCircle, Film, Link, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { DropZone } from '../components/workbench/DropZone.js'
 import { FileCard } from '../components/workbench/FileCard.js'
@@ -28,8 +28,34 @@ export function Workbench() {
   const [videoUrl, setVideoUrl] = useState('')
   const [videoAnalyzing, setVideoAnalyzing] = useState(false)
   const [videoError, setVideoError] = useState<string | null>(null)
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
   const activeProject = projects.find(p => p.id === activeProjectId)
+
+  // Group files by type
+  const fileGroups = {
+    market_data: files.filter(f => f.file_type === 'market_data'),
+    product_info: files.filter(f => f.file_type === 'product_info'),
+    product_features: files.filter(f => f.file_type === 'product_features')
+  }
+
+  const fileTypeLabels = {
+    market_data: { label: '市场数据', description: '竞品数据、自有品牌数据、行业数据等', icon: '📊', color: 'var(--color-info)' },
+    product_info: { label: '产品信息', description: '产品介绍、规格参数等', icon: '📦', color: 'var(--color-success)' },
+    product_features: { label: '产品卖点', description: '核心卖点、差异化优势等', icon: '✨', color: 'var(--color-warning)' }
+  }
+
+  const toggleGroup = (groupKey: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(groupKey)) {
+        next.delete(groupKey)
+      } else {
+        next.add(groupKey)
+      }
+      return next
+    })
+  }
 
   const fetchFiles = useCallback(async () => {
     if (!activeProjectId) return
@@ -326,7 +352,7 @@ export function Workbench() {
         </div>
       )}
 
-      {/* Files list */}
+      {/* Files list - grouped by type */}
       {initialLoading ? (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
@@ -337,24 +363,70 @@ export function Workbench() {
           <FileCardSkeletonList count={3} />
         </div>
       ) : files.length > 0 ? (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-              已上传文件
-              <span className="ml-2 text-sm font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
-                ({readyCount}/{files.length} 已解析)
-              </span>
-            </h2>
-          </div>
-          <div className="space-y-2.5">
-            {files.map(file => (
-              <FileCard
-                key={file.id}
-                file={file}
-                onDelete={handleDeleteFile}
-              />
-            ))}
-          </div>
+        <div className="mb-8 space-y-4">
+          {Object.entries(fileGroups).map(([groupKey, groupFiles]) => {
+            if (groupFiles.length === 0) return null
+
+            const typeInfo = fileTypeLabels[groupKey as keyof typeof fileTypeLabels]
+            const isCollapsed = collapsedGroups.has(groupKey)
+            const groupReadyCount = groupFiles.filter(f => f.status === 'ready').length
+
+            return (
+              <div key={groupKey} className="border rounded-lg" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-elevated-1)' }}>
+                {/* Group header */}
+                <button
+                  onClick={() => toggleGroup(groupKey)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-[var(--color-bg-elevated-2)] transition-colors duration-150 rounded-t-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{typeInfo.icon}</span>
+                    <div className="text-left">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                          {typeInfo.label}
+                        </h3>
+                        <span
+                          className="px-2 py-0.5 text-xs rounded-full font-medium"
+                          style={{
+                            backgroundColor: `${typeInfo.color}20`,
+                            color: typeInfo.color
+                          }}
+                        >
+                          {groupFiles.length} 个文件
+                        </span>
+                        {groupReadyCount > 0 && (
+                          <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                            · {groupReadyCount} 已解析
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
+                        {typeInfo.description}
+                      </p>
+                    </div>
+                  </div>
+                  {isCollapsed ? (
+                    <ChevronDown size={18} style={{ color: 'var(--color-text-tertiary)' }} />
+                  ) : (
+                    <ChevronUp size={18} style={{ color: 'var(--color-text-tertiary)' }} />
+                  )}
+                </button>
+
+                {/* Group content */}
+                {!isCollapsed && (
+                  <div className="p-3 space-y-2.5 border-t" style={{ borderColor: 'var(--color-border)' }}>
+                    {groupFiles.map(file => (
+                      <FileCard
+                        key={file.id}
+                        file={file}
+                        onDelete={handleDeleteFile}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       ) : null}
 

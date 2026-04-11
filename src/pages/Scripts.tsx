@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle } from 'lucide-react'
+import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle, Clock, XCircle } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useTopicStore } from '../store/topic.store.js'
 import { useScriptStore } from '../store/script.store.js'
@@ -24,6 +24,10 @@ import { exportScriptsToExcel } from '../utils/export.utils.js'
 import { toast } from '../store/toast.store.js'
 import { persistFilters } from '../utils/storage.js'
 
+// Product detail type for enhanced product selector
+// Product list is simple string array from API
+// Future v2.8.0 will add structured ProductDetail
+
 export function Scripts() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
@@ -37,7 +41,7 @@ export function Scripts() {
   const [selectedScriptId, setSelectedScriptId] = useState<string>('')
   const { topics, selectedIds: topicSelectedIds, setTopics } = useTopicStore()
   const { getCommentCount } = useCommentStore()
-  const { workflows, fetchWorkflows, createRequest } = useApprovalStore()
+  const { workflows, requests, fetchWorkflows, fetchRequests, createRequest } = useApprovalStore()
   const [submittingApproval, setSubmittingApproval] = useState<string | null>(null)
   const [token, setToken] = useState<string>('')
   const {
@@ -46,6 +50,11 @@ export function Scripts() {
     setActiveTopicId, updateScript, batchDelete, setStatus, status
   } = useScriptStore()
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set())
+  const [batchGenerateDialogOpen, setBatchGenerateDialogOpen] = useState(false)
+  const [batchGenerating, setBatchGenerating] = useState(false)
+  const [batchProgress, setBatchProgress] = useState({ completed: 0, total: 0, current: '' })
+  const [productList, setProductList] = useState<string[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<string>('')
 
   // Initialize token from localStorage (client-side only)
   useEffect(() => {
@@ -54,17 +63,64 @@ export function Scripts() {
     }
   }, [])
 
-  const { start: startStream } = useSSEStream<Script & { message?: string; variant?: string; topicId?: string }>({
+  // Load product list
+  useEffect(() => {
+    if (activeProjectId) {
+      scriptApi.getProductList(activeProjectId).then(({ products }) => {
+        setProductList(products)
+
+        // Try to load last selected product from localStorage
+        const storageKey = `lastSelectedProduct_${activeProjectId}`
+        const lastSelected = localStorage.getItem(storageKey)
+
+        if (lastSelected && products.includes(lastSelected)) {
+          // Use last selected if it still exists
+          setSelectedProduct(lastSelected)
+        } else if (products.length > 0) {
+          // Auto-select first product
+          setSelectedProduct(products[0])
+        }
+      }).catch(err => {
+        console.error('Failed to load product list:', err)
+      })
+    }
+  }, [activeProjectId])
+
+
+  const { start: startStream } = useSSEStream<Script & { message?: string; variant?: string; topicId?: string; topicTitle?: string; total?: number; completed?: number; progress?: number }>({
     onEvent: (event, data) => {
       if (event.startsWith('script_')) {
         addScript(data as Script)
+      } else if (event === 'batch_start') {
+        setBatchGenerating(true)
+        setBatchProgress({ completed: 0, total: (data as any).total || 0, current: '' })
+      } else if (event === 'topic_start') {
+        setBatchProgress(prev => ({ ...prev, current: (data as any).title || '' }))
+        setExpandedTopics(prev => new Set(prev).add((data as any).topicId))
+      } else if (event === 'script_created') {
+        addScript(data as Script)
+      } else if (event === 'topic_complete') {
+        setBatchProgress(prev => ({
+          ...prev,
+          completed: (data as any).progress || prev.completed + 1,
+          current: ''
+        }))
+      } else if (event === 'batch_complete') {
+        setBatchGenerating(false)
+        setStatus('success')
+        toast.success('批量生成完成', `已生成 ${(data as any).completed}/${(data as any).total} 个选题的脚本`)
+      } else if (event === 'topic_error') {
+        toast.error(`生成失败`, `${(data as any).title}: ${(data as any).error}`)
       } else if (event === 'complete') {
         setStatus('success')
       } else if (event === 'error') {
         setStatus('error', (data as { message: string }).message)
       }
     },
-    onDone: () => setStatus('success')
+    onDone: () => {
+      setBatchGenerating(false)
+      setStatus('success')
+    }
   })
 
   // Load persisted filters on mount
@@ -109,9 +165,10 @@ export function Scripts() {
         setInitialLoading(false)
       })
 
-    // Fetch workflows for approval
+    // Fetch workflows and requests for approval
     if (token) {
       fetchWorkflows(activeProjectId, 'script', token)
+      fetchRequests(activeProjectId, { target_type: 'script' }, token)
     }
   }, [activeProjectId, token])
 
@@ -154,6 +211,33 @@ export function Scripts() {
     setExpandedTopics(prev => new Set(prev).add(topicId))
     await startStream(scriptApi.generateStream(activeProjectId, topicId))
   }, [activeProjectId, startStream, setActiveTopicId, setStatus])
+
+  const handleBatchGenerate = useCallback(async () => {
+    if (!activeProjectId) return
+
+    // Get topics without scripts
+    const topicsWithoutScripts = selectedTopics.filter(topic => {
+      const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+      return topicScripts.length === 0
+    })
+
+    if (topicsWithoutScripts.length === 0) {
+      toast.error('没有需要生成的选题', '所有已选选题都已有脚本')
+      return
+    }
+
+    if (topicsWithoutScripts.length > 10) {
+      toast.error('选题数量过多', '批量生成最多支持10个选题，请取消部分选题')
+      return
+    }
+
+    setBatchGenerateDialogOpen(false)
+    setStatus('streaming')
+    setBatchGenerating(true)
+
+    const topicIds = topicsWithoutScripts.map(t => t.id)
+    await startStream(scriptApi.generateBatchStream(activeProjectId, topicIds, selectedProduct || undefined))
+  }, [activeProjectId, selectedTopics, scripts, startStream, setStatus, selectedProduct])
 
   const handleSaveScript = async (id: string, data: { segments: ScriptSegment[]; fullText: string; wordCount: number }) => {
     await scriptApi.update(id, data)
@@ -272,6 +356,26 @@ export function Scripts() {
         <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
+      {/* Batch Generation Button */}
+      {!initialLoading && selectedTopics.length > 0 && (
+        <div className="mb-6 flex items-center gap-3">
+          <Button
+            variant="ai"
+            onClick={() => setBatchGenerateDialogOpen(true)}
+            loading={batchGenerating}
+            disabled={selectedTopics.filter(t => scripts.filter(s => s.topic_id === t.id).length === 0).length === 0}
+            icon={<Zap size={15} />}
+          >
+            {batchGenerating ? `批量生成中 (${batchProgress.completed}/${batchProgress.total})` : '批量生成脚本'}
+          </Button>
+          {selectedTopics.filter(t => scripts.filter(s => s.topic_id === t.id).length === 0).length > 0 && (
+            <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+              {selectedTopics.filter(t => scripts.filter(s => s.topic_id === t.id).length === 0).length} 个选题待生成
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Batch Toolbar */}
       {scripts.length > 0 && !initialLoading && (
         <div className="mb-6">
@@ -362,6 +466,11 @@ export function Scripts() {
           const isExpanded = expandedTopics.has(topic.id)
           const isGeneratingThis = status === 'streaming' && activeTopicId === topic.id
 
+          // Get approval status for first script (A variant)
+          const scriptId = topicScripts[0]?.id
+          const approvalRequest = scriptId ? requests.find(r => r.target_id === scriptId && r.target_type === 'script') : null
+          const approvalStatus = approvalRequest?.status
+
           return (
             <div key={topic.id} className="border rounded-lg overflow-hidden" style={{
               backgroundColor: 'var(--color-bg-elevated-1)',
@@ -375,6 +484,30 @@ export function Scripts() {
                   <div className="flex items-center gap-1.5 mb-1">
                     <PlatformBadge platform={topic.platform} />
                     <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{topic.estimated_duration}秒</span>
+
+                    {/* Approval status badge */}
+                    {approvalStatus && (
+                      <span
+                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
+                        style={{
+                          backgroundColor: approvalStatus === 'approved'
+                            ? 'rgba(16, 185, 129, 0.1)'
+                            : approvalStatus === 'rejected'
+                            ? 'rgba(239, 68, 68, 0.1)'
+                            : 'rgba(251, 191, 36, 0.1)',
+                          color: approvalStatus === 'approved'
+                            ? 'rgb(16, 185, 129)'
+                            : approvalStatus === 'rejected'
+                            ? 'rgb(239, 68, 68)'
+                            : 'rgb(251, 191, 36)'
+                        }}
+                      >
+                        {approvalStatus === 'approved' && <CheckCircle size={11} />}
+                        {approvalStatus === 'rejected' && <XCircle size={11} />}
+                        {approvalStatus === 'pending' && <Clock size={11} />}
+                        {approvalStatus === 'approved' ? '已通过' : approvalStatus === 'rejected' ? '已拒绝' : '审批中'}
+                      </span>
+                    )}
                   </div>
                   <h3 className="text-base font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>{topic.title}</h3>
                 </div>
@@ -491,6 +624,234 @@ export function Scripts() {
         onCancel={() => setDeleteDialogOpen(false)}
         danger
       />
+
+      {/* Batch Generate Dialog */}
+      {batchGenerateDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={() => setBatchGenerateDialogOpen(false)}>
+          <div
+            className="rounded-lg p-6 w-[480px]"
+            style={{
+              backgroundColor: 'var(--color-bg-elevated-3)',
+              border: '1px solid var(--color-border)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+              批量生成脚本
+            </h3>
+            <p className="text-sm mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+              为所有未生成脚本的选题一次性生成A/B两个版本
+            </p>
+
+            {/* Product Selector - Card-based Layout */}
+            {productList.length > 0 && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                  产品选择
+                </label>
+
+                {/* Auto-detect option */}
+                <button
+                  onClick={() => {
+                    setSelectedProduct('')
+                    if (activeProjectId) {
+                      localStorage.removeItem(`lastSelectedProduct_${activeProjectId}`)
+                    }
+                  }}
+                  className="w-full mb-3 px-4 py-3 rounded-lg border transition-all duration-200 text-left"
+                  style={{
+                    backgroundColor: selectedProduct === '' ? 'rgba(94, 106, 210, 0.1)' : 'var(--color-bg-elevated-1)',
+                    borderColor: selectedProduct === '' ? 'var(--color-primary)' : 'var(--color-border)',
+                    boxShadow: selectedProduct === '' ? '0 0 0 1px var(--color-primary)' : 'none'
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
+                      backgroundColor: 'var(--color-bg-elevated-2)'
+                    }}>
+                      <span className="text-xl">🤖</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium mb-0.5" style={{ color: 'var(--color-text-primary)' }}>
+                        自动识别
+                      </div>
+                      <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                        智能检测选题中的主要产品
+                      </div>
+                    </div>
+                    {selectedProduct === '' && (
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{
+                        backgroundColor: 'var(--color-primary)'
+                      }}>
+                        <CheckCircle size={14} style={{ color: '#FFFFFF' }} />
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {/* Product cards grid */}
+                <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                  {productList.map(productName => {
+                    const isSelected = selectedProduct === productName
+                    const storageKey = `lastSelectedProduct_${activeProjectId}`
+                    const lastSelected = localStorage.getItem(storageKey)
+                    const isLastSelected = productName === lastSelected
+
+                    return (
+                      <button
+                        key={productName}
+                        onClick={() => {
+                          setSelectedProduct(productName)
+                          if (activeProjectId) {
+                            localStorage.setItem(storageKey, productName)
+                          }
+                        }}
+                        className="px-4 py-3 rounded-lg border transition-all duration-200 text-left hover:-translate-y-0.5"
+                        style={{
+                          backgroundColor: isSelected ? 'rgba(94, 106, 210, 0.1)' : 'var(--color-bg-elevated-1)',
+                          borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
+                          boxShadow: isSelected ? '0 0 0 1px var(--color-primary)' : 'none'
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
+                            backgroundColor: 'var(--color-bg-elevated-2)'
+                          }}>
+                            <span className="text-xl">📦</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
+                                {productName}
+                              </div>
+                              {isLastSelected && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full" style={{
+                                  backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                                  color: 'rgb(251, 191, 36)'
+                                }}>
+                                  上次
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{
+                              backgroundColor: 'var(--color-primary)'
+                            }}>
+                              <CheckCircle size={14} style={{ color: '#FFFFFF' }} />
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <p className="text-xs mt-3" style={{ color: 'var(--color-text-tertiary)' }}>
+                  {selectedProduct ? `所有脚本将使用「${selectedProduct}」的产品信息` : '将自动从选题中检测主要产品'}
+                </p>
+              </div>
+            )}
+
+            <div className="mb-6 px-4 py-3 rounded-lg" style={{
+              backgroundColor: 'var(--color-bg-elevated-1)',
+              borderLeft: '3px solid var(--color-primary)'
+            }}>
+              <div className="flex items-center gap-2 mb-2">
+                <Zap size={16} style={{ color: 'var(--color-primary)' }} />
+                <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                  待生成选题
+                </span>
+              </div>
+              <div className="space-y-1.5 mt-3">
+                {selectedTopics.filter(topic => {
+                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                  return topicScripts.length === 0
+                }).slice(0, 10).map(topic => (
+                  <div key={topic.id} className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
+                    <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                      {topic.title}
+                    </span>
+                  </div>
+                ))}
+                {selectedTopics.filter(topic => {
+                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                  return topicScripts.length === 0
+                }).length > 10 && (
+                  <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                    ... 还有 {selectedTopics.filter(topic => {
+                      const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                      return topicScripts.length === 0
+                    }).length - 10} 个选题
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {selectedTopics.filter(topic => {
+              const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+              return topicScripts.length === 0
+            }).length > 10 && (
+              <div className="mb-6 px-3 py-2.5 rounded-lg text-xs" style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: 'var(--color-text-secondary)'
+              }}>
+                <strong style={{ color: '#EF4444' }}>注意：</strong> 批量生成最多支持10个选题，请取消部分选题后再试
+              </div>
+            )}
+
+            {selectedTopics.filter(topic => {
+              const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+              return topicScripts.length === 0
+            }).length > 0 && selectedTopics.filter(topic => {
+              const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+              return topicScripts.length === 0
+            }).length <= 10 && (
+              <div className="mb-6 px-3 py-2.5 rounded-lg text-xs" style={{
+                backgroundColor: 'rgba(94, 106, 210, 0.1)',
+                color: 'var(--color-text-secondary)'
+              }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>预计耗时</span>
+                </div>
+                <div>约 {Math.ceil(selectedTopics.filter(topic => {
+                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                  return topicScripts.length === 0
+                }).length / 2) * 20} 秒（并行生成，比逐个生成节省66%时间）</div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setBatchGenerateDialogOpen(false)}
+                className="flex-1"
+              >
+                取消
+              </Button>
+              <Button
+                variant="ai"
+                onClick={handleBatchGenerate}
+                icon={<Zap size={15} />}
+                className="flex-1"
+                disabled={selectedTopics.filter(topic => {
+                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                  return topicScripts.length === 0
+                }).length === 0 || selectedTopics.filter(topic => {
+                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                  return topicScripts.length === 0
+                }).length > 10}
+              >
+                生成 {selectedTopics.filter(topic => {
+                  const topicScripts = scripts.filter(s => s.topic_id === topic.id)
+                  return topicScripts.length === 0
+                }).length} 个选题的脚本
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Comment Panel */}
       {activeProjectId && selectedScriptId && (

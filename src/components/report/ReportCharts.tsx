@@ -2,7 +2,7 @@ import React from 'react'
 import { PieChart, Pie, Cell, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, ResponsiveContainer } from 'recharts'
 
 // 深色主题配色
-const COLORS = ['#635BFF', '#8B85FF', '#FF6B6B', '#FFB74D', '#4CAF50', '#E91E63', '#FF9800', '#9C27B0']
+const COLORS = ['#5E6AD2', '#8B85FF', '#FF6B6B', '#FFB74D', '#4CAF50', '#E91E63', '#FF9800', '#9C27B0']
 
 interface ChartProps {
   data: Array<{ name: string; value: number }>
@@ -64,7 +64,7 @@ export function TopicPriorityChart({ data, width = 400, height = 300 }: ChartPro
           <Tooltip
             contentStyle={{ background: '#0D0D0D', border: '1px solid #333333', color: '#FFFFFF' }}
           />
-          <Bar dataKey="value" fill="#635BFF" />
+          <Bar dataKey="value" fill="#5E6AD2" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -94,7 +94,7 @@ export function TimelineActivityChart({ data, width = 600, height = 300 }: Timel
           <Tooltip
             contentStyle={{ background: '#0D0D0D', border: '1px solid #333333', color: '#FFFFFF' }}
           />
-          <Line type="monotone" dataKey="count" stroke="#635BFF" strokeWidth={2} />
+          <Line type="monotone" dataKey="count" stroke="#5E6AD2" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </div>

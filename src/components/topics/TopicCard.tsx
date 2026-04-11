@@ -1,5 +1,5 @@
-import React from 'react'
-import { Clock, Users, CheckSquare, Square, Star, MessageCircle } from 'lucide-react'
+import React, { useState } from 'react'
+import { Clock, Users, CheckSquare, Square, Star, MessageCircle, TrendingUp, AlertCircle, Info } from 'lucide-react'
 import { TopicCard as TopicCardType } from '../../types/index.js'
 import { PlatformBadge } from '../shared/Badge.js'
 
@@ -26,14 +26,33 @@ export const TopicCard = React.memo(function TopicCard({
   onCommentClick,
   commentCount = 0
 }: TopicCardProps) {
+  const [isHovered, setIsHovered] = useState(false)
   const duration = topic.estimated_duration
   const durationStr = duration >= 60 ? `${Math.floor(duration / 60)}分${duration % 60 > 0 ? `${duration % 60}秒` : ''}` : `${duration}秒`
+
+  // Priority color and label mapping
+  const priorityConfig = {
+    5: { label: '高优先级', color: 'var(--color-error)', icon: TrendingUp },
+    4: { label: '中高优先级', color: 'var(--color-warning)', icon: AlertCircle },
+    3: { label: '中优先级', color: 'var(--color-warning)', icon: AlertCircle },
+    2: { label: '中低优先级', color: 'var(--color-info)', icon: Info },
+    1: { label: '低优先级', color: 'var(--color-info)', icon: Info }
+  }
+  const priorityInfo = priorityConfig[topic.priority as keyof typeof priorityConfig] || priorityConfig[3]
+  const PriorityIcon = priorityInfo.icon
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onToggleSelect && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault()
+      onToggleSelect(topic.id)
+    }
+  }
 
   return (
     <div
       className={[
-        'border rounded-lg p-4 transition-all duration-100',
-        selected ? 'shadow-md' : 'hover:shadow-sm',
+        'relative border rounded-lg p-4 transition-all duration-200 focus-visible-card',
+        selected ? 'shadow-md' : 'hover:shadow-sm hover:-translate-y-0.5',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
       style={{
@@ -42,24 +61,70 @@ export const TopicCard = React.memo(function TopicCard({
         boxShadow: selected ? '0 0 0 1px var(--color-primary)' : undefined
       }}
       onClick={() => onToggleSelect?.(topic.id)}
+      onKeyDown={handleKeyDown}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      tabIndex={onToggleSelect ? 0 : undefined}
+      role={onToggleSelect ? 'button' : undefined}
+      aria-label={onToggleSelect ? `选择选题: ${topic.title}` : undefined}
+      aria-pressed={onToggleSelect ? selected : undefined}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="flex flex-wrap gap-1.5">
-          <PlatformBadge platform={topic.platform} />
-          <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            <Clock size={11} />
-            {durationStr}
-          </span>
+      {/* Selection checkbox - show on hover or when selected */}
+      {onToggleSelect && (
+        <div
+          className="absolute top-3 left-3 transition-all duration-150"
+          style={{
+            opacity: isHovered || selected ? 1 : 0,
+            transform: isHovered || selected ? 'scale(1)' : 'scale(0.8)'
+          }}
+        >
+          {selected
+            ? <CheckSquare size={18} style={{ color: 'var(--color-primary)' }} />
+            : <Square size={18} style={{ color: 'var(--color-border-light)' }} />
+          }
         </div>
-        {onToggleSelect && (
-          <div className="flex-shrink-0">
-            {selected
-              ? <CheckSquare size={16} style={{ color: 'var(--color-primary)' }} />
-              : <Square size={16} style={{ color: 'var(--color-border-light)' }} />
-            }
-          </div>
-        )}
+      )}
+
+      {/* Comment indicator - floating badge at top right */}
+      {commentCount > 0 && onCommentClick && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onCommentClick(topic.id)
+          }}
+          className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition-all duration-200 hover:scale-105"
+          style={{
+            backgroundColor: 'var(--color-info-bg)',
+            color: 'var(--color-info)',
+            border: '1px solid var(--color-info-border)'
+          }}
+        >
+          <MessageCircle size={12} />
+          <span>{commentCount}</span>
+        </button>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-wrap gap-1.5 mb-3 mt-1">
+        <PlatformBadge platform={topic.platform} size="md" />
+        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full" style={{
+          backgroundColor: 'var(--color-bg-elevated-2)',
+          color: 'var(--color-text-tertiary)'
+        }}>
+          <Clock size={11} />
+          {durationStr}
+        </span>
+        {/* Priority badge */}
+        <span
+          className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
+          style={{
+            backgroundColor: `${priorityInfo.color}20`,
+            color: priorityInfo.color
+          }}
+        >
+          <PriorityIcon size={11} />
+          P{topic.priority}
+        </span>
       </div>
 
       {/* Title */}
@@ -78,62 +143,10 @@ export const TopicCard = React.memo(function TopicCard({
       </div>
 
       {/* CTA */}
-      <div className="rounded-md px-2.5 py-1.5 mb-3" style={{ backgroundColor: 'var(--color-bg-elevated-2)' }}>
+      <div className="rounded-md px-2.5 py-1.5" style={{ backgroundColor: 'var(--color-bg-elevated-2)' }}>
         <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>CTA：</span>
         <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>{topic.cta}</span>
       </div>
-
-      {/* Priority stars */}
-      {onPriorityChange && (
-        <div className="flex items-center gap-1 mb-2" onClick={e => e.stopPropagation()}>
-          <span className="text-xs mr-1" style={{ color: 'var(--color-text-tertiary)' }}>优先级</span>
-          {[1, 2, 3, 4, 5].map(star => (
-            <button
-              key={star}
-              onClick={() => onPriorityChange(topic.id, star)}
-              className="transition-colors duration-100"
-            >
-              <Star
-                size={14}
-                className={star <= topic.priority ? 'fill-amber-400' : ''}
-                style={{ color: star <= topic.priority ? 'var(--color-warning)' : 'var(--color-border-light)' }}
-              />
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Comment button */}
-      {onCommentClick && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onCommentClick(topic.id)
-          }}
-          className="flex items-center gap-1.5 text-xs transition-colors duration-100 pt-2 border-t"
-          style={{
-            color: 'var(--color-text-tertiary)',
-            borderColor: 'var(--color-border)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--color-primary)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--color-text-tertiary)'
-          }}
-        >
-          <MessageCircle size={14} />
-          <span>评论</span>
-          {commentCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-full font-medium" style={{
-              backgroundColor: 'var(--color-primary-subtle)',
-              color: 'var(--color-primary)'
-            }}>
-              {commentCount}
-            </span>
-          )}
-        </button>
-      )}
     </div>
   )
 })

@@ -19,6 +19,7 @@ import { testingRouter } from './routes/testing.route.js'
 import { questionnaireRouter } from './routes/questionnaire.route.js'
 import { timelineRouter } from './routes/timeline.route.js'
 import { projectAssetsRouter } from './routes/project-assets.route.js'
+import productRouter from './routes/product.route.js'
 import { authRouter } from './routes/auth.route.js'
 import projectMembersRouter from './routes/project-members.route.js'
 import commentsRouter from './routes/comments.route.js'
@@ -347,6 +348,7 @@ app.use('/api/kb', kbRouter)
 app.use('/api/testing', testingRouter)
 app.use('/api/questionnaire', questionnaireRouter)
 app.use('/api/timeline', timelineRouter)
+app.use('/api/product', productRouter)
 app.use(approvalRouter)
 app.use(notificationRouter)
 

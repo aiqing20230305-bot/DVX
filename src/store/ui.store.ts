@@ -23,12 +23,18 @@ export const useUIStore = create<UIStore>()(
 
       setTheme: (theme) => {
         set({ theme })
+        // v2.2.0: Use data-theme attribute (primary method)
+        document.documentElement.setAttribute('data-theme', theme)
+        // Backward compatibility: Keep dark class for legacy components
         document.documentElement.classList.toggle('dark', theme === 'dark')
       },
 
       toggleTheme: () => {
         set(state => {
           const theme: Theme = state.theme === 'dark' ? 'light' : 'dark'
+          // v2.2.0: Use data-theme attribute (primary method)
+          document.documentElement.setAttribute('data-theme', theme)
+          // Backward compatibility: Keep dark class for legacy components
           document.documentElement.classList.toggle('dark', theme === 'dark')
           return { theme }
         })

@@ -54,7 +54,7 @@ export function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
-            <Sparkles className="w-8 h-8 text-[#635BFF]" />
+            <Sparkles className="w-8 h-8 text-[#5E6AD2]" />
             <h1 className="text-3xl font-bold text-white">超级洞察</h1>
           </div>
           <p className="text-[#A3A3A3]">AI内容策略平台</p>
@@ -105,7 +105,7 @@ export function Login() {
                 <input type="checkbox" className="rounded" />
                 记住我
               </label>
-              <a href="#" className="text-sm text-[#635BFF] hover:text-[#8B85FF]">
+              <a href="#" className="text-sm text-[#5E6AD2] hover:text-[#8B85FF]">
                 忘记密码？
               </a>
             </div>
@@ -135,7 +135,7 @@ export function Login() {
           <div className="mt-6 text-center">
             <span className="text-[#A3A3A3]">还没有账号？</span>
             {' '}
-            <Link to="/register" className="text-[#635BFF] hover:text-[#8B85FF] font-medium">
+            <Link to="/register" className="text-[#5E6AD2] hover:text-[#8B85FF] font-medium">
               立即注册
             </Link>
           </div>

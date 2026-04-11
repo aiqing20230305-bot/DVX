@@ -1,6 +1,7 @@
 import { Router, Response } from 'express'
 import { notificationRepo } from '../db/repositories/notification.repo.js'
-import { authMiddleware, AuthRequest } from '../middleware/auth.middleware.js'
+import { authMiddleware } from '../middleware/auth.middleware.js'
+import { AuthRequest } from '../middleware/permission.middleware.js'
 
 const router = Router()
 

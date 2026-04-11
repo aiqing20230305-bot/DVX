@@ -90,7 +90,7 @@ export function Register() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
-            <Sparkles className="w-8 h-8 text-[#635BFF]" />
+            <Sparkles className="w-8 h-8 text-[#5E6AD2]" />
             <h1 className="text-3xl font-bold text-white">超级洞察</h1>
           </div>
           <p className="text-[#A3A3A3]">AI内容策略平台</p>
@@ -233,9 +233,9 @@ export function Register() {
               />
               <span className="text-sm text-[#A3A3A3]">
                 我已阅读并同意
-                <a href="#" className="text-[#635BFF] hover:text-[#8B85FF]">服务条款</a>
+                <a href="#" className="text-[#5E6AD2] hover:text-[#8B85FF]">服务条款</a>
                 和
-                <a href="#" className="text-[#635BFF] hover:text-[#8B85FF]">隐私政策</a>
+                <a href="#" className="text-[#5E6AD2] hover:text-[#8B85FF]">隐私政策</a>
               </span>
             </div>
 
@@ -264,7 +264,7 @@ export function Register() {
           <div className="mt-6 text-center">
             <span className="text-[#A3A3A3]">已有账号？</span>
             {' '}
-            <Link to="/login" className="text-[#635BFF] hover:text-[#8B85FF] font-medium">
+            <Link to="/login" className="text-[#5E6AD2] hover:text-[#8B85FF] font-medium">
               立即登录
             </Link>
           </div>

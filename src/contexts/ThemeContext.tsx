@@ -1,3 +1,19 @@
+/**
+ * @deprecated Since v2.2.0 - Use useUIStore() from store/ui.store.ts instead
+ *
+ * Migration Guide:
+ * ```tsx
+ * // Old (deprecated):
+ * import { useTheme } from './contexts/ThemeContext'
+ * const { theme, toggleTheme, setTheme } = useTheme()
+ *
+ * // New (recommended):
+ * import { useUIStore } from './store/ui.store'
+ * const { theme, toggleTheme, setTheme } = useUIStore()
+ * ```
+ *
+ * This context will be removed in v2.4.0. Please migrate to UIStore.
+ */
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 
 type Theme = 'light' | 'dark'

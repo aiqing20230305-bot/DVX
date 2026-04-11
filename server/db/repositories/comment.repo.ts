@@ -112,7 +112,12 @@ export const commentRepo = {
         u.id as user_id,
         u.email as user_email,
         u.name as user_name,
-        u.avatar as user_avatar
+        u.avatar as user_avatar,
+        u.role as user_role,
+        u.status as user_status,
+        u.email_verified as user_email_verified,
+        u.created_at as user_created_at,
+        u.updated_at as user_updated_at
       FROM comments c
       JOIN users u ON c.user_id = u.id
       WHERE c.target_type = ? AND c.target_id = ?
@@ -137,7 +142,12 @@ export const commentRepo = {
         id: row.user_id,
         email: row.user_email,
         name: row.user_name,
-        avatar: row.user_avatar
+        avatar: row.user_avatar,
+        role: row.user_role,
+        status: row.user_status,
+        email_verified: row.user_email_verified,
+        created_at: row.user_created_at,
+        updated_at: row.user_updated_at
       }
     }))
 
@@ -177,7 +187,12 @@ export const commentRepo = {
         u.id as user_id,
         u.email as user_email,
         u.name as user_name,
-        u.avatar as user_avatar
+        u.avatar as user_avatar,
+        u.role as user_role,
+        u.status as user_status,
+        u.email_verified as user_email_verified,
+        u.created_at as user_created_at,
+        u.updated_at as user_updated_at
       FROM comments c
       JOIN users u ON c.user_id = u.id
       WHERE c.project_id = ?
@@ -202,7 +217,12 @@ export const commentRepo = {
         id: row.user_id,
         email: row.user_email,
         name: row.user_name,
-        avatar: row.user_avatar
+        avatar: row.user_avatar,
+        role: row.user_role,
+        status: row.user_status,
+        email_verified: row.user_email_verified,
+        created_at: row.user_created_at,
+        updated_at: row.user_updated_at
       }
     }))
   },
@@ -243,7 +263,12 @@ export const commentRepo = {
         u.id as user_id,
         u.email as user_email,
         u.name as user_name,
-        u.avatar as user_avatar
+        u.avatar as user_avatar,
+        u.role as user_role,
+        u.status as user_status,
+        u.email_verified as user_email_verified,
+        u.created_at as user_created_at,
+        u.updated_at as user_updated_at
       FROM comments c
       JOIN users u ON c.user_id = u.id
       WHERE c.parent_id = ?
@@ -267,7 +292,12 @@ export const commentRepo = {
         id: row.user_id,
         email: row.user_email,
         name: row.user_name,
-        avatar: row.user_avatar
+        avatar: row.user_avatar,
+        role: row.user_role,
+        status: row.user_status,
+        email_verified: row.user_email_verified,
+        created_at: row.user_created_at,
+        updated_at: row.user_updated_at
       }
     }))
   }

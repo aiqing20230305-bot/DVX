@@ -19,5 +19,15 @@ export const scriptApi = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projectId, topicId })
-    })
+    }),
+
+  generateBatchStream: (projectId: string, topicIds: string[], product?: string) =>
+    fetch('/api/script/generate-batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, topicIds, product })
+    }),
+
+  getProductList: (projectId: string) =>
+    api.get<{ products: string[] }>(`/script/products/${projectId}`)
 }

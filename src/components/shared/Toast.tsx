@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react'
+import { CheckCircle2, AlertCircle, AlertTriangle, Info, X, Copy, Check } from 'lucide-react'
 import { Toast as ToastType } from '../../store/toast.store.js'
+import { getErrorDetails } from '../../utils/error-message.js'
 
 interface ToastProps {
   toast: ToastType
@@ -43,12 +44,29 @@ const colorMap = {
 
 export function Toast({ toast, onClose }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false)
+  const [copied, setCopied] = useState(false)
   const Icon = iconMap[toast.type]
   const colors = colorMap[toast.type]
 
   const handleClose = () => {
     setIsExiting(true)
     setTimeout(onClose, 300) // Match animation duration
+  }
+
+  const handleCopy = async () => {
+    try {
+      const details = getErrorDetails({
+        userMessage: toast.title,
+        suggestions: toast.suggestions || [],
+        severity: toast.type === 'error' ? 'error' : toast.type === 'warning' ? 'warning' : 'info',
+        technicalDetails: toast.technicalDetails
+      })
+      await navigator.clipboard.writeText(details)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
   }
 
   // Smart message formatting
@@ -127,6 +145,48 @@ export function Toast({ toast, onClose }: ToastProps) {
             <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
               {formattedMessage}
             </p>
+          )}
+
+          {/* Suggestions */}
+          {toast.suggestions && toast.suggestions.length > 0 && (
+            <ul className="mt-2 space-y-1 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+              {toast.suggestions.map((suggestion, idx) => (
+                <li key={idx} className="flex items-start gap-1">
+                  <span className="flex-shrink-0 mt-0.5">{idx + 1}.</span>
+                  <span>{suggestion}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Copy button */}
+          {toast.canCopy && toast.technicalDetails && (
+            <button
+              onClick={handleCopy}
+              className="mt-2 px-2 py-1 text-xs rounded flex items-center gap-1 transition-all duration-100"
+              style={{
+                color: 'var(--color-text-tertiary)',
+                backgroundColor: 'var(--color-bg-elevated-2)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              }}
+            >
+              {copied ? (
+                <>
+                  <Check size={12} />
+                  <span>已复制</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={12} />
+                  <span>复制错误详情</span>
+                </>
+              )}
+            </button>
           )}
         </div>
 

@@ -9,6 +9,7 @@ import { PublicRoute } from './components/auth/PublicRoute.js'
 import { ThemeProvider } from './contexts/ThemeContext.js'
 import { useProjectStore } from './store/project.store.js'
 import { useAuthStore } from './store/auth.store.js'
+import { useUIStore } from './store/ui.store.js'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js'
 import './styles/print.css'
 
@@ -53,9 +54,17 @@ function PageLoading() {
 export function App() {
   const { fetchProjects } = useProjectStore()
   const { isAuthenticated, fetchCurrentUser } = useAuthStore()
+  const { theme, setTheme } = useUIStore()
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts()
+
+  // v2.2.0: Initialize theme on mount (sync UIStore with DOM)
+  useEffect(() => {
+    // Ensure data-theme attribute is set on initial load
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
 
   // Try to restore auth state on mount
   useEffect(() => {

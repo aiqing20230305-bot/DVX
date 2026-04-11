@@ -37,7 +37,7 @@ const typeNames: Record<KBSearchResult['type'], string> = {
 }
 
 const typeColors: Record<KBSearchResult['type'], string> = {
-  report: '#635BFF',
+  report: '#5E6AD2',
   template: '#10B981',
   tone: '#F59E0B',
   insight: '#EF4444',

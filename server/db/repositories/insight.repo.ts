@@ -87,5 +87,45 @@ export const insightRepo = {
     const db = getDb()
     const placeholders = ids.map(() => '?').join(',')
     db.prepare(`DELETE FROM insights WHERE id IN (${placeholders})`).run(...ids)
+  },
+
+  /**
+   * Batch create insights with transaction
+   * All succeed or all fail
+   */
+  createBatch(projectId: string, dataList: InsightData[]): InsightRow[] {
+    const db = getDb()
+    const now = Date.now()
+
+    // Prepare the insert statement
+    const stmt = db.prepare(
+      `INSERT INTO insights (id, project_id, type, title, summary, evidence, metric, confidence, actionable, selected, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+
+    // Transaction: all succeed or all fail
+    const insertMany = db.transaction((items: Array<{ projectId: string; data: InsightData }>) => {
+      const results: InsightRow[] = []
+      for (const { projectId, data } of items) {
+        const id = genId()
+        stmt.run(
+          id, projectId, data.type, data.title, data.summary,
+          JSON.stringify(data.evidence),
+          data.metric ? JSON.stringify(data.metric) : null,
+          data.confidence, data.actionable ? 1 : 0, 0, now, now
+        )
+        results.push({
+          id, project_id: projectId, type: data.type, title: data.title,
+          summary: data.summary, evidence: JSON.stringify(data.evidence),
+          metric: data.metric ? JSON.stringify(data.metric) : null,
+          confidence: data.confidence, actionable: data.actionable ? 1 : 0,
+          selected: 0, created_at: now, updated_at: now
+        })
+      }
+      return results
+    })
+
+    // Execute transaction
+    return insertMany(dataList.map(data => ({ projectId, data })))
   }
 }

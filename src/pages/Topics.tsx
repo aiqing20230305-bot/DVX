@@ -113,6 +113,9 @@ export function Topics() {
       })
   }, [activeProjectId])
 
+  const [batchGenerateDialogOpen, setBatchGenerateDialogOpen] = useState(false)
+  const [batchCount, setBatchCount] = useState(10)
+
   const handleGenerate = useCallback(async () => {
     if (!activeProjectId) return
     reset()
@@ -120,6 +123,14 @@ export function Topics() {
     const insightIds = Array.from(insightSelectedIds)
     await startStream(topicApi.generateStream(activeProjectId, insightIds))
   }, [activeProjectId, insightSelectedIds, startStream, reset, setStatus])
+
+  const handleBatchGenerate = useCallback(async (count: number) => {
+    if (!activeProjectId) return
+    setBatchGenerateDialogOpen(false)
+    setStatus('streaming')
+    const insightIds = Array.from(insightSelectedIds)
+    await startStream(topicApi.generateBatchStream(activeProjectId, insightIds, count))
+  }, [activeProjectId, insightSelectedIds, startStream, setStatus])
 
   const handlePriorityChange = async (id: string, priority: number) => {
     updatePriority(id, priority)
@@ -399,6 +410,17 @@ export function Topics() {
             {isGenerating ? '生成中...' : topics.length > 0 ? '重新生成' : '生成选题'}
           </Button>
 
+          {!isGenerating && (
+            <Button
+              variant="primary"
+              onClick={() => setBatchGenerateDialogOpen(true)}
+              disabled={!activeProjectId}
+              icon={<Zap size={15} />}
+            >
+              批量生成
+            </Button>
+          )}
+
           {topics.length > 0 && !isGenerating && (
             <>
               <Button variant="ghost" size="sm" icon={<Download size={13} />} onClick={handleExport}>导出</Button>
@@ -561,6 +583,77 @@ export function Topics() {
         onCancel={() => setDeleteDialogOpen(false)}
         danger
       />
+
+      {/* Batch Generate Dialog */}
+      {batchGenerateDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={() => setBatchGenerateDialogOpen(false)}>
+          <div
+            className="rounded-lg p-6 w-[400px]"
+            style={{
+              backgroundColor: 'var(--color-bg-elevated-3)',
+              border: '1px solid var(--color-border)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+              批量生成选题
+            </h3>
+            <p className="text-sm mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+              一次生成多个选题，提升规划效率
+            </p>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                生成数量
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {[3, 5, 10, 15, 20].map(count => (
+                  <button
+                    key={count}
+                    onClick={() => setBatchCount(count)}
+                    className="px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-100"
+                    style={{
+                      backgroundColor: batchCount === count ? 'var(--color-primary)' : 'var(--color-bg-elevated-1)',
+                      borderColor: batchCount === count ? 'var(--color-primary)' : 'var(--color-border)',
+                      color: batchCount === count ? 'white' : 'var(--color-text-primary)'
+                    }}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6 px-3 py-2.5 rounded-lg text-xs" style={{
+              backgroundColor: 'rgba(94, 106, 210, 0.1)',
+              color: 'var(--color-text-secondary)'
+            }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>预计耗时</span>
+              </div>
+              <div>约 {Math.ceil(batchCount / 4) * 10} 秒（相比逐个生成节省 {Math.round((1 - (batchCount / 4 * 10) / (batchCount * 8)) * 100)}% 时间）</div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setBatchGenerateDialogOpen(false)}
+                className="flex-1"
+              >
+                取消
+              </Button>
+              <Button
+                variant="ai"
+                onClick={() => handleBatchGenerate(batchCount)}
+                icon={<Zap size={15} />}
+                className="flex-1"
+              >
+                生成 {batchCount} 个选题
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Keyboard Shortcuts Help */}
       <KeyboardShortcutsHelp

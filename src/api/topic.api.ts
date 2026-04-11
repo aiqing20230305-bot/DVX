@@ -19,5 +19,12 @@ export const topicApi = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projectId, insightIds })
+    }),
+
+  generateBatchStream: (projectId: string, insightIds: string[], count: number) =>
+    fetch('/api/topic/generate-batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, insightIds, count })
     })
 }

@@ -1,39 +1,112 @@
 import React from 'react'
 
-interface SkeletonProps {
+/**
+ * Skeleton Loading Component (Phase 3.5 - v2.2.0)
+ *
+ * 统一的加载状态骨架组件，提供5种预设变体
+ *
+ * @example
+ * ```tsx
+ * // 文本行
+ * <Skeleton variant="text" count={3} />
+ *
+ * // 标题
+ * <Skeleton variant="title" width="60%" />
+ *
+ * // 卡片
+ * <Skeleton variant="card" height="200px" />
+ *
+ * // 头像
+ * <Skeleton variant="avatar" />
+ *
+ * // 图表
+ * <Skeleton variant="chart" height="300px" />
+ * ```
+ */
+
+type SkeletonVariant = 'text' | 'title' | 'card' | 'avatar' | 'chart'
+
+export interface SkeletonProps {
+  /** 骨架变体类型 */
+  variant?: SkeletonVariant
+  /** 宽度（支持CSS单位或数字） */
+  width?: string | number
+  /** 高度（支持CSS单位或数字） */
+  height?: string | number
+  /** 重复数量（用于text列表） */
+  count?: number
+  /** 自定义类名 */
   className?: string
-  rows?: number
 }
 
-export function Skeleton({ className = '' }: SkeletonProps) {
-  return (
-    <div className={`skeleton ${className}`} aria-busy="true" />
-  )
+// 变体预设尺寸
+const variantStyles: Record<SkeletonVariant, { width: string; height: string; rounded: string }> = {
+  text: { width: '100%', height: '16px', rounded: 'rounded' },
+  title: { width: '60%', height: '24px', rounded: 'rounded' },
+  card: { width: '100%', height: '200px', rounded: 'rounded-lg' },
+  avatar: { width: '48px', height: '48px', rounded: 'rounded-full' },
+  chart: { width: '100%', height: '300px', rounded: 'rounded-lg' }
 }
 
-export function SkeletonCard() {
-  return (
-    <div className="bg-[#F7F8FA] border border-[#DEE0E3] rounded-xl p-5 space-y-3">
-      <div className="flex gap-2">
-        <Skeleton className="h-5 w-16" />
-        <Skeleton className="h-5 w-14" />
-      </div>
-      <Skeleton className="h-5 w-3/4" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-      <div className="pt-2 space-y-2">
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-4/5" />
-        <Skeleton className="h-3 w-3/4" />
-      </div>
-    </div>
-  )
+export function Skeleton({
+  variant = 'text',
+  width,
+  height,
+  count = 1,
+  className = ''
+}: SkeletonProps) {
+  const defaultStyle = variantStyles[variant]
+
+  // 解析width/height（支持数字和字符串）
+  const finalWidth = width !== undefined
+    ? (typeof width === 'number' ? `${width}px` : width)
+    : defaultStyle.width
+
+  const finalHeight = height !== undefined
+    ? (typeof height === 'number' ? `${height}px` : height)
+    : defaultStyle.height
+
+  // 生成多个骨架（用于text列表）
+  const skeletons = Array.from({ length: count }, (_, i) => (
+    <div
+      key={i}
+      className={[
+        'skeleton', // Phase 3.5: 使用globals.css中的shimmer动画
+        defaultStyle.rounded,
+        className
+      ].filter(Boolean).join(' ')}
+      style={{
+        width: finalWidth,
+        height: finalHeight,
+        // Phase 3.5: 渐变背景
+        background: 'linear-gradient(90deg, var(--color-bg-elevated-1) 25%, var(--color-bg-elevated-2) 50%, var(--color-bg-elevated-1) 75%)',
+        backgroundSize: '200% 100%',
+        marginBottom: variant === 'text' && count > 1 && i < count - 1 ? '8px' : '0'
+      }}
+    />
+  ))
+
+  return count === 1 ? skeletons[0] : <div className="space-y-2">{skeletons}</div>
 }
 
-export function SkeletonList({ count = 3 }: { count?: number }) {
+/**
+ * SkeletonGroup - 用于组合多种骨架
+ *
+ * @example
+ * ```tsx
+ * <SkeletonGroup>
+ *   <Skeleton variant="avatar" />
+ *   <div className="flex-1">
+ *     <Skeleton variant="title" />
+ *     <Skeleton variant="text" count={2} />
+ *   </div>
+ * </SkeletonGroup>
+ * ```
+ */
+export function SkeletonGroup({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-      {Array.from({ length: count }, (_, i) => <SkeletonCard key={i} />)}
+    <div className={`flex gap-4 ${className}`}>
+      {children}
     </div>
   )
 }

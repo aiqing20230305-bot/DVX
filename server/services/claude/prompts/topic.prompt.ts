@@ -43,18 +43,30 @@ JSON字段说明：
    - 第二层（建信任）：测评/前后对比/使用场景型
    - 第三层（促转化）：套组值感/囤货逻辑/长期护理型
 
-2. 每次输出 8-12 个选题，按优先级排序
+2. 每次输出 5-6 个选题，按优先级排序（聚焦最可执行、最有价值的选题）
 
 3. 必须包含的选题类型：
    - 至少1个 "痛点直给型"（最稳定转化）
    - 至少1个 "热梗反转型"（高点击）
    - 至少1个 "套组值感型"（中后链路转化）
-   - 至少1个 "懒人/场景型"（覆盖更广人群）
 
-4. direction 字段要直接写出视频的核心Hook方向，不是泛泛的主题词`
+4. 选题质量标准：
+   - 数据支撑强（基于洞察中的具体数据）
+   - 可执行性高（direction能直接指导脚本）
+   - 转化路径清晰（core逻辑完整）
+
+5. direction 字段要直接写出视频的核心Hook方向，不是泛泛的主题词
+
+6. 聚焦最有价值的选题，避免低质量填充：
+   - 每个选题都能独立成片，不是简单变种
+   - 优先覆盖不同人群和不同场景
+   - 删除数据支撑弱或执行难度高的选题`
 }
 
-export function buildTopicUserMessage(insightsSummary: string, brandContext?: string): string {
+export function buildTopicUserMessage(insightsSummary: string, brandContext?: string, count?: number): string {
+  const topicCount = count && count >= 3 && count <= 20 ? count : null
+  const countInstruction = topicCount ? `请生成${topicCount}个投流选题` : `请生成5-6个最核心、最可执行的投流选题`
+
   return `根据以下洞察，为品牌生成投流视频选题方向。
 
 ${brandContext ? `【品牌信息】\n${brandContext}\n` : ''}
@@ -62,11 +74,13 @@ ${brandContext ? `【品牌信息】\n${brandContext}\n` : ''}
 【洞察内容】
 ${insightsSummary}
 
-请生成8-12个投流选题，覆盖完整的内容漏斗（抢流量→建信任→促转化）。
+${countInstruction}，覆盖完整的内容漏斗（抢流量→建信任→促转化）。
 每个选题用<topic>标签包裹，按优先级从高到低排序。
 
-重点确保：
+质量要求：
 1. 每个选题的direction要足够具体，能直接指导脚本创作
 2. cta要自然融入内容逻辑，不能突兀
-3. 人群要精细化，不能只写"女性用户"`
+3. 人群要精细化，不能只写"女性用户"
+4. 聚焦最有价值的选题，每个选题都有明确的数据支撑和转化路径
+5. 避免低质量填充，宁缺毋滥`
 }

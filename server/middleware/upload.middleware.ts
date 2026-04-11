@@ -45,3 +45,28 @@ export const uploadMiddleware = multer({
     }
   }
 })
+
+/**
+ * Upload middleware for importing Excel/CSV files
+ * Uses memory storage for direct buffer processing
+ */
+export const importUploadMiddleware = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for import files
+  fileFilter: (_req, file, cb) => {
+    const ext = extname(file.originalname).toLowerCase()
+    const importMimeTypes = new Set([
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'text/csv',
+      'application/octet-stream'
+    ])
+    const importExtensions = new Set(['.xlsx', '.xls', '.csv'])
+
+    if (importMimeTypes.has(file.mimetype) || importExtensions.has(ext)) {
+      cb(null, true)
+    } else {
+      cb(new Error(`不支持的文件类型：${file.mimetype}（${ext}）。导入仅支持：Excel (.xlsx, .xls) 或 CSV (.csv)`))
+    }
+  }
+})

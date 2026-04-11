@@ -8,6 +8,9 @@ export interface Toast {
   title: string
   message?: string
   duration?: number
+  suggestions?: string[]
+  technicalDetails?: string
+  canCopy?: boolean
 }
 
 interface ToastStore {
@@ -66,5 +69,20 @@ export const toast = {
 
   info: (title: string, message?: string, duration?: number) => {
     useToastStore.getState().addToast({ type: 'info', title, message, duration })
+  },
+
+  /**
+   * Display a friendly error message with suggestions and technical details
+   */
+  friendlyError: (userMessage: string, suggestions?: string[], technicalDetails?: string, duration?: number) => {
+    useToastStore.getState().addToast({
+      type: 'error',
+      title: userMessage,
+      message: suggestions && suggestions.length > 0 ? '💡 建议操作：' : undefined,
+      suggestions,
+      technicalDetails,
+      canCopy: !!technicalDetails,
+      duration: duration ?? 10000  // Longer duration for error messages with suggestions
+    })
   }
 }

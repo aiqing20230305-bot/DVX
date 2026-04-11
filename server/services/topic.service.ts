@@ -7,7 +7,7 @@ import { buildTopicSystemPrompt, buildTopicUserMessage } from './claude/prompts/
 import { Response } from 'express'
 import { initSSE, sendSSEEvent, closeSSE } from '../utils/sse.js'
 
-export async function generateTopicsStream(projectId: string, insightIds: string[], res: Response): Promise<void> {
+export async function generateTopicsStream(projectId: string, insightIds: string[], res: Response, count?: number): Promise<void> {
   initSSE(res)
 
   try {
@@ -32,7 +32,10 @@ export async function generateTopicsStream(projectId: string, insightIds: string
       return
     }
 
-    topicRepo.deleteByProject(projectId)
+    // Only delete existing topics if count is not specified (backward compatible)
+    if (!count) {
+      topicRepo.deleteByProject(projectId)
+    }
 
     const insightsSummary = selectedInsights.map(i => {
       const evidence = JSON.parse(i.evidence) as string[]
@@ -40,7 +43,7 @@ export async function generateTopicsStream(projectId: string, insightIds: string
     }).join('\n\n')
 
     const systemPrompt = buildTopicSystemPrompt()
-    const userMessage = buildTopicUserMessage(insightsSummary)
+    const userMessage = buildTopicUserMessage(insightsSummary, undefined, count)
 
     const topics: TopicData[] = []
 
@@ -70,7 +73,10 @@ export async function generateTopicsStream(projectId: string, insightIds: string
       },
       onComplete: () => {
         // Log topic generation
-        logRepo.create(projectId, 'topic', `生成 ${topics.length} 个选题`)
+        const logMessage = count
+          ? `批量生成 ${topics.length} 个选题（目标${count}个）`
+          : `生成 ${topics.length} 个选题`
+        logRepo.create(projectId, 'topic', logMessage)
 
         sendSSEEvent(res, 'complete', { count: topics.length })
         closeSSE(res)

@@ -174,7 +174,7 @@ export async function generateProjectPPT(options: PPTGeneratorOptions): Promise<
 /**
  * 添加封面
  */
-function addCoverSlide(pptx: any, project: any, THEME: any) {
+function addCoverSlide(pptx: any, project: any, THEME: any, transition?: any) {
   const slide = pptx.addSlide()
   slide.background = { color: THEME.bg }
 
@@ -263,7 +263,7 @@ function addCoverSlide(pptx: any, project: any, THEME: any) {
 /**
  * 添加目录
  */
-function addTableOfContents(pptx: any, insightCount: number, topicCount: number, scriptCount: number, THEME: any) {
+function addTableOfContents(pptx: any, insightCount: number, topicCount: number, scriptCount: number, THEME: any, transition?: any) {
   const slide = pptx.addSlide()
   slide.background = { color: THEME.bg }
 
@@ -326,7 +326,7 @@ function addTableOfContents(pptx: any, insightCount: number, topicCount: number,
 /**
  * 添加项目概况
  */
-function addProjectOverview(pptx: any, project: any, THEME: any) {
+function addProjectOverview(pptx: any, project: any, THEME: any, transition?: any) {
   const slide = pptx.addSlide()
   slide.background = { color: THEME.bg }
 
@@ -400,7 +400,7 @@ function addProjectOverview(pptx: any, project: any, THEME: any) {
 /**
  * 添加洞察章节
  */
-function addInsightsSection(pptx: any, insights: any[], THEME: any) {
+function addInsightsSection(pptx: any, insights: any[], THEME: any, transition?: any) {
   // 章节标题页
   const titleSlide = pptx.addSlide()
   titleSlide.background = { color: THEME.bg }
@@ -489,7 +489,7 @@ function addInsightsSection(pptx: any, insights: any[], THEME: any) {
 /**
  * 添加选题章节
  */
-function addTopicsSection(pptx: any, topics: any[], THEME: any) {
+function addTopicsSection(pptx: any, topics: any[], THEME: any, transition?: any) {
   // 章节标题页
   const titleSlide = pptx.addSlide()
   titleSlide.background = { color: THEME.bg }
@@ -599,7 +599,7 @@ function addTopicsSection(pptx: any, topics: any[], THEME: any) {
 /**
  * 添加脚本章节
  */
-function addScriptsSection(pptx: any, scripts: any[], THEME: any) {
+function addScriptsSection(pptx: any, scripts: any[], THEME: any, transition?: any) {
   // 章节标题页
   const titleSlide = pptx.addSlide()
   titleSlide.background = { color: THEME.bg }
@@ -716,7 +716,7 @@ function addScriptsSection(pptx: any, scripts: any[], THEME: any) {
 /**
  * 添加数据概览页
  */
-function addDataOverview(pptx: any, charts: { insightChart?: string; topicChart?: string; timelineChart?: string }, THEME: any) {
+function addDataOverview(pptx: any, charts: { insightChart?: string; topicChart?: string; timelineChart?: string }, THEME: any, transition?: any) {
   const slide = pptx.addSlide()
   slide.background = { color: THEME.bg }
 
@@ -772,7 +772,7 @@ function addDataOverview(pptx: any, charts: { insightChart?: string; topicChart?
 /**
  * 添加结尾页
  */
-function addEndingSlide(pptx: any, project: any, THEME: any) {
+function addEndingSlide(pptx: any, project: any, THEME: any, transition?: any) {
   const slide = pptx.addSlide()
   slide.background = { color: THEME.bg }
 

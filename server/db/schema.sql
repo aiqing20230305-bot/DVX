@@ -240,3 +240,21 @@ CREATE TABLE IF NOT EXISTS project_members (
 
 CREATE INDEX IF NOT EXISTS idx_project_members_project_id ON project_members(project_id);
 CREATE INDEX IF NOT EXISTS idx_project_members_user_id ON project_members(user_id);
+
+-- v2.5.3: Products Management Table
+CREATE TABLE IF NOT EXISTS products (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  alias TEXT,
+  description TEXT,
+  source TEXT NOT NULL CHECK (source IN ('auto_extracted', 'manual')),
+  file_count INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+  UNIQUE(project_id, name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_products_project_id ON products(project_id);
+CREATE INDEX IF NOT EXISTS idx_products_source ON products(source);

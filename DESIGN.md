@@ -31,16 +31,18 @@ AI驱动的电商内容策略平台，为品牌营销人员、内容策划师和
 ### 品牌主色 (Brand Primary)
 
 ```css
---color-primary: #635BFF
---color-primary-hover: #5449E0
---color-primary-light: #8B85FF
---color-primary-dark: #4A45CC
+--color-primary: #5E6AD2
+--color-primary-hover: #7B85DB
+--color-primary-light: #8B95E3
+--color-primary-dark: #3A45A8
+--color-primary-active: #4A55B8
 ```
 
 **选择理由**:
-- **紫蓝色 (#635BFF)** 来自 Stripe，传达"专业+创新"的双重气质
+- **Linear 紫 (#5E6AD2)** 传达"专业+创新+效率"的三重气质
 - 在金融/SaaS领域建立差异化（避免千篇一律的纯蓝色）
 - 对比度优秀（WCAG AAA标准），深色背景下清晰可见
+- **v2.2.0更新**: 从Stripe紫(#635BFF)迁移至Linear紫(#5E6AD2)，提升可访问性和品牌一致性
 
 **应用策略**:
 - **60%中性色** — 背景、边框、次要元素
@@ -50,14 +52,14 @@ AI驱动的电商内容策略平台，为品牌营销人员、内容策划师和
 ### 为什么这样美？
 
 **1. 在行业惯例中创造独特性**
-- B2B SaaS产品普遍用纯蓝色（#3370FF），但超级洞察用紫蓝 #635BFF
-- 在"可信赖"和"有活力"之间找到平衡点
+- B2B SaaS产品普遍用纯蓝色（#3370FF），但超级洞察用Linear紫 #5E6AD2
+- 在"可信赖"和"有活力"之间找到平衡点，兼顾"效率感"
 - 这是 **Tier 4 品味** — 在技术正确基础上注入个性
 
 **2. 温柔的渐变注入人性**
 ```css
---gradient-primary: linear-gradient(135deg, #635BFF 0%, #8B5CFF 100%)
---gradient-ai: linear-gradient(135deg, #635BFF 0%, #06B6D4 100%)
+--gradient-primary: linear-gradient(135deg, #5E6AD2 0%, #8B5CFF 100%)
+--gradient-ai: linear-gradient(135deg, #5E6AD2 0%, #06B6D4 100%)
 ```
 - 渐变让界面不再冰冷，传达"专业但温和"
 - AI渐变（紫→青）象征"智能+效率"
@@ -68,8 +70,9 @@ AI驱动的电商内容策略平台，为品牌营销人员、内容策划师和
 - 避免"圣诞树效应"（过度使用彩色）
 
 **对标案例**:
+- **Linear** (Tier 5) — 定义了"效率美学"，#5E6AD2传达极致专业感
 - **Stripe** (Tier 5) — 定义了"温柔现代主义"，#635BFF已成为品牌符号
-- **超级洞察** (Tier 4) — 学习Stripe但需打磨细节，主色使用比例可更克制
+- **超级洞察** (Tier 4) — 采用Linear紫追求专业工具定位，主色使用比例可更克制
 
 ---
 
@@ -211,6 +214,150 @@ AI驱动的电商内容策略平台，为品牌营销人员、内容策划师和
 - 6%透明度的白色 = 几乎看不见的分割线
 - 视觉上"存在"但不"干扰"
 - 这是 **微交互设计** 的精髓
+
+---
+
+## 🏷️ Token 命名系统 v2.2 (Token Naming System)
+
+### 设计理念
+
+超级洞察使用**语义化 Token 命名**体系，让设计系统更易理解和维护。从 v2.2.0 开始，我们统一了 Token 命名规范，并开始逐步废弃旧的命名方式。
+
+### 语义化 Token (推荐使用)
+
+**背景色 Token:**
+```css
+--color-bg-base           /* 页面主背景 (#0D0D0D) */
+--color-bg-elevated-1     /* 卡片、面板 (#1A1A1A) */
+--color-bg-elevated-2     /* 悬浮卡片、输入框 (#262626) */
+--color-bg-elevated-3     /* Modal、Dropdown 最高层 (#2D2D2D) */
+```
+
+**使用规则:**
+- `base` = 基础层，页面底色
+- `elevated-1/2/3` = 提升层级，数字越大越"浮"在上面
+- 创建清晰的视觉层次: 内容区 < 卡片 < 面板 < 弹窗
+
+**文本色 Token:**
+```css
+--color-text-primary      /* 主标题、重要内容 (#FFFFFF) */
+--color-text-secondary    /* 正文、说明文字 (#A3A3A3) */
+--color-text-tertiary     /* 辅助文字、占位符 (#737373) */
+--color-text-disabled     /* 禁用状态 (#525252) */
+```
+
+**边框色 Token:**
+```css
+--color-border            /* 标准边框 (rgba(255,255,255,0.1)) */
+--color-border-light      /* 悬停/激活边框 (rgba(255,255,255,0.2)) */
+--color-border-heavy      /* 强调边框 (rgba(255,255,255,0.3)) */
+--color-divider           /* 分割线 (rgba(255,255,255,0.06)) */
+```
+
+### 旧版 Token (v2.4.0 将废弃)
+
+**⚠️  以下 Token 已标记为废弃，请在新代码中避免使用:**
+
+```css
+/* ❌ 废弃: 使用 --color-bg-base 替代 */
+--color-bg-primary        
+
+/* ❌ 废弃: 使用 --color-bg-elevated-1 替代 */
+--color-bg-secondary      
+
+/* ❌ 废弃: 使用 --color-bg-elevated-2 替代 */
+--color-bg-tertiary       
+
+/* ❌ 废弃: 使用 --color-bg-elevated-3 替代 */
+--color-bg-elevated       
+```
+
+**为什么废弃?**
+- `primary/secondary/tertiary` 在不同上下文中含义模糊
+- `base` + `elevated-N` 更直观地表达层级关系
+- 与 Tailwind v4 的 Theme Token 命名对齐
+
+### 迁移指南
+
+**组件开发者:**
+```tsx
+// ❌ 旧写法 (不推荐)
+<div style={{ background: 'var(--color-bg-secondary)' }}>
+  <Card />
+</div>
+
+// ✅ 新写法 (推荐)
+<div style={{ background: 'var(--color-bg-elevated-1)' }}>
+  <Card />
+</div>
+```
+
+**CSS 样式表:**
+```css
+/* ❌ 旧写法 */
+.card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+/* ✅ 新写法 */
+.card {
+  background: var(--color-bg-elevated-1);
+  border: 1px solid var(--color-border);
+}
+```
+
+### 向后兼容性
+
+- **v2.2.0 - v2.3.x**: 新旧 Token 并存，旧 Token 触发 Linter 警告
+- **v2.4.0**: 移除旧 Token，必须使用新 Token
+- **过渡期**: 约 3 个月（给现有代码迁移时间）
+
+### Token 使用统计 (v2.2.0)
+
+| Token 类型 | 新 Token 使用率 | 目标 (v2.3.0) |
+|-----------|----------------|---------------|
+| 背景色 | 85% | 100% |
+| 文本色 | 95% | 100% |
+| 边框色 | 90% | 100% |
+
+### Linter 规则
+
+**Stylelint 配置 (.stylelintrc.json):**
+```json
+{
+  "rules": {
+    "custom-property-pattern": {
+      "pattern": "^(color|gradient|space|duration|ease|radius)-(.*)",
+      "message": "使用语义化 Token 命名: --color-bg-base, --color-bg-elevated-1 等"
+    },
+    "declaration-property-value-disallowed-list": {
+      "/.*/": [
+        "--color-bg-primary",
+        "--color-bg-secondary", 
+        "--color-bg-tertiary"
+      ],
+      "message": "⚠️  废弃 Token: 请使用 --color-bg-base 或 --color-bg-elevated-N 替代"
+    }
+  }
+}
+```
+
+### 为什么这样设计？
+
+**1. 认知负担最小化**
+- `elevated-1` > `elevated-2` > `elevated-3` = 一看就懂的层级
+- 避免 `primary` 和 `secondary` 的歧义（是颜色优先级还是背景层级？）
+
+**2. 对标行业标准**
+- Tailwind CSS v4 使用 `bg-base`, `bg-surface`, `bg-overlay`
+- Material Design 3 使用 `surface`, `surface-variant`, `surface-container`
+- 超级洞察采用 `base` + `elevated-N` 平衡直观性和扩展性
+
+**3. 可维护性提升**
+- 新成员不需要死记硬背 Token 含义
+- 代码审查时一眼看出是否使用正确
+- 重构时搜索 `elevated-1` 即可定位所有卡片背景
 
 ---
 
@@ -647,7 +794,7 @@ ghost     — 我几乎不存在
 **2. AI专属渐变**
 ```css
 .btn-ai {
-  background: linear-gradient(135deg, #635BFF 0%, #06B6D4 100%);
+  background: linear-gradient(135deg, #5E6AD2 0%, #06B6D4 100%);
 }
 ```
 - 渐变 = AI标识

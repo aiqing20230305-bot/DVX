@@ -1,9 +1,10 @@
-import { Router, Request, Response } from 'express'
+import { Router, Response } from 'express'
 import { workflowRepo, requestRepo, reviewRepo, CreateWorkflowInput, CreateRequestInput, CreateReviewInput } from '../db/repositories/approval.repo.js'
 import { projectMemberRepo } from '../db/repositories/project-member.repo.js'
 import { logRepo } from '../db/repositories/log.repo.js'
 import { notificationRepo, CreateNotificationInput } from '../db/repositories/notification.repo.js'
-import { authMiddleware, AuthRequest } from '../middleware/auth.middleware.js'
+import { authMiddleware } from '../middleware/auth.middleware.js'
+import { AuthRequest } from '../middleware/permission.middleware.js'
 
 const router = Router()
 

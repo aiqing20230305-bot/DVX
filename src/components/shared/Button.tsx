@@ -52,23 +52,34 @@ export function Button({
 
   const isDisabled = disabled || loading
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  // Add ripple effect (支持鼠标和键盘触发)
+  const addRipple = (x?: number, y?: number) => {
     if (!isDisabled && buttonRef.current) {
-      // Add ripple effect
       const rect = buttonRef.current.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
+      const rippleX = x !== undefined ? x - rect.left : rect.width / 2
+      const rippleY = y !== undefined ? y - rect.top : rect.height / 2
       const id = Date.now()
 
-      setRipples(prev => [...prev, { x, y, id }])
+      setRipples(prev => [...prev, { x: rippleX, y: rippleY, id }])
 
       // Remove ripple after animation (Linear: 300ms快速反馈)
       setTimeout(() => {
         setRipples(prev => prev.filter(r => r.id !== id))
       }, 300)
     }
+  }
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    addRipple(e.clientX, e.clientY)
     onClick?.(e)
+  }
+
+  // 键盘触发ripple (Space/Enter)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      addRipple() // Center ripple for keyboard
+    }
+    props.onKeyDown?.(e)
   }
 
   return (
@@ -76,10 +87,14 @@ export function Button({
       ref={buttonRef}
       disabled={isDisabled}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      aria-busy={loading}
+      aria-live={loading ? 'polite' : undefined}
       className={[
         // Base styles
         'relative inline-flex items-center justify-center font-semibold overflow-hidden',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E6AD2] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+        // Focus ring - Linear风格: 2px outline + 2px offset, 只在键盘focus时显示
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E6AD2] focus-visible:ring-offset-2',
         'select-none transition-all duration-100',
         // Variant & size
         variantClasses[variant],
@@ -88,6 +103,8 @@ export function Button({
         isDisabled
           ? 'opacity-50 cursor-not-allowed'
           : 'cursor-pointer active:scale-[0.98]',
+        // Loading pulse animation
+        loading && 'btn-loading-pulse',
         className
       ].join(' ')}
       {...props}

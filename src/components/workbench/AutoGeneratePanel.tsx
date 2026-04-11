@@ -82,7 +82,7 @@ export function AutoGeneratePanel() {
     try {
       // Step 1: Generate Insights
       if (cancelledRef.current) return
-      updateStep('insights', { status: 'running' })
+      updateStep('insights', { status: 'running', count: 0 })
 
       const insightsResponse = await insightApi.generateStream(activeProjectId)
       const insightsReader = insightsResponse.body?.getReader()
@@ -103,6 +103,8 @@ export function AutoGeneratePanel() {
               const data = JSON.parse(line.slice(6))
               if (data.insights) {
                 setInsights(data.insights)
+                // 实时更新洞察数量
+                updateStep('insights', { status: 'running', count: data.insights.length })
               }
             }
           }
@@ -116,7 +118,7 @@ export function AutoGeneratePanel() {
 
       // Step 2: Generate Topics
       if (cancelledRef.current) return
-      updateStep('topics', { status: 'running' })
+      updateStep('topics', { status: 'running', count: 0 })
 
       const insightIds = freshInsights.map(i => i.id)
       const topicsResponse = await topicApi.generateStream(activeProjectId, insightIds)
@@ -138,6 +140,8 @@ export function AutoGeneratePanel() {
               const data = JSON.parse(line.slice(6))
               if (data.topics) {
                 setTopics(data.topics)
+                // 实时更新选题数量
+                updateStep('topics', { status: 'running', count: data.topics.length })
               }
             }
           }
@@ -151,48 +155,63 @@ export function AutoGeneratePanel() {
 
       // Step 3: Generate Scripts (only for top 8 high-priority topics)
       if (cancelledRef.current) return
-      updateStep('scripts', { status: 'running' })
 
       // Select top 8 topics by priority
       const topTopics = freshTopics
         .sort((a, b) => (b.priority || 0) - (a.priority || 0))
         .slice(0, 8)
 
-      // Generate scripts in parallel for better performance
-      await Promise.all(
-        topTopics.map(async (topic) => {
-          try {
-            const scriptsResponse = await scriptApi.generateStream(activeProjectId, topic.id)
-            const scriptsReader = scriptsResponse.body?.getReader()
-            const scriptsDecoder = new TextDecoder()
+      updateStep('scripts', { status: 'running', count: 0, label: `生成脚本 (0/${topTopics.length})` })
 
-            if (scriptsReader) {
-              let buffer = ''
-              while (true) {
-                const { done, value } = await scriptsReader.read()
-                if (done) break
+      // Generate scripts sequentially to show progress
+      let completedCount = 0
+      for (const topic of topTopics) {
+        if (cancelledRef.current) break
 
-                buffer += scriptsDecoder.decode(value, { stream: true })
-                // Process script stream data
-              }
+        try {
+          updateStep('scripts', {
+            status: 'running',
+            count: completedCount,
+            label: `生成脚本 (${completedCount}/${topTopics.length}) - ${topic.title.slice(0, 15)}...`
+          })
+
+          const scriptsResponse = await scriptApi.generateStream(activeProjectId, topic.id)
+          const scriptsReader = scriptsResponse.body?.getReader()
+          const scriptsDecoder = new TextDecoder()
+
+          if (scriptsReader) {
+            let buffer = ''
+            while (true) {
+              const { done, value } = await scriptsReader.read()
+              if (done) break
+
+              buffer += scriptsDecoder.decode(value, { stream: true })
+              // Process script stream data
             }
-          } catch (error) {
-            console.error(`Failed to generate script for topic ${topic.id}:`, error)
           }
-        })
-      )
+
+          completedCount++
+          updateStep('scripts', {
+            status: 'running',
+            count: completedCount,
+            label: `生成脚本 (${completedCount}/${topTopics.length})`
+          })
+        } catch (error) {
+          console.error(`Failed to generate script for topic ${topic.id}:`, error)
+        }
+      }
 
       // Refresh scripts
       const { scripts: freshScripts } = await scriptApi.listByProject(activeProjectId)
       setScripts(freshScripts)
-      updateStep('scripts', { status: 'completed', count: freshScripts.length })
+      updateStep('scripts', { status: 'completed', count: freshScripts.length, label: '生成脚本' })
 
       // Step 4: Generate Report
       if (cancelledRef.current) return
-      updateStep('report', { status: 'running' })
+      updateStep('report', { status: 'running', label: '生成报告 - 正在汇总数据...' })
 
       await api.post('/report/generate', { projectId: activeProjectId })
-      updateStep('report', { status: 'completed' })
+      updateStep('report', { status: 'completed', label: '生成报告' })
 
       // Success
       if (!cancelledRef.current) {

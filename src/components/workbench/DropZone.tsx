@@ -145,12 +145,20 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
         onDragLeave={handleDragLeave}
         onClick={() => !disabled && inputRef.current?.click()}
         className={[
-          'relative border-2 border-dashed rounded-xl p-10 text-center transition-all duration-200 cursor-pointer',
-          isDragOver
-            ? 'border-[#3370FF] bg-[#3370FF]/10'
-            : 'border-[#DEE0E3] bg-[#F7F8FA]/30 hover:border-[#C9CDD4] hover:bg-[#F7F8FA]/50',
+          'relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 cursor-pointer',
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         ].join(' ')}
+        style={{
+          borderColor: isDragOver ? 'var(--color-primary)' : 'var(--color-border-light)',
+          backgroundColor: isDragOver ? 'rgba(94, 106, 210, 0.05)' : 'var(--color-bg-elevated-1)',
+          backgroundImage: isDragOver
+            ? 'linear-gradient(135deg, rgba(94, 106, 210, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%)'
+            : 'none',
+          ...(isDragOver && {
+            borderImage: 'linear-gradient(135deg, var(--color-primary), #06B6D4) 1',
+            borderImageSlice: 1
+          })
+        }}
       >
         <input
           ref={inputRef}
@@ -161,28 +169,47 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
           onChange={e => handleFiles(e.target.files)}
           disabled={disabled}
         />
-        <div className="flex flex-col items-center gap-3">
-          <div className={[
-            'w-14 h-14 rounded-2xl flex items-center justify-center transition-colors',
-            isDragOver ? 'bg-[#3370FF]/30' : 'bg-[#F7F8FA]'
-          ].join(' ')}>
-            <Upload size={24} className={isDragOver ? 'text-[#5B8EFF]' : 'text-[#8F959E]'} />
+        <div className="flex flex-col items-center gap-4">
+          {/* Enhanced icon with gradient background */}
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-200"
+            style={{
+              background: isDragOver
+                ? 'linear-gradient(135deg, var(--color-primary) 0%, #06B6D4 100%)'
+                : 'var(--color-bg-elevated-2)'
+            }}
+          >
+            <Upload size={28} style={{ color: isDragOver ? '#FFFFFF' : 'var(--color-text-tertiary)' }} />
           </div>
+
+          {/* Title hierarchy */}
           <div>
-            <p className="text-[#646A73] font-medium mb-1">
-              {isDragOver ? '释放文件以上传' : '拖放文件，或点击选择'}
+            <p className="text-base font-semibold mb-1.5" style={{ color: 'var(--color-text-primary)' }}>
+              {isDragOver ? '释放文件以上传' : '拖放文件到这里'}
             </p>
-            <p className="text-[#8F959E] text-sm">支持 Excel、CSV、PDF、图片、视频(MP4/MOV/WebM) · 最大 50MB</p>
+            <p className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+              或点击选择文件
+            </p>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+              支持 Excel、CSV、PDF、图片、视频 · 最大 50MB
+            </p>
           </div>
-          <div className="flex gap-3 mt-1">
+
+          {/* File type badges */}
+          <div className="flex flex-wrap gap-2 mt-2 justify-center">
             {[
-              { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: 'text-emerald-400' },
-              { icon: <FileText size={14} />, label: 'PDF', color: 'text-red-400' },
-              { icon: <Image size={14} />, label: '图片', color: 'text-blue-400' },
-              { icon: <Film size={14} />, label: '视频', color: 'text-purple-400' },
-            ].map(({ icon, label, color }) => (
-              <span key={label} className={`flex items-center gap-1.5 text-xs ${color} bg-[#F7F8FA] px-2.5 py-1 rounded-full`}>
-                {icon}{label}
+              { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: 'text-emerald-400', bg: 'rgba(16, 185, 129, 0.1)' },
+              { icon: <FileText size={14} />, label: 'PDF', color: 'text-red-400', bg: 'rgba(239, 68, 68, 0.1)' },
+              { icon: <Image size={14} />, label: '图片', color: 'text-blue-400', bg: 'rgba(59, 130, 246, 0.1)' },
+              { icon: <Film size={14} />, label: '视频', color: 'text-purple-400', bg: 'rgba(168, 85, 247, 0.1)' },
+            ].map(({ icon, label, color, bg }) => (
+              <span
+                key={label}
+                className={`flex items-center gap-1.5 text-xs ${color} px-3 py-1.5 rounded-full`}
+                style={{ backgroundColor: bg }}
+              >
+                {icon}
+                {label}
               </span>
             ))}
           </div>

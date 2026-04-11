@@ -39,7 +39,12 @@ export function ABVariantPanel({ scripts, loading = false, onSave, onCommentClic
   }
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div className="relative grid grid-cols-1 xl:grid-cols-2 gap-6">
+      {/* Visual separator between A and B variants */}
+      <div className="hidden xl:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2" style={{
+        background: 'linear-gradient(to bottom, transparent 0%, var(--color-border) 10%, var(--color-border) 90%, transparent 100%)'
+      }} />
+
       <div>
         {scriptA
           ? (

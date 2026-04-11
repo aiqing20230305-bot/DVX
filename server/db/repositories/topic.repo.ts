@@ -124,6 +124,60 @@ export const topicRepo = {
     db.prepare(`DELETE FROM topics WHERE id IN (${placeholders})`).run(...ids)
   },
 
+  /**
+   * Batch create topics with transaction
+   * All succeed or all fail
+   */
+  createBatch(projectId: string, dataList: TopicData[]): TopicRow[] {
+    const db = getDb()
+    const now = Date.now()
+
+    // Prepare the insert statement
+    const stmt = db.prepare(
+      `INSERT INTO topics (id, project_id, title, angle, persona, platform, estimated_duration, cta, insight_ref, priority, selected, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+
+    // Transaction: all succeed or all fail
+    const insertMany = db.transaction((items: Array<{ projectId: string; data: TopicData }>) => {
+      const results: TopicRow[] = []
+      for (const { projectId, data } of items) {
+        const id = genId()
+        // Normalize: support both new format (name/direction/targetPersona) and legacy (title/angle/persona)
+        // Clean control characters to prevent JSON parsing issues
+        const title = cleanControlChars(data.name || data.title || '')
+        const angle = cleanControlChars(data.direction || data.angle || '')
+        const persona = cleanControlChars(data.targetPersona || data.persona || '')
+        const platform = data.platform || 'douyin'
+        const estimatedDuration = data.estimatedDuration || 30
+        const cta = cleanControlChars(data.cta || data.core || '')
+        const insightRef = data.insightRef || []
+        const priorityNum = data.rank || 3
+        // Store extra fields as JSON in angle column (append)
+        const extraInfo = [
+          data.nameTag ? `[${cleanControlChars(data.nameTag)}]` : '',
+          data.core ? `核心: ${cleanControlChars(data.core)}` : '',
+          data.hookType ? `钩子: ${cleanControlChars(data.hookType)}` : '',
+          data.contentType ? `类型: ${cleanControlChars(data.contentType)}` : '',
+          data.reason ? `理由: ${cleanControlChars(data.reason)}` : '',
+        ].filter(Boolean).join('\n')
+        const fullAngle = extraInfo ? `${angle}\n---\n${extraInfo}` : angle
+
+        stmt.run(id, projectId, title, fullAngle, persona, platform, estimatedDuration, cta, JSON.stringify(insightRef), priorityNum, 0, now, now)
+        results.push({
+          id, project_id: projectId, title, angle: fullAngle,
+          persona, platform, estimated_duration: estimatedDuration,
+          cta, insight_ref: JSON.stringify(insightRef), priority: priorityNum, selected: 0,
+          created_at: now, updated_at: now
+        })
+      }
+      return results
+    })
+
+    // Execute transaction
+    return insertMany(dataList.map(data => ({ projectId, data })))
+  },
+
   updatePriorityBatch(ids: string[], priority: number): void {
     const db = getDb()
     const now = Date.now()

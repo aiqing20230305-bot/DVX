@@ -1,6 +1,6 @@
 {
   "name": "超级洞察",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",

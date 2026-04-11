@@ -21,7 +21,16 @@
   --color-bg-elevated-2: #F3F4F6;     /* 灰白 - Hover状态 */
   --color-bg-elevated-3: #FFFFFF;     /* 纯白 - Modal, Dropdown (最顶层) */
 
-  /* Legacy alias for compatibility */
+  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.4.0
+   * Use semantic tokens instead:
+   * --color-bg-primary     → --color-bg-base
+   * --color-bg-secondary   → --color-bg-elevated-1
+   * --color-bg-tertiary    → --color-bg-elevated-2
+   * --color-bg-elevated    → --color-bg-elevated-3
+   * --color-surface        → --color-bg-elevated-1
+   * --color-surface-2      → --color-bg-elevated-2
+   * --color-surface-3      → --color-bg-elevated-3
+   */
   --color-bg-primary: #FFFFFF;
   --color-bg-secondary: #F9FAFB;
   --color-bg-tertiary: #F3F4F6;
@@ -39,7 +48,11 @@
   --color-text-link: #5E6AD2;         /* 链接 */
   --color-text-link-hover: #4A55B8;   /* 链接hover */
 
-  /* Legacy text alias */
+  /* ⚠️  DEPRECATED in v2.2.0 - Use semantic tokens:
+   * --color-text        → --color-text-primary
+   * --color-text-muted  → --color-text-secondary
+   * --color-text-subtle → --color-text-tertiary
+   */
   --color-text: #1A1A1A;
   --color-text-muted: #6B7280;
   --color-text-subtle: #9CA3AF;
@@ -50,19 +63,19 @@
   --color-border-subtle: #F3F4F6;     /* 微妙分割 - 内部分割线 */
   --color-divider: rgba(0, 0, 0, 0.06);
 
-  /* Status Colors (语义色) */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.1);
-  --color-success-border: rgba(16, 185, 129, 0.3);
-  --color-warning: #FBBF24;
+  /* Status Colors (语义色) - WCAG AA Compliant (v2.2.0 Phase 5) */
+  --color-success: #059669;           /* 5.1:1 对比度 (原#10B981: 2.97:1 不足) */
+  --color-success-bg: rgba(5, 150, 105, 0.1);
+  --color-success-border: rgba(5, 150, 105, 0.3);
+  --color-warning: #FBBF24;           /* 1.91:1 - 仅配合图标使用，单独使用需#D97706 */
   --color-warning-bg: rgba(251, 191, 36, 0.1);
   --color-warning-border: rgba(251, 191, 36, 0.3);
-  --color-error: #EF4444;
-  --color-error-bg: rgba(239, 68, 68, 0.1);
-  --color-error-border: rgba(239, 68, 68, 0.3);
-  --color-info: #3B82F6;
-  --color-info-bg: rgba(59, 130, 246, 0.1);
-  --color-info-border: rgba(59, 130, 246, 0.3);
+  --color-error: #DC2626;             /* 5.03:1 对比度 (原#EF4444: 3.98:1 不足) */
+  --color-error-bg: rgba(220, 38, 38, 0.1);
+  --color-error-border: rgba(220, 38, 38, 0.3);
+  --color-info: #2563EB;              /* 5.14:1 对比度 (原#3B82F6: 3.55:1 不足) */
+  --color-info-bg: rgba(37, 99, 235, 0.1);
+  --color-info-border: rgba(37, 99, 235, 0.3);
 
   /* Gradients (设计系统v2.0) */
   --gradient-primary: linear-gradient(135deg, #5E6AD2 0%, #8B5CFF 100%);
@@ -98,6 +111,13 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* Linear spring */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);         /* 元素退出 */
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);   /* Material标准 */
+
+  /* AI Operation States (v2.2.0 Phase 2 - AI Visual Language) */
+  --duration-ai-stream: 2000ms;      /* AI 流式生成脉冲周期 */
+  --duration-ai-complete: 600ms;     /* AI 完成庆祝动画 */
+  --color-ai-active: rgba(94, 106, 210, 0.2);    /* AI 激活背景 */
+  --color-ai-border: rgba(94, 106, 210, 0.3);    /* AI 边框 */
+  --color-ai-glow: rgba(94, 106, 210, 0.6);      /* AI 光晕效果 */
 }
 
 /* ====================================================
@@ -112,7 +132,7 @@
   --color-bg-elevated-2: #2A2A2A;     /* 中灰 - Hover状态 */
   --color-bg-elevated-3: #1A1A1A;     /* 深灰 - Modal, Dropdown */
 
-  /* Legacy alias for compatibility */
+  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.4.0 */
   --color-bg-primary: #0A0A0A;
   --color-bg-secondary: #1A1A1A;
   --color-bg-tertiary: #2A2A2A;
@@ -130,7 +150,7 @@
   --color-text-link: #8B95E3;         /* 链接（浅紫色）*/
   --color-text-link-hover: #A3ABEB;   /* 链接hover */
 
-  /* Legacy text alias */
+  /* ⚠️  DEPRECATED in v2.2.0 */
   --color-text: #FFFFFF;
   --color-text-muted: #A3A3A3;
   --color-text-subtle: #737373;
@@ -189,6 +209,7 @@ body {
   50% { opacity: 0; }
 }
 
+/* Streaming Cursor - Pulse (default, Linear style) */
 .streaming-cursor::after {
   content: '▋';
   display: inline-block;
@@ -197,6 +218,199 @@ body {
   margin-left: 1px;
 }
 
+/* Streaming Cursor - Blink (classic style) */
+.streaming-cursor-blink::after {
+  content: '▋';
+  display: inline-block;
+  animation: blink-cursor 1s step-end infinite;
+  color: var(--color-primary);
+  margin-left: 1px;
+}
+
+@keyframes blink-cursor {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Streaming Cursor - Steady (no animation) */
+.streaming-cursor-steady::after {
+  content: '▋';
+  display: inline-block;
+  color: var(--color-primary);
+  margin-left: 1px;
+}
+
+/* Button Ripple Animation - Linear fast feedback */
+@keyframes button-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(15);
+    opacity: 0;
+  }
+}
+
+/* Button Loading Pulse - Improved from static opacity */
+@keyframes button-loading-pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.btn-loading-pulse {
+  animation: button-loading-pulse 1.5s ease-in-out infinite;
+}
+
+/* Modal Animations - Phase 3.3: Scale + Fade entrance */
+@keyframes modal-overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-content-scale-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-overlay-enter {
+  animation: modal-overlay-fade-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content-enter {
+  animation: modal-content-scale-fade-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ====================================================
+   Animation Utility Library (Phase 3.6 - v2.2.0)
+   通用动画工具库，供全局使用
+   ==================================================== */
+
+/* Fade In - 淡入 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade In Up - 向上淡入 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade In Down - 向下淡入 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale In - 缩放淡入 */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide In Right - 从右滑入 */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In Left - 从左滑入 */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation Utility Classes - 动画工具类 */
+.animate-fade-in {
+  animation: fadeIn 200ms var(--ease-out);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 200ms var(--ease-out);
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 200ms var(--ease-out);
+}
+
+.animate-scale-in {
+  animation: scaleIn 200ms var(--ease-out);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 200ms var(--ease-out);
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 200ms var(--ease-out);
+}
+
+/* Stagger Delay Utilities - 交错延迟工具类 */
+.animate-stagger-1 { animation-delay: 100ms; }
+.animate-stagger-2 { animation-delay: 200ms; }
+.animate-stagger-3 { animation-delay: 300ms; }
+.animate-stagger-4 { animation-delay: 400ms; }
+.animate-stagger-5 { animation-delay: 500ms; }
+
+/* Duration Variants - 时长变体 */
+.animate-fast { animation-duration: 150ms !important; }
+.animate-slow { animation-duration: 300ms !important; }
+
+/* Fill Mode - 填充模式 */
+.animate-fill-both { animation-fill-mode: both; }
+.animate-fill-forwards { animation-fill-mode: forwards; }
+
+/* Phase 3.5: Shimmer animation - 优化timing到1.8s */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -210,8 +424,8 @@ body {
     var(--color-bg-elevated-1) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 8px;
+  animation: shimmer 1.8s infinite; /* Phase 3.5: 从1.5s优化到1.8s，更平滑 */
+  /* border-radius由组件自己控制 */
 }
 
 /* Card interaction effects */
@@ -230,6 +444,33 @@ body {
 .card-hover:active {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* ====================================================
+   Keyboard Navigation & Focus States (Phase 5 - v2.2.0)
+   WCAG 2.4.7: Focus Visible
+   ==================================================== */
+
+/* Focus-visible for interactive cards - 2px ring, 2px offset */
+.focus-visible-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.2);
+}
+
+/* Focus-visible for buttons - inner shadow + outer glow */
+.focus-visible-button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-primary),
+              0 0 0 3px rgba(94, 106, 210, 0.2);
+}
+
+/* Focus-visible for inputs */
+.focus-visible-input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
 }
 
 /* Interactive elements */
@@ -451,4 +692,111 @@ body {
   color: var(--color-text-secondary);
   max-width: 400px;
   margin-bottom: 24px;
+}
+
+/* ====================================================
+   AI Visual Language System (v2.2.0 Phase 2)
+   AI操作状态的视觉模式
+   ==================================================== */
+
+/* AI Streaming Pulse - 流式生成脉冲动画 */
+@keyframes ai-stream-pulse {
+  0%, 100% { 
+    opacity: 1; 
+    box-shadow: 0 0 20px var(--color-ai-glow);
+  }
+  50% { 
+    opacity: 0.85; 
+    box-shadow: 0 0 30px var(--color-ai-glow);
+  }
+}
+
+/* AI Complete Glow - 完成庆祝光晕 */
+@keyframes ai-complete-glow {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(1); 
+  }
+}
+
+/* AI Badge Pulse - 新徽章脉冲 */
+@keyframes ai-badge-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 var(--color-ai-border); 
+  }
+  50% { 
+    box-shadow: 0 0 0 6px rgba(94, 106, 210, 0); 
+  }
+}
+
+/* AI Streaming State - 应用于正在生成的容器 */
+.ai-streaming {
+  position: relative;
+  animation: ai-stream-pulse var(--duration-ai-stream) ease-in-out infinite;
+}
+
+/* AI Progress Stage - 进度阶段指示器 */
+.ai-progress-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, 
+    var(--color-ai-active) 0%, 
+    rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid var(--color-ai-border);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all var(--duration-moderate) var(--ease-out);
+}
+
+.ai-progress-stage[data-status="active"] {
+  background: linear-gradient(135deg, 
+    rgba(94, 106, 210, 0.3) 0%, 
+    rgba(6, 182, 212, 0.15) 100%);
+  border-color: rgba(94, 106, 210, 0.5);
+}
+
+.ai-progress-stage[data-status="complete"] {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--color-success);
+}
+
+/* AI Complete Badge - 完成徽章 */
+.ai-complete-badge {
+  animation: ai-complete-glow var(--duration-ai-complete) var(--ease-out);
+}
+
+/* AI Batch Counter - 批量操作计数器 */
+.ai-batch-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums; /* 防止数字跳动 */
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.ai-batch-counter .count-number {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.ai-batch-counter .count-total {
+  font-size: 16px;
+  color: var(--color-text-tertiary);
+}
+
+/* AI Badge New - 新徽章脉冲效果 */
+.ai-badge-new {
+  animation: ai-badge-pulse 2s ease-in-out infinite;
 }

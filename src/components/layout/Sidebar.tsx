@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Database, Lightbulb, FileText, PenTool, BookOpen,
-  ChevronLeft, ChevronRight, Sun, Moon, Plus, Zap,
+  ChevronLeft, ChevronRight, Plus, Zap,
   ChevronDown, Check, Trash2, ArrowLeft, FolderOpen,
   User, LogOut, GitBranch, Settings
 } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store.js'
 import { useProjectStore } from '../../store/project.store.js'
 import { useAuthStore } from '../../store/auth.store.js'
-import { useTheme } from '../../contexts/ThemeContext.js'
 import { toast } from '../../store/toast.store.js'
 import { Modal } from '../shared/Modal.js'
 import { Button } from '../shared/Button.js'
@@ -35,7 +34,6 @@ export function Sidebar() {
   const { sidebarCollapsed, toggleSidebar } = useUIStore()
   const { projects, activeProjectId, setActiveProject, addProject, removeProject } = useProjectStore()
   const { user, logout } = useAuthStore()
-  const { theme, toggleTheme } = useTheme()
   const [projectDropdown, setProjectDropdown] = useState(false)
   const [userDropdown, setUserDropdown] = useState(false)
   const [newProjectModal, setNewProjectModal] = useState(false)
@@ -339,24 +337,6 @@ export function Sidebar() {
           <div className="flex items-center gap-1 flex-shrink-0">
             {/* Notification Center */}
             {user && token && <NotificationCenter token={token} />}
-
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
-              style={{ color: 'var(--color-text-secondary)' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-primary)';
-                e.currentTarget.style.backgroundColor = 'var(--color-bg-tertiary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-              title={theme === 'dark' ? '切换到亮色' : '切换到暗色'}
-            >
-              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
 
             {/* Sidebar toggle */}
             <button

@@ -19,7 +19,7 @@ router.get(
   requireProjectMember('viewer'),
   (req: AuthRequest, res: Response) => {
     try {
-      const projectId = req.params.id
+      const projectId = req.params.id as string
       const members = projectMemberRepo.getMembersByProject(projectId)
 
       res.json({
@@ -54,7 +54,7 @@ router.post(
   requireProjectMember('editor'),
   async (req: AuthRequest, res: Response) => {
     try {
-      const projectId = req.params.id
+      const projectId = req.params.id as string
       const { email, role } = req.body
       const inviterId = req.userId!
 
@@ -358,7 +358,7 @@ router.get(
   requireProjectMember('viewer'),
   (req: AuthRequest, res: Response) => {
     try {
-      const projectId = req.params.id
+      const projectId = req.params.id as string
       const owner = projectMemberRepo.getProjectOwner(projectId)
 
       if (!owner) {
@@ -402,7 +402,7 @@ router.post(
   requireProjectOwner(),
   async (req: AuthRequest, res: Response) => {
     try {
-      const projectId = req.params.id
+      const projectId = req.params.id as string
       const { newOwnerId } = req.body
       const currentOwnerId = req.userId!
 
@@ -497,7 +497,7 @@ router.get(
   requireProjectMember('viewer'),
   (req: AuthRequest, res: Response) => {
     try {
-      const projectId = req.params.id
+      const projectId = req.params.id as string
       const count = projectMemberRepo.countMembersByProject(projectId)
 
       res.json({

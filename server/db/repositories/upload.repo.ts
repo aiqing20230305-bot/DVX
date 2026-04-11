@@ -8,7 +8,7 @@ export interface Upload {
   original_name: string
   mime_type: string
   size: number
-  file_type: 'market_data' | 'product_info' | 'product_features'
+  file_type: 'market_data' | 'product_info' | 'product_features' | 'brand_guide'
   status: 'uploading' | 'parsing' | 'ready' | 'error'
   parsed_data: string | null
   error_message: string | null

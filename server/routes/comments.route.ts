@@ -213,11 +213,11 @@ router.delete(
   authMiddleware,
   async (req: AuthRequest, res: Response) => {
     try {
-      const commentId = req.params.commentId
+      const commentId = req.params.commentId as string
       const userId = req.userId!
 
       // 获取评论信息
-      const comment = commentRepo.findById(commentId)
+      const comment = commentRepo.findById(commentId as string)
       if (!comment) {
         return res.status(404).json({
           error: '评论不存在',

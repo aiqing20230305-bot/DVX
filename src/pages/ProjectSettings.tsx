@@ -7,6 +7,7 @@ import { useAuthStore } from '../store/auth.store'
 import { useApprovalStore } from '../store/approval.store'
 import MemberList from '../components/members/MemberList'
 import InviteMemberModal from '../components/members/InviteMemberModal'
+import ProductManagement from '../components/products/ProductManagement'
 import { WorkflowList, WorkflowForm } from '../components/approval'
 import { ApprovalWorkflow } from '../api/approval.api'
 import { Button } from '../components/shared/Button'
@@ -203,6 +204,14 @@ export default function ProjectSettings() {
                 onInvite={() => setInviteModalOpen(true)}
               />
             )}
+          </section>
+
+          {/* Product Management Section */}
+          <section className="border rounded-lg p-6" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <ProductManagement projectId={activeProjectId} />
           </section>
 
           {/* Approval Workflows Section */}
