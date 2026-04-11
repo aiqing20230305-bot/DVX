@@ -6,7 +6,8 @@ import { ErrorBoundary } from './components/shared/ErrorBoundary.js'
 import { TestingTrackerProvider } from './components/testing/TestingTracker.js'
 import { ProtectedRoute } from './components/auth/ProtectedRoute.js'
 import { PublicRoute } from './components/auth/PublicRoute.js'
-import { ThemeProvider } from './contexts/ThemeContext.js'
+// ThemeProvider removed in v2.4.0 Phase 1.2 - Theme management consolidated to UIStore
+// import { ThemeProvider } from './contexts/ThemeContext.js'
 import { useProjectStore } from './store/project.store.js'
 import { useAuthStore } from './store/auth.store.js'
 import { useUIStore } from './store/ui.store.js'
@@ -78,11 +79,12 @@ export function App() {
   }, [isAuthenticated])
 
   return (
-    <ThemeProvider>
-      <ErrorBoundary>
-        <ToastContainer />
-        <Suspense fallback={<PageLoading />}>
-          <Routes>
+    // v2.4.0 Phase 1.2: Theme management consolidated to UIStore
+    // ThemeProvider removed - theme state now managed by useUIStore()
+    <ErrorBoundary>
+      <ToastContainer />
+      <Suspense fallback={<PageLoading />}>
+        <Routes>
           {/* Public routes (login/register) */}
           <Route
             path="/login"
@@ -137,6 +139,5 @@ export function App() {
           </Routes>
         </Suspense>
       </ErrorBoundary>
-    </ThemeProvider>
   )
 }
