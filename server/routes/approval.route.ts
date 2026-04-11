@@ -125,7 +125,7 @@ router.get('/api/approval/workflows', authMiddleware, async (req: AuthRequest, r
  */
 router.put('/api/approval/workflows/:workflowId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { workflowId } = req.params
+    const workflowId = req.params.workflowId as string
     const { name, description, steps, status } = req.body
     const userId = req.userId!
 
@@ -190,7 +190,7 @@ router.put('/api/approval/workflows/:workflowId', authMiddleware, async (req: Au
  */
 router.delete('/api/approval/workflows/:workflowId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { workflowId } = req.params
+    const workflowId = req.params.workflowId as string
     const userId = req.userId!
 
     const workflow = workflowRepo.findById(workflowId)
@@ -375,7 +375,7 @@ router.get('/api/approval/requests/pending', authMiddleware, async (req: AuthReq
  */
 router.put('/api/approval/requests/:requestId/cancel', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { requestId } = req.params
+    const requestId = req.params.requestId as string
     const userId = req.userId!
 
     const request = requestRepo.findById(requestId)
@@ -429,7 +429,7 @@ router.put('/api/approval/requests/:requestId/cancel', authMiddleware, async (re
  */
 router.post('/api/approval/requests/:requestId/review', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { requestId } = req.params
+    const requestId = req.params.requestId as string
     const { status, comment } = req.body
     const userId = req.userId!
 
@@ -633,7 +633,7 @@ router.post('/api/approval/requests/:requestId/review', authMiddleware, async (r
  */
 router.get('/api/approval/requests/:requestId/reviews', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { requestId } = req.params
+    const requestId = req.params.requestId as string
     const userId = req.userId!
 
     const request = requestRepo.findById(requestId)

@@ -41,10 +41,9 @@ router.post('/', authMiddleware, requireProjectMember('editor'), async (req: Req
       angle: angle || '产品卖点型',
       persona: persona || '目标受众',
       platform: platform || '抖音',
-      estimated_duration: estimated_duration || 30,
+      estimatedDuration: estimated_duration || 30,
       cta: cta || '立即购买',
-      priority: 'medium',
-      selected: selected || false
+      priority: 'medium'
     })
 
     // Record to timeline

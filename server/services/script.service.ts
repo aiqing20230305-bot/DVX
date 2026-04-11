@@ -1,4 +1,4 @@
-import { topicRepo } from '../db/repositories/topic.repo.js'
+import { topicRepo, TopicRow } from '../db/repositories/topic.repo.js'
 import { scriptRepo, ScriptData } from '../db/repositories/script.repo.js'
 import { logRepo } from '../db/repositories/log.repo.js'
 import { uploadRepo } from '../db/repositories/upload.repo.js'
@@ -437,7 +437,7 @@ export async function generateScriptsBatchStream(projectId: string, topicIds: st
 
   try {
     // Validate all topics exist
-    const topics = topicIds.map(id => topicRepo.findById(id)).filter(Boolean)
+    const topics = topicIds.map(id => topicRepo.findById(id)).filter((t): t is TopicRow => Boolean(t))
     if (topics.length === 0) {
       sendSSEEvent(res, 'error', { message: '未找到有效的选题' })
       closeSSE(res)

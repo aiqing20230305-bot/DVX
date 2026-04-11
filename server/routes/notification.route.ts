@@ -64,7 +64,7 @@ router.get('/api/notifications/unread-count', authMiddleware, async (req: AuthRe
  */
 router.put('/api/notifications/:id/read', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params
+    const id = req.params.id as string
     const userId = req.userId!
 
     // 查找通知
@@ -155,7 +155,7 @@ router.post('/api/notifications/read-batch', authMiddleware, async (req: AuthReq
  */
 router.delete('/api/notifications/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params
+    const id = req.params.id as string
     const userId = req.userId!
 
     // 查找通知
