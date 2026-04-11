@@ -147,8 +147,10 @@ export function Sidebar() {
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-border-light)'}
                   onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
+                  aria-label={projectDropdown ? "收起项目列表" : "展开项目列表"}
+                  aria-expanded={projectDropdown}
                 >
-                  <ChevronDown size={14} className={`transition-transform ${projectDropdown ? 'rotate-180' : ''}`} style={{ color: 'var(--color-text-secondary)' }} />
+                  <ChevronDown size={14} className={`transition-transform ${projectDropdown ? 'rotate-180' : ''}`} style={{ color: 'var(--color-text-secondary)' }} aria-hidden="true" />
                 </button>
               </div>
 
@@ -179,8 +181,9 @@ export function Sidebar() {
                           e.currentTarget.style.color = 'var(--color-text-tertiary)';
                         }}
                         onClick={(e) => { e.stopPropagation(); removeProject(project.id) }}
+                        aria-label={`删除项目 ${project.name}`}
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={12} aria-hidden="true" />
                       </button>
                     </div>
                   ))}

@@ -90,9 +90,9 @@ export function ProjectStatsPanel() {
 
   return (
     <div className="mb-8">
-      <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+      <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-secondary)' }}>
         项目进度
-      </h3>
+      </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map(stat => {
           const Icon = stat.icon
