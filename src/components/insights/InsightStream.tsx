@@ -77,22 +77,23 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
         {insights.length > 0 && (
           <div>
             <div className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>已生成 {insights.length} 条洞察</div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none" role="list">
               {insights.map((insight, index) => (
-                <InsightCard
-                  key={insight.id}
-                  insight={insight}
-                  selected={selectedIds.has(insight.id)}
-                  focused={index === focusIndex}
-                  onToggleSelect={onToggleSelect}
-                  onCommentClick={onCommentClick}
-                  commentCount={getCommentCount?.('insight', insight.id) || 0}
-                  data-keyboard-focus={insight.id}
-                />
+                <li key={insight.id} role="listitem">
+                  <InsightCard
+                    insight={insight}
+                    selected={selectedIds.has(insight.id)}
+                    focused={index === focusIndex}
+                    onToggleSelect={onToggleSelect}
+                    onCommentClick={onCommentClick}
+                    commentCount={getCommentCount?.('insight', insight.id) || 0}
+                    data-keyboard-focus={insight.id}
+                  />
+                </li>
               ))}
               {/* Skeleton placeholders */}
               {insights.length < 3 && <SkeletonList count={3 - insights.length} />}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -116,20 +117,21 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
       {insights.length === 0 ? (
         <div className="text-center py-16" style={{ color: 'var(--color-text-tertiary)' }}>未生成任何洞察</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" role="listbox" aria-activedescendant={focusedId || undefined}>
+        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none" role="listbox" aria-activedescendant={focusedId || undefined}>
           {insights.map((insight, index) => (
-            <InsightCard
-              key={insight.id}
-              insight={insight}
-              selected={selectedIds.has(insight.id)}
-              focused={index === focusIndex}
-              onToggleSelect={onToggleSelect}
-              onCommentClick={onCommentClick}
-              commentCount={getCommentCount?.('insight', insight.id) || 0}
-              data-keyboard-focus={insight.id}
-            />
+            <li key={insight.id} role="listitem">
+              <InsightCard
+                insight={insight}
+                selected={selectedIds.has(insight.id)}
+                focused={index === focusIndex}
+                onToggleSelect={onToggleSelect}
+                onCommentClick={onCommentClick}
+                commentCount={getCommentCount?.('insight', insight.id) || 0}
+                data-keyboard-focus={insight.id}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   )

@@ -66,21 +66,22 @@ export function TopicGrid({
           <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>AI 正在基于洞察生成选题方案...</span>
         </div>
         {topics.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none" role="list">
             {topics.map((t, index) => (
-              <TopicCard
-                key={t.id}
-                topic={t}
-                selected={selectedIds.has(t.id)}
-                focused={index === focusIndex}
-                onToggleSelect={onToggleSelect}
-                onPriorityChange={onPriorityChange}
-                onCommentClick={onCommentClick}
-                commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
-                data-keyboard-focus={t.id}
-              />
+              <li key={t.id} role="listitem">
+                <TopicCard
+                  topic={t}
+                  selected={selectedIds.has(t.id)}
+                  focused={index === focusIndex}
+                  onToggleSelect={onToggleSelect}
+                  onPriorityChange={onPriorityChange}
+                  onCommentClick={onCommentClick}
+                  commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
+                  data-keyboard-focus={t.id}
+                />
+              </li>
             ))}
-          </div>
+          </ul>
         ) : (
           <SkeletonList count={6} />
         )}
@@ -102,20 +103,21 @@ export function TopicGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" role="listbox" aria-activedescendant={focusedId || undefined}>
+    <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none" role="listbox" aria-activedescendant={focusedId || undefined}>
       {topics.map((t, index) => (
-        <TopicCard
-          key={t.id}
-          topic={t}
-          selected={selectedIds.has(t.id)}
-          focused={index === focusIndex}
-          onToggleSelect={onToggleSelect}
-          onPriorityChange={onPriorityChange}
-          onCommentClick={onCommentClick}
-          commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
-          data-keyboard-focus={t.id}
-        />
+        <li key={t.id} role="listitem">
+          <TopicCard
+            topic={t}
+            selected={selectedIds.has(t.id)}
+            focused={index === focusIndex}
+            onToggleSelect={onToggleSelect}
+            onPriorityChange={onPriorityChange}
+            onCommentClick={onCommentClick}
+            commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
+            data-keyboard-focus={t.id}
+          />
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
