@@ -133,7 +133,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
                 </div>
               )}
               <div className="font-medium text-[#1F2329] mb-1">{option.label}</div>
-              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{option.description}</div>
+              <div className="text-xs" style={{ color: fileType === option.value ? '#65686F' : 'var(--color-text-tertiary)' }}>{option.description}</div>
             </button>
           ))}
         </div>
@@ -198,10 +198,10 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
           {/* File type badges */}
           <div className="flex flex-wrap gap-2 mt-2 justify-center">
             {[
-              { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: 'var(--color-success)', bg: 'var(--color-success-bg)' },
-              { icon: <FileText size={14} />, label: 'PDF', color: 'var(--color-error)', bg: 'var(--color-error-bg)' },
-              { icon: <Image size={14} />, label: '图片', color: 'var(--color-info)', bg: 'var(--color-info-bg)' },
-              { icon: <Film size={14} />, label: '视频', color: 'var(--color-primary)', bg: 'var(--color-primary-subtle)' },
+              { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: '#037754', bg: 'rgba(5, 150, 105, 0.1)' },
+              { icon: <FileText size={14} />, label: 'PDF', color: '#BB2020', bg: 'rgba(220, 38, 38, 0.1)' },
+              { icon: <Image size={14} />, label: '图片', color: '#1F54C7', bg: 'rgba(37, 99, 235, 0.1)' },
+              { icon: <Film size={14} />, label: '视频', color: '#4F5AB2', bg: 'rgba(94, 106, 210, 0.1)' },
             ].map(({ icon, label, color, bg }) => (
               <span
                 key={label}

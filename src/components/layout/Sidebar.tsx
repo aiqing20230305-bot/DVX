@@ -241,7 +241,7 @@ export function Sidebar() {
                 ].join(' ')}
                 style={({ isActive }) => isActive ? {
                   backgroundColor: 'rgba(94, 106, 210, 0.15)',
-                  color: 'var(--color-primary)',
+                  color: 'var(--color-primary-active)',
                   borderColor: 'rgba(94, 106, 210, 0.3)',
                   boxShadow: '0 10px 15px -3px rgba(94, 106, 210, 0.2)'
                 } : {

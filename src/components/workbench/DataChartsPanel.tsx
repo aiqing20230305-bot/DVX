@@ -88,7 +88,7 @@ export function DataChartsPanel() {
     <div className="mb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-[#646A73]">数据统计</h3>
+        <h2 className="text-sm font-medium text-[#646A73]">数据统计</h2>
         <div className="flex gap-2">
           {(['7', '30', 'all'] as TimeRange[]).map(range => (
             <button
