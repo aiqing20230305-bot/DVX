@@ -1,4 +1,4 @@
-import { config } from '../config'
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001'
 
 export interface Product {
   id: string
@@ -22,7 +22,7 @@ export interface ProductInput {
  * 获取项目的产品列表
  */
 export async function getProducts(projectId: string): Promise<Product[]> {
-  const response = await fetch(`${config.apiUrl}/project/${projectId}/products`, {
+  const response = await fetch(`${API_BASE}/api/project/${projectId}/products`, {
     credentials: 'include'
   })
 
@@ -38,7 +38,7 @@ export async function getProducts(projectId: string): Promise<Product[]> {
  * 创建产品
  */
 export async function createProduct(projectId: string, input: ProductInput): Promise<Product> {
-  const response = await fetch(`${config.apiUrl}/project/${projectId}/products`, {
+  const response = await fetch(`${API_BASE}/api/project/${projectId}/products`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -62,7 +62,7 @@ export async function updateProduct(
   productId: string,
   input: Partial<ProductInput>
 ): Promise<Product> {
-  const response = await fetch(`${config.apiUrl}/project/${projectId}/products/${productId}`, {
+  const response = await fetch(`${API_BASE}/api/project/${projectId}/products/${productId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -82,7 +82,7 @@ export async function updateProduct(
  * 删除产品
  */
 export async function deleteProduct(projectId: string, productId: string): Promise<void> {
-  const response = await fetch(`${config.apiUrl}/project/${projectId}/products/${productId}`, {
+  const response = await fetch(`${API_BASE}/api/project/${projectId}/products/${productId}`, {
     method: 'DELETE',
     credentials: 'include'
   })
@@ -97,7 +97,7 @@ export async function deleteProduct(projectId: string, productId: string): Promi
  * 刷新产品列表（重新提取）
  */
 export async function refreshProducts(projectId: string): Promise<Product[]> {
-  const response = await fetch(`${config.apiUrl}/project/${projectId}/products/refresh`, {
+  const response = await fetch(`${API_BASE}/api/project/${projectId}/products/refresh`, {
     method: 'POST',
     credentials: 'include'
   })

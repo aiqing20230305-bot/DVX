@@ -110,3 +110,21 @@ export function SkeletonGroup({ children, className = '' }: { children: React.Re
     </div>
   )
 }
+
+/**
+ * SkeletonList - 用于显示卡片列表的骨架
+ *
+ * @example
+ * ```tsx
+ * <SkeletonList count={6} />
+ * ```
+ */
+export function SkeletonList({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      {Array.from({ length: count }).map((_, i) => (
+        <Skeleton key={i} variant="card" height="200px" />
+      ))}
+    </div>
+  )
+}

@@ -362,7 +362,6 @@ export function Topics() {
   }, [topics, debouncedSearchQuery, filterPlatform, filterPriority, filterSelected, selectedIds, sortBy, sortAscending])
 
   // Keyboard navigation for topics list
-  const isGenerating = status === 'streaming' || status === 'loading'
   const { focusIndex, focusedId } = useKeyboardNavigation({
     items: sortedTopics,
     getItemId: (item) => item.id,
