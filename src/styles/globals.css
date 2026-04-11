@@ -43,7 +43,7 @@
   /* Text Colors - 4级对比系统 (Default: Light Theme) */
   --color-text-primary: #1A1A1A;      /* 主文字 - 标题, 按钮 */
   --color-text-secondary: #6B7280;    /* 次文字 - 正文, 描述 */
-  --color-text-tertiary: #9CA3AF;     /* 三级文字 - 辅助, 标签 */
+  --color-text-tertiary: #6D7078;     /* 三级文字 - 辅助, 标签 (WCAG AA: 4.50:1 min, v2.2.1修复) */
   --color-text-disabled: #D1D5DB;     /* 禁用 - 不可用状态 */
   --color-text-link: #5E6AD2;         /* 链接 */
   --color-text-link-hover: #4A55B8;   /* 链接hover */
@@ -55,7 +55,7 @@
    */
   --color-text: #1A1A1A;
   --color-text-muted: #6B7280;
-  --color-text-subtle: #9CA3AF;
+  --color-text-subtle: #6D7078;  /* v2.2.1: WCAG AA 修复 (#F9FAFB: 4.74:1, #F3F4F6: 4.50:1) */
 
   /* Border Colors - 2级细腻系统 (Default: Light Theme) */
   --color-border: #E5E7EB;            /* 主边框 - 1px实线 */
