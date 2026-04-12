@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle, Clock, XCircle, RefreshCw, Loader2, AlertCircle } from 'lucide-react'
+import { PenTool, Zap, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, CheckCircle, Clock, XCircle, RefreshCw, Loader2, AlertCircle, Layout } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
 import { useTopicStore } from '../store/topic.store.js'
 import { useScriptStore } from '../store/script.store.js'
@@ -16,6 +16,9 @@ import { CardSkeleton } from '../components/shared/LoadingSpinner.js'
 import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { CommentPanel } from '../components/comments/CommentPanel.js'
+import { TemplateSelectModal } from '../components/scripts/TemplateSelectModal.js'
+import { SaveAsTemplateModal } from '../components/scripts/SaveAsTemplateModal.js'
+import { ScriptEditModal } from '../components/scripts/ScriptEditModal.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { useDebounce } from '../hooks/useDebounce.js'
 import { Script, ScriptSegment, TopicCard } from '../types/index.js'
@@ -43,6 +46,12 @@ interface BatchTopicStatus {
 export function Scripts() {
   const navigate = useNavigate()
   const { activeProjectId } = useProjectStore()
+
+  // v2.11.0 Phase 3.2: WCAG 2.4.2 - Set unique page title
+  useEffect(() => {
+    document.title = '脚本创作 · 超级洞察'
+  }, [])
+
   const [initialLoading, setInitialLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -68,6 +77,11 @@ export function Scripts() {
   const [batchTopicStatuses, setBatchTopicStatuses] = useState<Map<string, BatchTopicStatus>>(new Map())
   const [productList, setProductList] = useState<string[]>([])
   const [selectedProduct, setSelectedProduct] = useState<string>('')
+  const [templateSelectModalOpen, setTemplateSelectModalOpen] = useState(false)
+  const [saveAsTemplateModalOpen, setSaveAsTemplateModalOpen] = useState(false)
+  const [scriptToSave, setScriptToSave] = useState<Script | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingScript, setEditingScript] = useState<Script | null>(null)
 
   // Initialize token from localStorage (client-side only)
   useEffect(() => {
@@ -405,6 +419,35 @@ export function Scripts() {
   const handleSaveScript = async (id: string, data: { segments: ScriptSegment[]; fullText: string; wordCount: number }) => {
     await scriptApi.update(id, data)
     updateScript(id, data)
+
+    // v2.16.0 Phase 2: Create history record after successful save (silently)
+    try {
+      await scriptApi.createHistory(id, {
+        segments: data.segments,
+        fullText: data.fullText,
+        wordCount: data.wordCount
+      })
+    } catch (err) {
+      // Silent failure - don't interrupt user workflow
+      console.warn('Failed to create history record:', err)
+    }
+  }
+
+  // v2.16.0 Phase 2: Restore script to historical version
+  const handleRestoreVersion = async (scriptId: string, historyId: string) => {
+    try {
+      await scriptApi.restoreVersion(scriptId, historyId)
+      // Reload scripts to get the updated content
+      if (activeProjectId) {
+        const response = await scriptApi.getAll(activeProjectId)
+        setScripts(response.scripts)
+      }
+      toast.success('版本回退成功')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '回退失败'
+      toast.error('回退失败', message)
+      throw err // Re-throw to let the modal handle it
+    }
   }
 
   const handleExport = () => {
@@ -492,6 +535,41 @@ export function Scripts() {
     setCommentPanelOpen(true)
   }
 
+  const handleSaveAsTemplate = (script: Script) => {
+    setScriptToSave(script)
+    setSaveAsTemplateModalOpen(true)
+  }
+
+  const handleEditScript = (script: Script) => {
+    setEditingScript(script)
+    setEditModalOpen(true)
+  }
+
+  const handleSaveEditedScript = async (id: string, data: { segments: ScriptSegment[]; fullText: string; wordCount: number }) => {
+    try {
+      await scriptApi.update(id, data)
+      // Update local state
+      setScripts(scripts.map(s => s.id === id ? { ...s, ...data, updated_at: new Date().toISOString() } : s))
+      toast.success('保存成功', '脚本已更新')
+    } catch (err) {
+      toast.error('保存失败', err instanceof Error ? err.message : String(err))
+      throw err
+    }
+  }
+
+  const handleDeleteScript = async (script: Script) => {
+    try {
+      await scriptApi.deleteMany([script.id])
+
+      // 从本地状态中移除
+      setScripts(scripts.filter(s => s.id !== script.id))
+
+      toast.success('删除成功', `已删除 ${script.variant} 版本脚本`)
+    } catch (err) {
+      toast.error('删除失败', err instanceof Error ? err.message : String(err))
+    }
+  }
+
   const toggleTopicExpand = (id: string) => {
     setExpandedTopics(prev => {
       const next = new Set(prev)
@@ -519,9 +597,19 @@ export function Scripts() {
         <p className="text-sm ml-12" style={{ color: 'var(--color-text-tertiary)' }}>为每个选题生成 A/B 两个版本脚本，支持在线编辑</p>
       </div>
 
-      {/* Batch Generation Button */}
+      {/* Action Buttons */}
       {!initialLoading && selectedTopics.length > 0 && (
         <div className="mb-6 flex items-center gap-3">
+          {/* 从模板创建 - v2.14.1 */}
+          <Button
+            variant="secondary"
+            onClick={() => setTemplateSelectModalOpen(true)}
+            icon={<Layout size={15} />}
+          >
+            从模板创建
+          </Button>
+
+          {/* 批量生成 */}
           <Button
             variant="ai"
             onClick={() => setBatchGenerateDialogOpen(true)}
@@ -736,9 +824,16 @@ export function Scripts() {
                 <div className="p-4">
                   <ABVariantPanel
                     scripts={topicScripts}
+                    topicTitle={topic.title}
+                    selectedIds={selectedIds}
+                    onToggleSelection={toggleSelection}
                     loading={isGeneratingThis && topicScripts.length === 0}
                     onSave={handleSaveScript}
                     onCommentClick={handleCommentClick}
+                    onSaveAsTemplate={handleSaveAsTemplate}
+                    onEditScript={handleEditScript}
+                    onDeleteScript={handleDeleteScript}
+                    onRestoreVersion={handleRestoreVersion}
                     getCommentCount={getCommentCount}
                   />
                 </div>
@@ -1146,6 +1241,43 @@ export function Scripts() {
           targetId={selectedScriptId}
           isOpen={commentPanelOpen}
           onToggle={() => setCommentPanelOpen(!commentPanelOpen)}
+        />
+      )}
+
+      {/* Template Select Modal - v2.14.1 */}
+      <TemplateSelectModal
+        isOpen={templateSelectModalOpen}
+        onClose={() => setTemplateSelectModalOpen(false)}
+        onScriptCreated={() => {
+          // Refresh scripts list
+          if (activeProjectId) {
+            loadData()
+          }
+        }}
+      />
+
+      {/* Save As Template Modal - v2.14.1 */}
+      <SaveAsTemplateModal
+        script={scriptToSave}
+        isOpen={saveAsTemplateModalOpen}
+        onClose={() => {
+          setSaveAsTemplateModalOpen(false)
+          setScriptToSave(null)
+        }}
+        onSuccess={() => {
+          toast.success('模板创建成功', '已保存到模板库')
+        }}
+      />
+
+      {/* Script Edit Modal - v2.15.0 */}
+      {editingScript && (
+        <ScriptEditModal
+          script={editingScript}
+          onClose={() => {
+            setEditModalOpen(false)
+            setEditingScript(null)
+          }}
+          onSave={handleSaveEditedScript}
         />
       )}
     </div>

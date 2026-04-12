@@ -40,28 +40,29 @@ export function Register() {
   const validate = () => {
     const newErrors: Record<string, string> = {}
 
+    // v2.11.0 Phase 3.2: WCAG 3.3.3 - Provide specific, actionable error messages
     if (!formData.name) {
-      newErrors.name = '请输入姓名'
+      newErrors.name = '请输入您的姓名'
     } else if (formData.name.length < 2) {
-      newErrors.name = '姓名至少2个字符'
+      newErrors.name = '姓名需要至少2个字符，请输入完整姓名'
     }
 
     if (!formData.email) {
-      newErrors.email = '请输入邮箱'
+      newErrors.email = '请输入邮箱地址'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '邮箱格式不正确'
+      newErrors.email = '请输入有效的邮箱地址，格式如：example@company.com'
     }
 
     if (!formData.password) {
-      newErrors.password = '请输入密码'
+      newErrors.password = '请设置您的登录密码'
     } else if (formData.password.length < 8) {
-      newErrors.password = '密码至少需要8个字符'
+      newErrors.password = '密码强度不足，请设置至少8个字符的密码'
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = '请确认密码'
+      newErrors.confirmPassword = '请再次输入密码以确认'
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = '两次输入的密码不一致'
+      newErrors.confirmPassword = '两次输入的密码不一致，请重新确认'
     }
 
     setErrors(newErrors)
@@ -100,61 +101,88 @@ export function Register() {
         <div className="bg-[#1A1A1A] border border-[#333333] rounded-lg p-8">
           <h2 className="text-2xl font-semibold text-white mb-6">注册</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-[#FFFFFF] mb-2">
-                姓名
+              <label htmlFor="register-name" className="block text-sm font-medium text-[#FFFFFF] mb-2">
+                姓名 <span className="text-red-400" aria-label="必填项">*</span>
               </label>
               <Input
+                id="register-name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="请输入姓名"
+                required
+                aria-required="true"
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'name-error' : undefined}
                 className={errors.name ? 'border-red-500' : ''}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                <p id="name-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.name}
+                </p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-[#FFFFFF] mb-2">
-                邮箱
+              <label htmlFor="register-email" className="block text-sm font-medium text-[#FFFFFF] mb-2">
+                邮箱 <span className="text-red-400" aria-label="必填项">*</span>
               </label>
               <Input
+                id="register-email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="请输入邮箱"
+                required
+                aria-required="true"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
                 className={errors.email ? 'border-red-500' : ''}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p id="email-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.email}
+                </p>
               )}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-[#FFFFFF] mb-2">
-                密码
+              <label htmlFor="register-password" className="block text-sm font-medium text-[#FFFFFF] mb-2">
+                密码 <span className="text-red-400" aria-label="必填项">*</span>
               </label>
               <Input
+                id="register-password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 onFocus={() => setShowPasswordStrength(true)}
                 placeholder="请输入密码（至少8个字符）"
+                required
+                aria-required="true"
+                aria-invalid={!!errors.password}
+                aria-describedby={
+                  errors.password
+                    ? 'password-error'
+                    : showPasswordStrength && formData.password
+                      ? 'password-strength'
+                      : undefined
+                }
                 className={errors.password ? 'border-red-500' : ''}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.password}
+                </p>
               )}
 
               {/* Password Strength Indicator */}
               {showPasswordStrength && formData.password && (
-                <div className="mt-2 space-y-1">
+                <div id="password-strength" className="mt-2 space-y-1" aria-live="polite" aria-atomic="true">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-[#A3A3A3]">密码强度:</span>
                     <span className={`font-medium ${passwordStrength.color}`}>
@@ -209,34 +237,43 @@ export function Register() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-[#FFFFFF] mb-2">
-                确认密码
+              <label htmlFor="register-confirm-password" className="block text-sm font-medium text-[#FFFFFF] mb-2">
+                确认密码 <span className="text-red-400" aria-label="必填项">*</span>
               </label>
               <Input
+                id="register-confirm-password"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 placeholder="请再次输入密码"
+                required
+                aria-required="true"
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
                 className={errors.confirmPassword ? 'border-red-500' : ''}
               />
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                <p id="confirm-password-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.confirmPassword}
+                </p>
               )}
             </div>
 
             {/* Terms */}
             <div className="flex items-start gap-2">
               <input
+                id="terms-checkbox"
                 type="checkbox"
                 required
+                aria-required="true"
                 className="mt-1 rounded"
               />
-              <span className="text-sm text-[#A3A3A3]">
+              <label htmlFor="terms-checkbox" className="text-sm text-[#A3A3A3]">
                 我已阅读并同意
                 <a href="#" className="text-[#5E6AD2] hover:text-[#8B85FF]">服务条款</a>
                 和
                 <a href="#" className="text-[#5E6AD2] hover:text-[#8B85FF]">隐私政策</a>
-              </span>
+              </label>
             </div>
 
             {/* Submit Button */}

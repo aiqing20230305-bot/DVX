@@ -278,8 +278,10 @@ export async function generateScriptsStream(projectId: string, topicId: string, 
           'script',
           (item) => {
             if (!scriptSaved) {
+              console.log(`[Script] Parsing success for variant ${variant}, saving to database...`)
               const saved = scriptRepo.create(projectId, topicId, variant, item)
               scriptSaved = true
+              console.log(`[Script] Saved variant ${variant} with id: ${saved.id}`)
               sendSSEEvent(res, `script_${variant}`, {
                 ...item,
                 id: saved.id,
@@ -289,7 +291,15 @@ export async function generateScriptsStream(projectId: string, topicId: string, 
             }
           },
           (err, raw) => {
-            console.error(`Failed to parse script ${variant}:`, err.message, raw.slice(0, 100))
+            console.error(`[Script] ❌ Failed to parse script ${variant}:`, err.message)
+            console.error(`[Script] Raw content (first 500 chars):`, raw.slice(0, 500))
+            console.error(`[Script] Full buffer length:`, raw.length)
+            // Send parse error to client
+            sendSSEEvent(res, 'parse_error', {
+              variant,
+              error: err.message,
+              preview: raw.slice(0, 200)
+            })
           }
         )
 
@@ -303,19 +313,50 @@ export async function generateScriptsStream(projectId: string, topicId: string, 
             sendSSEEvent(res, `chunk_${variant}`, { text })
           },
           onComplete: () => {
-            sendSSEEvent(res, `complete_${variant}`, { variant })
+            // Check if script was actually saved
+            if (!scriptSaved) {
+              const remainingBuffer = parser.getRemainingBuffer()
+              console.error(`[Script] ⚠️ Variant ${variant} generation completed but script not saved!`)
+              console.error(`[Script] Remaining buffer (first 500 chars):`, remainingBuffer.slice(0, 500))
+              sendSSEEvent(res, 'generation_failed', {
+                variant,
+                reason: 'Script parsing failed - no valid <script> tag found',
+                bufferPreview: remainingBuffer.slice(0, 200)
+              })
+            } else {
+              console.log(`[Script] ✅ Variant ${variant} generation completed successfully`)
+            }
+            sendSSEEvent(res, `complete_${variant}`, { variant, saved: scriptSaved })
           }
         })
       })
     )
 
+    // Verify at least one script was saved
+    const savedScripts = scriptRepo.findByProject(projectId).filter(s => s.topic_id === topicId)
+    console.log(`[Script] Verification: Found ${savedScripts.length} scripts for topic ${topicId}`)
+
+    if (savedScripts.length === 0) {
+      console.error(`[Script] ❌ CRITICAL: No scripts were saved for topic ${topicId}`)
+      sendSSEEvent(res, 'error', {
+        message: '脚本生成失败：未能保存任何版本',
+        detail: 'AI输出格式可能不符合预期，请检查日志'
+      })
+      closeSSE(res)
+      return
+    }
+
     // Mark topic as selected after successful script generation
     topicRepo.update(topicId, { selected: true })
 
-    // Log script generation
-    logRepo.create(projectId, 'script', `生成脚本：${topic.title}（A/B两版本）`)
+    // Log script generation with actual count
+    logRepo.create(projectId, 'script', `生成脚本：${topic.title}（${savedScripts.length}个版本）`)
 
-    sendSSEEvent(res, 'complete', { message: '脚本生成完成' })
+    sendSSEEvent(res, 'complete', {
+      message: '脚本生成完成',
+      savedCount: savedScripts.length,
+      topicId
+    })
     closeSSE(res)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)

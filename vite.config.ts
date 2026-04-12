@@ -15,14 +15,17 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // React core and related libraries
+          // v2.31.0 Phase 2: Optimized code splitting strategy
+          // React core (high priority, loaded first)
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          // UI component libraries
-          'ui-vendor': ['lucide-react'],
-          // Data visualization libraries
-          'chart-vendor': ['recharts'],
-          // State management and utilities
-          'utils-vendor': ['zustand'],
+          // UI icons (medium priority, frequently used)
+          'ui-icons': ['lucide-react'],
+          // Charts (lazy loaded, only for specific pages)
+          'charts-vendor': ['recharts'],
+          // Office libraries (lazy loaded, only when exporting)
+          'office-vendor': ['xlsx', 'jspdf', 'pdf-parse'],
+          // State management (high priority, app-wide)
+          'state-vendor': ['zustand'],
         }
       }
     },

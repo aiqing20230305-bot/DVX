@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express'
-import { scriptRepo, ScriptData } from '../db/repositories/script.repo.js'
+import { scriptRepo, ScriptData, ScriptSegment } from '../db/repositories/script.repo.js'
 import { generateScriptsStream, generateScriptsBatchStream, extractProductList, extractProductListWithDetails } from '../services/script.service.js'
 import { productRepo } from '../db/repositories/product.repo.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requireProjectMember } from '../middleware/permission.middleware.js'
+import { scriptHistoryRepo } from '../db/repositories/script-history.repo.js'
+import { compareScriptVersions } from '../services/script-compare.service.js'
 
 const router = Router()
 
@@ -249,6 +251,295 @@ router.delete('/batch', authMiddleware, async (req: Request, res: Response) => {
 
     scriptRepo.deleteMany(ids)
     res.json({ success: true, count: ids.length })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+// ========================================
+// v2.16.0: Script Version History APIs
+// ========================================
+
+/**
+ * POST /api/script/:id/history - 创建历史记录
+ * Body: { segments, fullText, wordCount }
+ */
+router.post('/:id/history', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const scriptId = req.params.id as string
+    const { segments, fullText, wordCount } = req.body as {
+      segments: any[]
+      fullText: string
+      wordCount: number
+    }
+
+    if (!segments || !fullText || typeof wordCount !== 'number') {
+      res.status(400).json({ error: '缺少必要参数: segments, fullText, wordCount' })
+      return
+    }
+
+    // Get script to check permission
+    const script = scriptRepo.findById(scriptId)
+    if (!script) {
+      res.status(404).json({ error: '脚本不存在' })
+      return
+    }
+
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(script.project_id, userId, 'editor')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要editor权限' })
+      return
+    }
+
+    // Get next version number
+    const latestVersion = scriptHistoryRepo.getLatestVersion(scriptId)
+    const nextVersion = latestVersion + 1
+
+    // Create history record
+    const history = scriptHistoryRepo.create({
+      script_id: scriptId,
+      version: nextVersion,
+      segments: JSON.stringify(segments),
+      full_text: fullText,
+      word_count: wordCount
+    })
+
+    res.json({
+      id: history.id,
+      version: history.version,
+      created_at: history.created_at
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+/**
+ * GET /api/script/:id/history - 获取历史列表
+ */
+router.get('/:id/history', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const scriptId = req.params.id as string
+
+    // Get script to check permission
+    const script = scriptRepo.findById(scriptId)
+    if (!script) {
+      res.status(404).json({ error: '脚本不存在' })
+      return
+    }
+
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(script.project_id, userId, 'viewer')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要viewer权限' })
+      return
+    }
+
+    // Get history list (without segments for performance)
+    const histories = scriptHistoryRepo.findByScript(scriptId)
+    const historyList = histories.map(h => ({
+      id: h.id,
+      version: h.version,
+      word_count: h.word_count,
+      created_at: h.created_at
+    }))
+
+    res.json({ histories: historyList })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+/**
+ * GET /api/script/:id/history/:historyId - 获取单个历史版本详情
+ */
+router.get('/:id/history/:historyId', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const scriptId = req.params.id as string
+    const historyId = req.params.historyId as string
+
+    // Get script to check permission
+    const script = scriptRepo.findById(scriptId)
+    if (!script) {
+      res.status(404).json({ error: '脚本不存在' })
+      return
+    }
+
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(script.project_id, userId, 'viewer')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要viewer权限' })
+      return
+    }
+
+    // Get history detail
+    const history = scriptHistoryRepo.findById(historyId)
+    if (!history || history.script_id !== scriptId) {
+      res.status(404).json({ error: '历史记录不存在' })
+      return
+    }
+
+    res.json({
+      id: history.id,
+      version: history.version,
+      segments: JSON.parse(history.segments),
+      full_text: history.full_text,
+      word_count: history.word_count,
+      created_at: history.created_at
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+/**
+ * POST /api/script/:id/restore - 恢复到历史版本
+ * Body: { historyId }
+ */
+router.post('/:id/restore', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const scriptId = req.params.id as string
+    const { historyId } = req.body as { historyId: string }
+
+    if (!historyId) {
+      res.status(400).json({ error: '缺少 historyId' })
+      return
+    }
+
+    // Get script to check permission
+    const script = scriptRepo.findById(scriptId)
+    if (!script) {
+      res.status(404).json({ error: '脚本不存在' })
+      return
+    }
+
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(script.project_id, userId, 'editor')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要editor权限' })
+      return
+    }
+
+    // Get history to restore
+    const history = scriptHistoryRepo.findById(historyId)
+    if (!history || history.script_id !== scriptId) {
+      res.status(404).json({ error: '历史记录不存在' })
+      return
+    }
+
+    // Update script with history data
+    scriptRepo.update(scriptId, {
+      segments: JSON.parse(history.segments) as ScriptSegment[],
+      fullText: history.full_text,
+      wordCount: history.word_count
+    })
+
+    // Create new history record (marking as restore)
+    const latestVersion = scriptHistoryRepo.getLatestVersion(scriptId)
+    const nextVersion = latestVersion + 1
+    scriptHistoryRepo.create({
+      script_id: scriptId,
+      version: nextVersion,
+      segments: history.segments,
+      full_text: history.full_text,
+      word_count: history.word_count
+    })
+
+    res.json({
+      success: true,
+      script: scriptRepo.findById(scriptId)
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+/**
+ * GET /api/script/:id/history/compare - 比较两个历史版本
+ * Query: { v1, v2 }
+ * v1: 历史版本ID 1
+ * v2: 历史版本ID 2
+ *
+ * v2.17.0: Script version comparison
+ */
+router.get('/:id/history/compare', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const scriptId = req.params.id as string
+    const { v1, v2 } = req.query as { v1?: string; v2?: string }
+
+    if (!v1 || !v2) {
+      res.status(400).json({ error: '缺少 v1 或 v2 参数' })
+      return
+    }
+
+    // Get script to check permission
+    const script = scriptRepo.findById(scriptId)
+    if (!script) {
+      res.status(404).json({ error: '脚本不存在' })
+      return
+    }
+
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(script.project_id, userId, 'viewer')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要viewer权限' })
+      return
+    }
+
+    // Verify both history records belong to this script
+    const history1 = scriptHistoryRepo.findById(v1)
+    const history2 = scriptHistoryRepo.findById(v2)
+
+    if (!history1 || !history2) {
+      res.status(404).json({ error: '历史记录不存在' })
+      return
+    }
+
+    if (history1.script_id !== scriptId || history2.script_id !== scriptId) {
+      res.status(400).json({ error: '历史记录不属于该脚本' })
+      return
+    }
+
+    // Compare versions
+    const comparisonResult = compareScriptVersions(v1, v2)
+
+    res.json(comparisonResult)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     res.status(500).json({ error: message })

@@ -26,6 +26,10 @@ kb-data/
 # 测试数据
 test-data/
 
+# 测试覆盖率报告 (v2.30.0 Phase 3)
+coverage/
+.nyc_output/
+
 # Claude Code 配置（可能包含敏感信息）
 .claude/
 

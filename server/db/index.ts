@@ -9,6 +9,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 let _db: Database.Database | null = null
 
 export function getDb(): Database.Database {
+  // 测试环境：使用测试数据库
+  if ((global as any).__TEST_DB__) {
+    return (global as any).__TEST_DB__
+  }
+
+  // 生产环境：使用单例数据库
   if (!_db) {
     _db = new Database(config.dbPath)
     _db.pragma('journal_mode = WAL')

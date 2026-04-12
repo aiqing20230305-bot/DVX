@@ -127,6 +127,7 @@ export function ProjectTimeline({ projectId, limit = 50 }: ProjectTimelineProps)
         <button
           onClick={() => setExpanded(true)}
           className="w-full flex items-center justify-center gap-2 py-2 text-sm text-[#646A73] hover:text-[#1F2329] transition-colors"
+          aria-label={`展开时间线，查看全部${logs.length}条记录`}
         >
           <span>查看更多</span>
           <ChevronDown size={16} />

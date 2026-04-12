@@ -1,0 +1,179 @@
+{
+  "workbench": {
+    "title": "Data Upload",
+    "subtitle": "Upload market data, product information and feature data",
+    "dropzone": {
+      "title": "Drop files here",
+      "subtitle": "or click to upload",
+      "hint": "Supports Excel (.xlsx), CSV (.csv), PDF (.pdf)",
+      "uploading": "Uploading...",
+      "success": "Upload successful"
+    },
+    "fileList": {
+      "title": "Uploaded Files",
+      "empty": "No files uploaded yet",
+      "parsing": "Parsing...",
+      "parsed": "Parsed",
+      "failed": "Parse failed"
+    },
+    "stats": {
+      "totalFiles": "Total Files",
+      "totalInsights": "Total Insights",
+      "totalTopics": "Total Topics",
+      "totalScripts": "Total Scripts"
+    }
+  },
+  "insights": {
+    "title": "Insight Generation",
+    "subtitle": "Generate AI insights based on uploaded data",
+    "generate": {
+      "button": "Generate Insights",
+      "streaming": "Generating insights...",
+      "stage": {
+        "parsing": "Data Parsing",
+        "analyzing": "Generating Insights",
+        "waiting": "Waiting"
+      }
+    },
+    "list": {
+      "empty": "No insights generated yet",
+      "filter": {
+        "all": "All",
+        "dataInsight": "Data Insights",
+        "userInsight": "User Insights",
+        "marketInsight": "Market Insights"
+      },
+      "confidence": "Confidence",
+      "comments": "Comments"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "generate": "Batch Generate Topics",
+      "delete": "Batch Delete"
+    }
+  },
+  "topics": {
+    "title": "Topic Planning",
+    "subtitle": "Generate topic directions based on insights",
+    "generate": {
+      "button": "Generate Topics",
+      "streaming": "Generating topics...",
+      "progress": "Progress"
+    },
+    "list": {
+      "empty": "No topics generated yet",
+      "platform": {
+        "douyin": "Douyin",
+        "xiaohongshu": "Xiaohongshu",
+        "kuaishou": "Kuaishou"
+      },
+      "priority": {
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "low": "Low Priority"
+      }
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "generate": "Batch Generate Scripts",
+      "delete": "Batch Delete"
+    }
+  },
+  "scripts": {
+    "title": "Script Creation",
+    "subtitle": "Generate video scripts based on topics",
+    "generate": {
+      "button": "Generate Scripts",
+      "streaming": "Generating scripts...",
+      "product": "Product"
+    },
+    "abVariant": {
+      "title": "A/B Version Comparison",
+      "versionA": "Version A",
+      "versionB": "Version B",
+      "diff": "Highlight Differences"
+    },
+    "approval": {
+      "pending": "Pending Approval",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "submit": "Submit for Approval",
+      "review": "Review"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "export": "Batch Export",
+      "delete": "Batch Delete"
+    }
+  },
+  "report": {
+    "title": "Report Export",
+    "subtitle": "Generate and export content strategy reports",
+    "generate": {
+      "button": "Generate Report",
+      "generating": "Generating report...",
+      "success": "Report generated successfully"
+    },
+    "preview": {
+      "title": "Report Preview",
+      "loading": "Loading preview...",
+      "zoom": "Zoom"
+    },
+    "export": {
+      "title": "Export Options",
+      "pdf": "PDF Format",
+      "pptx": "PPT Format",
+      "html": "HTML Format",
+      "description": {
+        "pdf": "Best for printing and formal presentations",
+        "pptx": "Best for presentations and editing",
+        "html": "Best for online sharing"
+      }
+    },
+    "share": {
+      "title": "Share",
+      "copyLink": "Copy Link",
+      "qrCode": "QR Code",
+      "linkCopied": "Link copied to clipboard"
+    }
+  },
+  "projects": {
+    "title": "Project Management",
+    "create": "Create Project",
+    "template": {
+      "title": "Select Template",
+      "fmcg": "FMCG",
+      "beauty": "Beauty",
+      "tech": "Tech",
+      "custom": "Custom"
+    },
+    "list": {
+      "empty": "No projects created yet",
+      "active": "Active",
+      "archived": "Archived"
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Login",
+    "noAccount": "Don't have an account?",
+    "register": "Register"
+  },
+  "register": {
+    "title": "Register",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Register",
+    "hasAccount": "Already have an account?",
+    "login": "Login",
+    "passwordStrength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    }
+  }
+}

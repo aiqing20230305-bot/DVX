@@ -15,19 +15,22 @@ const sizeMap = {
 
 export function LoadingSpinner({ size = 'md', text, center = true }: LoadingSpinnerProps) {
   const content = (
-    <div className="inline-flex flex-col items-center gap-3 animate-fade-in">
+    <div className="inline-flex flex-col items-center gap-3 animate-fade-in" role="status" aria-live="polite">
       <div className="relative">
         {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border-2 border-[#3370FF]/20 animate-pulse" />
-        {/* Spinner */}
+        <div className="absolute inset-0 rounded-full border-2 border-[#3370FF]/20 animate-pulse" aria-hidden="true" />
+        {/* Spinner - v2.11.0 Phase 3.2: WCAG 1.1.1 - Decorative icon hidden from screen readers */}
         <Loader2
           size={sizeMap[size]}
           className="animate-spinner text-[#3370FF]"
+          aria-hidden="true"
         />
       </div>
       {text && (
         <p className="text-sm text-[#646A73] animate-pulse">{text}</p>
       )}
+      {/* Screen reader only text */}
+      {!text && <span className="sr-only">加载中...</span>}
     </div>
   )
 

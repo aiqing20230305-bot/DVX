@@ -24,11 +24,13 @@ const Workbench = lazy(() => import('./pages/Workbench.js').then(m => ({ default
 const Insights = lazy(() => import('./pages/Insights.js').then(m => ({ default: m.Insights })))
 const Topics = lazy(() => import('./pages/Topics.js').then(m => ({ default: m.Topics })))
 const Scripts = lazy(() => import('./pages/Scripts.js').then(m => ({ default: m.Scripts })))
+const Templates = lazy(() => import('./pages/Templates.js').then(m => ({ default: m.Templates })))
 const Report = lazy(() => import('./pages/Report.js').then(m => ({ default: m.Report })))
 const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase.js').then(m => ({ default: m.KnowledgeBase })))
 const Projects = lazy(() => import('./pages/Projects.js').then(m => ({ default: m.Projects })))
 const ProjectDashboard = lazy(() => import('./pages/ProjectDashboard.js').then(m => ({ default: m.ProjectDashboard })))
 const ProjectSettings = lazy(() => import('./pages/ProjectSettings.js'))
+const Settings = lazy(() => import('./pages/Settings.js').then(m => ({ default: m.Settings })))
 const Approvals = lazy(() => import('./pages/Approvals.js'))
 const Notifications = lazy(() => import('./pages/Notifications.js').then(m => ({ default: m.Notifications })))
 const TestingSessions = lazy(() => import('./pages/Testing/TestingSessions.js').then(m => ({ default: m.TestingSessions })))
@@ -117,11 +119,13 @@ export function App() {
                       <Route path="/insights" element={<Insights />} />
                       <Route path="/topics" element={<Topics />} />
                       <Route path="/scripts" element={<Scripts />} />
+                      <Route path="/templates" element={<Templates />} />
                       <Route path="/report" element={<Report />} />
                       <Route path="/kb" element={<KnowledgeBase />} />
                       <Route path="/approvals" element={<Approvals />} />
                       <Route path="/notifications" element={<Notifications />} />
                       <Route path="/settings" element={<ProjectSettings />} />
+                      <Route path="/account/settings" element={<Settings />} />
                       <Route path="/testing" element={<TestingSessions />} />
                       <Route path="/testing/start" element={<StartTestSession />} />
                       <Route path="/testing/session/:id" element={<SessionDetail />} />

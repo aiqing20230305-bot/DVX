@@ -25,6 +25,10 @@ import projectMembersRouter from './routes/project-members.route.js'
 import commentsRouter from './routes/comments.route.js'
 import approvalRouter from './routes/approval.route.js'
 import notificationRouter from './routes/notification.route.js'
+import feedbackRouter from './routes/feedback.route.js'
+import scriptAnnotationsRouter from './routes/script-annotations.route.js'
+import notificationSettingsRouter from './routes/notification-settings.route.js'
+import templateRoutes from '../routes/template.routes.js'
 import { errorMiddleware } from './middleware/error.middleware.js'
 import { authMiddleware } from './middleware/auth.middleware.js'
 import { requireProjectMember, requireProjectOwner } from './middleware/permission.middleware.js'
@@ -43,6 +47,9 @@ mkdirSync(config.uploadsDir, { recursive: true })
 mkdirSync(config.kbDataDir, { recursive: true })
 
 const app = express()
+
+// Export app for testing
+export { app }
 
 // CORS configuration with origin whitelist
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || [
@@ -334,6 +341,7 @@ templateRouter.get('/:id', (req: Request, res: Response) => {
 
 app.use('/api/auth', authRouter)
 app.use('/api/template', templateRouter)
+app.use('/api/templates', templateRoutes)
 app.use('/api/project', projectRouter)
 app.use('/api/project', projectAssetsRouter)
 app.use(projectMembersRouter)
@@ -351,6 +359,9 @@ app.use('/api/timeline', timelineRouter)
 app.use('/api/product', productRouter)
 app.use(approvalRouter)
 app.use(notificationRouter)
+app.use(notificationSettingsRouter)
+app.use(feedbackRouter)
+app.use(scriptAnnotationsRouter)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() })
@@ -380,16 +391,20 @@ validateEnv()
 
 // Run database migrations
 import { runMigrations } from './db/migrations.js'
-runMigrations()
+await runMigrations()
 
-const isProduction = process.env.NODE_ENV === 'production'
-app.listen(config.port, () => {
-  logger.info('🚀 超级洞察 API 服务已启动', {
-    port: config.port,
-    environment: isProduction ? 'production' : 'development',
-    nodeVersion: process.version
+// Only start server if not in test environment
+// This allows tests to import the app without starting the server
+if (process.env.NODE_ENV !== 'test' && process.env.VITEST !== 'true') {
+  const isProduction = process.env.NODE_ENV === 'production'
+  app.listen(config.port, () => {
+    logger.info('🚀 超级洞察 API 服务已启动', {
+      port: config.port,
+      environment: isProduction ? 'production' : 'development',
+      nodeVersion: process.version
+    })
+    console.log(`\n🚀 超级洞察 API 服务已启动`)
+    console.log(`   地址: http://localhost:${config.port}`)
+    console.log(`   环境: ${isProduction ? 'production' : 'development'}\n`)
   })
-  console.log(`\n🚀 超级洞察 API 服务已启动`)
-  console.log(`   地址: http://localhost:${config.port}`)
-  console.log(`   环境: ${isProduction ? 'production' : 'development'}\n`)
-})
+}

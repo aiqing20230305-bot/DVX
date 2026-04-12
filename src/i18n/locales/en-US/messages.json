@@ -1,0 +1,39 @@
+{
+  "success": {
+    "login": "Login successful",
+    "register": "Registration successful, redirecting...",
+    "fileParsed": "File parsed successfully",
+    "insightGenerated": "Insight generated successfully",
+    "topicGenerated": "Topic generated successfully",
+    "scriptGenerated": "Script generated successfully",
+    "reportGenerated": "Report generated successfully",
+    "deleted": "Deleted successfully",
+    "saved": "Saved successfully"
+  },
+  "error": {
+    "login": "Login failed",
+    "register": "Registration failed",
+    "fileUpload": "File upload failed",
+    "fileParse": "File parse failed",
+    "insightGenerate": "Insight generation failed",
+    "topicGenerate": "Topic generation failed",
+    "scriptGenerate": "Script generation failed",
+    "reportGenerate": "Report generation failed",
+    "network": "Network error. Please check your connection",
+    "unknown": "Unknown error. Please try again later"
+  },
+  "validation": {
+    "emailRequired": "Please enter your email address",
+    "emailInvalid": "Please enter a valid email address, e.g., example@company.com",
+    "passwordRequired": "Please enter your password",
+    "passwordTooShort": "Password is too weak. Please use at least 8 characters",
+    "passwordMismatch": "Passwords do not match. Please re-enter",
+    "nameRequired": "Please enter your name",
+    "nameTooShort": "Name must be at least 2 characters. Please enter your full name"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete? This action cannot be undone",
+    "logout": "Are you sure you want to log out?",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?"
+  }
+}

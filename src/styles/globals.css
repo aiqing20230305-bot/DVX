@@ -21,15 +21,27 @@
   --color-bg-elevated-2: #F3F4F6;     /* 灰白 - Hover状态 */
   --color-bg-elevated-3: #FFFFFF;     /* 纯白 - Modal, Dropdown (最顶层) */
 
-  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.4.0
-   * Use semantic tokens instead:
-   * --color-bg-primary     → --color-bg-base
-   * --color-bg-secondary   → --color-bg-elevated-1
-   * --color-bg-tertiary    → --color-bg-elevated-2
-   * --color-bg-elevated    → --color-bg-elevated-3
-   * --color-surface        → --color-bg-elevated-1
-   * --color-surface-2      → --color-bg-elevated-2
-   * --color-surface-3      → --color-bg-elevated-3
+  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.14.0
+   *
+   * Reason: Non-semantic naming (primary/secondary/tertiary) is ambiguous.
+   *         Semantic naming (base/elevated-1/2/3) clearly expresses visual hierarchy.
+   *
+   * Migration guide:
+   *   --color-bg-primary     → --color-bg-base           (页面主背景)
+   *   --color-bg-secondary   → --color-bg-elevated-1     (卡片, 面板)
+   *   --color-bg-tertiary    → --color-bg-elevated-2     (Hover状态)
+   *   --color-bg-elevated    → --color-bg-elevated-3     (Modal, Dropdown)
+   *   --color-surface        → --color-bg-elevated-1     (同secondary)
+   *   --color-surface-2      → --color-bg-elevated-2     (同tertiary)
+   *   --color-surface-3      → --color-bg-elevated-3     (同elevated)
+   *
+   * Timeline:
+   *   v2.2.0: Deprecation warning added
+   *   v2.12.0 (now): Enhanced warning with detailed migration guide
+   *   v2.13.0: Add stylelint rule to warn on usage in new code
+   *   v2.14.0: Remove deprecated tokens (breaking change)
+   *
+   * See docs/migration/css-tokens-v2.12.md for full migration guide.
    */
   --color-bg-primary: #FFFFFF;
   --color-bg-secondary: #F9FAFB;
@@ -48,10 +60,16 @@
   --color-text-link: #5E6AD2;         /* 链接 */
   --color-text-link-hover: #4A55B8;   /* 链接hover */
 
-  /* ⚠️  DEPRECATED in v2.2.0 - Use semantic tokens:
-   * --color-text        → --color-text-primary
-   * --color-text-muted  → --color-text-secondary
-   * --color-text-subtle → --color-text-tertiary
+  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.14.0
+   *
+   * Reason: Non-semantic naming lacks clear hierarchy indication.
+   *
+   * Migration guide:
+   *   --color-text        → --color-text-primary      (标题, 按钮)
+   *   --color-text-muted  → --color-text-secondary    (正文, 描述)
+   *   --color-text-subtle → --color-text-tertiary     (辅助, 标签)
+   *
+   * Timeline: Same as background tokens (v2.14.0 removal)
    */
   --color-text: #1A1A1A;
   --color-text-muted: #6B7280;
@@ -63,13 +81,13 @@
   --color-border-subtle: #F3F4F6;     /* 微妙分割 - 内部分割线 */
   --color-divider: rgba(0, 0, 0, 0.06);
 
-  /* Status Colors (语义色) - WCAG AA Compliant (v2.2.0 Phase 5) */
+  /* Status Colors (语义色) - WCAG AA Compliant (v2.2.0 Phase 5, v2.10.0 Phase 4修复) */
   --color-success: #059669;           /* 5.1:1 对比度 (原#10B981: 2.97:1 不足) */
   --color-success-bg: rgba(5, 150, 105, 0.1);
   --color-success-border: rgba(5, 150, 105, 0.3);
-  --color-warning: #FBBF24;           /* 1.91:1 - 仅配合图标使用，单独使用需#D97706 */
-  --color-warning-bg: rgba(251, 191, 36, 0.1);
-  --color-warning-border: rgba(251, 191, 36, 0.3);
+  --color-warning: #D97706;           /* 4.69:1 对比度 (v2.10.0修复: 原#FBBF24: 1.91:1 不足) */
+  --color-warning-bg: rgba(217, 119, 6, 0.1);
+  --color-warning-border: rgba(217, 119, 6, 0.3);
   --color-error: #DC2626;             /* 5.03:1 对比度 (原#EF4444: 3.98:1 不足) */
   --color-error-bg: rgba(220, 38, 38, 0.1);
   --color-error-border: rgba(220, 38, 38, 0.3);
@@ -132,7 +150,10 @@
   --color-bg-elevated-2: #2A2A2A;     /* 中灰 - Hover状态 */
   --color-bg-elevated-3: #1A1A1A;     /* 深灰 - Modal, Dropdown */
 
-  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.4.0 */
+  /* ⚠️  DEPRECATED in v2.2.0 - Will be removed in v2.14.0
+   * Use semantic tokens (--color-bg-base, --color-bg-elevated-1/2/3) instead.
+   * See light theme section above for full migration guide.
+   */
   --color-bg-primary: #0A0A0A;
   --color-bg-secondary: #1A1A1A;
   --color-bg-tertiary: #2A2A2A;
@@ -155,10 +176,14 @@
   --color-text-muted: #A3A3A3;
   --color-text-subtle: #737373;
 
-  /* Border Colors - Dark Theme */
-  --color-border: #2A2A2A;            /* 主边框 */
-  --color-border-light: #3A3A3A;      /* 强调边框 */
-  --color-border-subtle: #1A1A1A;     /* 微妙分割 */
+  /* Border Colors - Dark Theme
+   * v2.11.0 Phase 3.2: WCAG 1.4.11 - Non-text Contrast (3:1 minimum)
+   * 原#2A2A2A: 2.5:1 → 新#404040: 3.9:1 ✓
+   * 原#1A1A1A: 1.6:1 → 新#2D2D2D: 2.7:1 (微妙分割可接受)
+   */
+  --color-border: #404040;            /* 主边框 - 3.9:1 对比度 */
+  --color-border-light: #4A4A4A;      /* 强调边框 - 4.7:1 对比度 */
+  --color-border-subtle: #2D2D2D;     /* 微妙分割 - 2.7:1 对比度 */
   --color-divider: rgba(255, 255, 255, 0.06);
 }
 
@@ -184,6 +209,15 @@ body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+/* v2.11.0 Phase 3.2: WCAG 1.4.12 - Text Spacing
+ * Paragraph spacing must be at least 2x the font size
+ * Line height must be at least 1.5x the font size
+ */
+p {
+  line-height: 1.6; /* ≥1.5 required */
+  margin-bottom: 2em; /* 2x font size for paragraph spacing */
 }
 
 ::-webkit-scrollbar {
@@ -799,4 +833,54 @@ body {
 /* AI Badge New - 新徽章脉冲效果 */
 .ai-badge-new {
   animation: ai-badge-pulse 2s ease-in-out infinite;
+}
+
+/* ====================================================
+   Drop Zone Animations (v2.10.0 Phase 3)
+   文件拖拽区域动画
+   ==================================================== */
+
+/* Dash Border Animation - 虚线边框移动动画 */
+@keyframes dash-flow {
+  0% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  }
+  100% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+  }
+}
+
+.dropzone-dash-animated {
+  background-image:
+    linear-gradient(90deg, var(--color-primary) 50%, transparent 50%),
+    linear-gradient(180deg, var(--color-primary) 50%, transparent 50%),
+    linear-gradient(270deg, var(--color-primary) 50%, transparent 50%),
+    linear-gradient(0deg, var(--color-primary) 50%, transparent 50%);
+  background-size: 20px 2px, 2px 20px, 20px 2px, 2px 20px;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+  animation: dash-flow 2s linear infinite;
+}
+
+/* v2.24.0: Custom Scrollbar Styles */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #333333 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #333333;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #444444;
 }

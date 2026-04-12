@@ -24,7 +24,17 @@ export function BatchToolbar({
   const isIndeterminate = selectedCount > 0 && selectedCount < totalCount
 
   return (
-    <div className="flex items-center justify-between p-4 bg-[#F7F8FA] border border-[#DEE0E3] rounded-lg mb-4">
+    <div
+      className="fixed left-1/2 -translate-x-1/2 z-40 max-w-4xl w-[calc(100%-48px)] flex items-center justify-between p-4 border rounded-lg shadow-lg transition-all duration-300"
+      style={{
+        bottom: selectedCount > 0 ? '24px' : '-100px', // 有选中项时显示，否则隐藏到底部外
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        backgroundColor: 'var(--color-bg-base)',
+        opacity: selectedCount > 0 ? 0.98 : 0,
+        borderColor: 'var(--color-border)'
+      }}
+    >
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -38,10 +48,10 @@ export function BatchToolbar({
             onChange={() => (isAllSelected ? onClearSelection() : onSelectAll())}
             className="w-4 h-4 rounded border-[#E3E5E8] text-[#3370FF] focus:ring-[#3370FF] focus:ring-offset-[#FFFFFF]"
           />
-          <span className="text-sm font-medium text-[#646A73]">全选</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>全选</span>
         </label>
-        <span className="text-sm text-[#8F959E]">
-          已选: <span className="font-medium text-[#646A73]">{selectedCount}</span> / {totalCount}
+        <span className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
+          已选: <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>{selectedCount}</span> / {totalCount}
         </span>
       </div>
 

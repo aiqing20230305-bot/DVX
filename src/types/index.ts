@@ -146,6 +146,48 @@ export interface Script {
   updated_at: number
 }
 
+export interface TemplateSegment {
+  type: string
+  timing: string
+  content: string
+  direction: string
+  duration?: number
+}
+
+export interface ScriptTemplate {
+  id: string
+  name: string
+  description: string | null
+  category: 'emotion' | 'rational' | 'harvest' | 'custom'
+  platform: 'douyin' | 'kuaishou' | 'xiaohongshu'
+  segments: TemplateSegment[]
+  tags: string[]
+  created_by: string | null
+  project_id: string | null
+  source_script_id: string | null
+  usage_count: number
+  created_at: number
+  updated_at: number
+}
+
+export interface TemplateVariables {
+  [key: string]: string | number
+}
+
+export interface TemplateQueryParams {
+  project_id?: string | null
+  category?: string
+  platform?: string
+  search?: string
+  limit?: number
+  offset?: number
+}
+
+export interface TemplateStats {
+  totalCount: number
+  byCategory: Array<{ category: string; count: number }>
+}
+
 export interface KBItem {
   id: string
   type: 'report' | 'template' | 'tone' | 'insight' | 'other'

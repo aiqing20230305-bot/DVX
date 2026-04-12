@@ -1,0 +1,39 @@
+{
+  "success": {
+    "login": "登录成功",
+    "register": "注册成功，正在跳转...",
+    "fileParsed": "文件解析成功",
+    "insightGenerated": "洞察生成成功",
+    "topicGenerated": "选题生成成功",
+    "scriptGenerated": "脚本生成成功",
+    "reportGenerated": "报告生成成功",
+    "deleted": "删除成功",
+    "saved": "保存成功"
+  },
+  "error": {
+    "login": "登录失败",
+    "register": "注册失败",
+    "fileUpload": "文件上传失败",
+    "fileParse": "文件解析失败",
+    "insightGenerate": "洞察生成失败",
+    "topicGenerate": "选题生成失败",
+    "scriptGenerate": "脚本生成失败",
+    "reportGenerate": "报告生成失败",
+    "network": "网络错误，请检查网络连接",
+    "unknown": "未知错误，请稍后重试"
+  },
+  "validation": {
+    "emailRequired": "请输入邮箱地址",
+    "emailInvalid": "请输入有效的邮箱地址，格式如：example@company.com",
+    "passwordRequired": "请输入登录密码",
+    "passwordTooShort": "密码强度不足，请设置至少8个字符的密码",
+    "passwordMismatch": "两次输入的密码不一致，请重新确认",
+    "nameRequired": "请输入您的姓名",
+    "nameTooShort": "姓名需要至少2个字符，请输入完整姓名"
+  },
+  "confirm": {
+    "delete": "确定要删除吗？此操作无法撤销",
+    "logout": "确定要退出登录吗？",
+    "unsavedChanges": "有未保存的更改，确定要离开吗？"
+  }
+}

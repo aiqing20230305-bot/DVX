@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { Download, BookOpen, CheckCircle2, FileText, Eye, Presentation, FileDown } from 'lucide-react'
+import { Download, BookOpen, CheckCircle2, FileText, Eye, Presentation, FileDown, Share2, Copy, X } from 'lucide-react'
 import { Button } from '../shared/Button.js'
+import { Modal } from '../shared/Modal.js'
 import { toast } from '../../store/toast.store.js'
 import { exportReportToPDF } from '../../utils/pdf-export.js'
 import { chartToImage, createHiddenChartContainer, cleanupChartContainer } from '../../utils/chart-to-image.js'
@@ -20,6 +21,7 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
   const [downloadingPDF, setDownloadingPDF] = useState(false)
   const [savedToKB, setSavedToKB] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState('default')
+  const [showQRModal, setShowQRModal] = useState(false)
 
   const handleExportHTML = async () => {
     setDownloadingHtml(true)
@@ -271,20 +273,156 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
     toast.success('预览已打开', '可在新窗口中查看打印效果')
   }
 
+  const getShareUrl = () => {
+    const baseUrl = window.location.origin
+    return `${baseUrl}/report/${projectId}`
+  }
+
+  const handleShareReport = () => {
+    if (!reportHtml) {
+      toast.error('无法分享', '请先生成报告')
+      return
+    }
+    setShowQRModal(true)
+  }
+
+  const handleCopyShareLink = async () => {
+    const shareUrl = getShareUrl()
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success('已复制', '分享链接已复制到剪贴板')
+    } catch (error) {
+      console.error('复制失败:', error)
+      toast.error('复制失败', '请手动复制链接')
+    }
+  }
+
   return (
     <div className="rounded-xl p-5 border" style={{ backgroundColor: 'var(--color-bg-elevated-1)', borderColor: 'var(--color-border)' }}>
-      <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>导出选项</h3>
-      <div className="space-y-3">
-        <Button
-          variant="primary"
-          icon={<FileText size={15} />}
-          onClick={handlePrintToPDF}
-          disabled={!reportHtml}
-          className="w-full justify-center"
-        >
-          打印为 PDF
-        </Button>
+      <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>导出与分享</h3>
 
+      {/* Export Format Cards */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* PDF Card */}
+        <div
+          onClick={() => !(!reportHtml) && handlePrintToPDF()}
+          className={`p-4 rounded-lg border transition-all cursor-pointer ${
+            !reportHtml ? 'opacity-50 cursor-not-allowed' : 'hover:border-[var(--color-primary)] hover:shadow-md'
+          }`}
+          style={{
+            backgroundColor: 'var(--color-bg-elevated-2)',
+            borderColor: 'var(--color-border)'
+          }}
+        >
+          <div className="flex flex-col items-center text-center gap-2">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(220, 38, 38, 0.1)' }}>
+              <FileText size={24} style={{ color: '#DC2626' }} />
+            </div>
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>PDF 格式</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>通用格式 · 约2-5MB</div>
+            </div>
+          </div>
+        </div>
+
+        {/* PPT Card */}
+        <div
+          onClick={() => !(!reportHtml || downloadingPPT) && handleExportPPT()}
+          className={`p-4 rounded-lg border transition-all cursor-pointer ${
+            !reportHtml || downloadingPPT ? 'opacity-50 cursor-not-allowed' : 'hover:border-[var(--color-primary)] hover:shadow-md'
+          }`}
+          style={{
+            backgroundColor: 'var(--color-bg-elevated-2)',
+            borderColor: 'var(--color-border)'
+          }}
+        >
+          <div className="flex flex-col items-center text-center gap-2">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(234, 88, 12, 0.1)' }}>
+              <Presentation size={24} style={{ color: '#EA580C' }} />
+            </div>
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>PPT 格式</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>演示文稿 · 约5-10MB</div>
+            </div>
+          </div>
+        </div>
+
+        {/* HTML Card */}
+        <div
+          onClick={() => !(!reportHtml || downloadingHtml) && handleExportHTML()}
+          className={`p-4 rounded-lg border transition-all cursor-pointer ${
+            !reportHtml || downloadingHtml ? 'opacity-50 cursor-not-allowed' : 'hover:border-[var(--color-primary)] hover:shadow-md'
+          }`}
+          style={{
+            backgroundColor: 'var(--color-bg-elevated-2)',
+            borderColor: 'var(--color-border)'
+          }}
+        >
+          <div className="flex flex-col items-center text-center gap-2">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(94, 106, 210, 0.1)' }}>
+              <Download size={24} style={{ color: 'var(--color-primary)' }} />
+            </div>
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>HTML 格式</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>网页文件 · 约1-2MB</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Share QR Card */}
+        <div
+          onClick={() => !(!reportHtml) && handleShareReport()}
+          className={`p-4 rounded-lg border transition-all cursor-pointer ${
+            !reportHtml ? 'opacity-50 cursor-not-allowed' : 'hover:border-[var(--color-primary)] hover:shadow-md'
+          }`}
+          style={{
+            backgroundColor: 'var(--color-bg-elevated-2)',
+            borderColor: 'var(--color-border)'
+          }}
+        >
+          <div className="flex flex-col items-center text-center gap-2">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+              <Share2 size={24} style={{ color: '#10B981' }} />
+            </div>
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>分享二维码</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>生成链接 · 移动扫码</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* PPT Template Selector */}
+      <div className="space-y-2 mb-3">
+        <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>PPT模板</label>
+        <select
+          value={selectedTemplate}
+          onChange={(e) => setSelectedTemplate(e.target.value)}
+          className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent"
+          style={{
+            backgroundColor: 'var(--color-bg-elevated-2)',
+            borderColor: 'var(--color-border)',
+            color: 'var(--color-text-primary)'
+          }}
+          disabled={!reportHtml}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-primary)';
+            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(99, 91, 255, 0.2)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-border)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+        >
+          <option value="default">默认深色模板（紫蓝）</option>
+          <option value="fmcg">快消品模板（活力红）</option>
+          <option value="beauty">美妆模板（优雅粉）</option>
+          <option value="food">食品模板（温暖橙）</option>
+        </select>
+      </div>
+
+      {/* Additional Options */}
+      <div className="space-y-3 pt-3 border-t" style={{ borderColor: 'var(--color-border)' }}>
         <Button
           variant="secondary"
           icon={<Eye size={15} />}
@@ -293,68 +431,6 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
           className="w-full justify-center"
         >
           打印预览
-        </Button>
-
-        {/* PPT模板选择器 */}
-        <div className="space-y-2">
-          <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>PPT模板</label>
-          <select
-            value={selectedTemplate}
-            onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent"
-            style={{
-              backgroundColor: 'var(--color-bg-elevated-2)',
-              borderColor: 'var(--color-border)',
-              color: 'var(--color-text-primary)'
-            }}
-            disabled={!reportHtml}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-primary)';
-              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(99, 91, 255, 0.2)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <option value="default">默认深色模板（紫蓝）</option>
-            <option value="fmcg">快消品模板（活力红）</option>
-            <option value="beauty">美妆模板（优雅粉）</option>
-            <option value="food">食品模板（温暖橙）</option>
-          </select>
-        </div>
-
-        <Button
-          variant="secondary"
-          icon={<Presentation size={15} />}
-          onClick={handleExportPPT}
-          loading={downloadingPPT}
-          disabled={!reportHtml}
-          className="w-full justify-center"
-        >
-          导出 PPT 报告
-        </Button>
-
-        <Button
-          variant="secondary"
-          icon={<FileDown size={15} />}
-          onClick={handleExportPDF}
-          loading={downloadingPDF}
-          disabled={!reportHtml}
-          className="w-full justify-center"
-        >
-          导出 PDF 报告
-        </Button>
-
-        <Button
-          variant="secondary"
-          icon={<Download size={15} />}
-          onClick={handleExportHTML}
-          loading={downloadingHtml}
-          disabled={!reportHtml}
-          className="w-full justify-center"
-        >
-          下载 HTML 报告
         </Button>
 
         <Button
@@ -382,6 +458,65 @@ export function ExportPanel({ projectId, reportHtml, onSaveToKB }: ExportPanelPr
           HTML 报告可直接在浏览器中打开，支持打印为 PDF
         </p>
       </div>
+
+      {/* QR Code Modal */}
+      <Modal
+        open={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        title="分享报告"
+      >
+        <div className="space-y-4">
+          <div className="text-center">
+            <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+              扫描二维码或复制链接分享报告
+            </p>
+
+            {/* QR Code Image */}
+            <div className="flex justify-center mb-4">
+              <div className="p-4 rounded-lg border" style={{ backgroundColor: '#FFFFFF', borderColor: 'var(--color-border)' }}>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getShareUrl())}`}
+                  alt="报告分享二维码"
+                  width={200}
+                  height={200}
+                  className="block"
+                />
+              </div>
+            </div>
+
+            {/* Share URL */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 p-3 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-elevated-2)', borderColor: 'var(--color-border)' }}>
+                <input
+                  type="text"
+                  value={getShareUrl()}
+                  readOnly
+                  className="flex-1 bg-transparent text-sm outline-none"
+                  style={{ color: 'var(--color-text-primary)' }}
+                />
+                <button
+                  onClick={handleCopyShareLink}
+                  aria-label="复制分享链接"
+                  className="p-2 rounded hover:bg-opacity-80 transition-colors"
+                  style={{ backgroundColor: 'var(--color-primary)', color: '#FFFFFF' }}
+                  title="复制链接"
+                >
+                  <Copy size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowQRModal(false)}
+            >
+              关闭
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

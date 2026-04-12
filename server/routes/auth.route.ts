@@ -98,9 +98,11 @@ router.post('/login', async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     })
 
-    // Return public user info
+    // Return public user info + token (for API clients)
+    // v2.11.0: Add token in response for API testing compatibility
     res.json({
       user: userRepo.toPublicUser(result.user!),
+      token: result.accessToken, // For API clients and testing
       message: '登录成功'
     })
   } catch (err) {
