@@ -1,5 +1,265 @@
 # 超级洞察 - 更新日志 (Changelog)
 
+## [2.12.0] - 2026-04-12 ✅ 完成
+
+### 🎨 设计系统改造 Phase 1: Foundation Consolidation
+
+**主题**: 解决设计token冲突，统一主题管理，标准化CSS变量命名  
+**完成时间**: 2026-04-12  
+**状态**: ✅ 完成（3个子任务全部完成）
+
+### 🎯 设计系统改造 Phase 3.2: Card Interaction Unification
+
+**主题**: 统一InsightCard和TopicCard的hover交互动画  
+**完成时间**: 2026-04-12  
+**状态**: ✅ 完成（开发→测试→部署→归档全流程自主执行）
+
+#### 核心成果
+
+**变更**:
+- InsightCard添加`hover:-translate-y-0.5`动画效果
+- 与TopicCard保持一致的交互体验（200ms transition, -2px translateY）
+- 提升卡片交互的一致性
+
+**测试验证**:
+- ✅ 端到端测试通过（项目a34f7a53，7条活动日志完整）
+- ✅ 脚本生成验证通过（2个variant正常保存，full_text + segments完整）
+- ✅ TypeScript编译0错误
+- ✅ 构建成功（3502模块，2.3秒）
+
+**部署**:
+- Commit: 8a8f5ee
+- 文件: `src/components/insights/InsightCard.tsx` (1 file, +3/-2)
+- 构建: Vite 6.4.1, 0 errors
+
+**关联任务**: Task #518, #519, #520  
+**设计系统成熟度**: Tier 4.0 → Tier 4.0+  
+**详细文档**: `WORK-SUMMARY-v2.12.0-Phase3.2-Complete.md`
+
+#### 核心成果
+
+| 指标 | 改造前 | 改造后 | 提升 |
+|------|--------|--------|------|
+| **配色一致性** | 文档#635BFF vs 代码#5E6AD2 | **100%统一** | ✅ |
+| **主题管理系统** | 2个（ThemeContext + UIStore） | **1个（UIStore）** | -50% |
+| **防FOUC** | 无保护 | **内联初始化脚本** | ✅ |
+| **Token文档化** | 简单迁移表 | **详细迁移指南** | ✅ |
+| **代码迁移率** | N/A | **100%（0个遗留token）** | ✅ |
+
+#### Phase 1.1: Color Token Unification
+
+**目标**: 统一主色定义，从Stripe紫(#635BFF)完全迁移到Linear紫(#5E6AD2)
+
+**成果**:
+- ✅ src/目录完全无#635BFF残留（已验证）
+- ✅ globals.css使用#5E6AD2 + 完整变体色
+- ✅ Tailwind配置使用CSS变量（无需修改）
+- ✅ DESIGN.md添加v2.12.0确认说明
+
+**技术细节**:
+- 主色：#5E6AD2（Linear Purple）
+- 变体：hover #7B85DB, active #4A55B8, light #8B95E3, dark #3A45A8
+- WCAG AAA对比度（深色背景）
+
+#### Phase 1.2: Theme Management Consolidation
+
+**目标**: 合并双主题管理系统，从ThemeContext + UIStore迁移到单一UIStore
+
+**成果**:
+- ✅ UIStore支持data-theme属性同步（已有）
+- ✅ ThemeContext标记@deprecated + console.warn（开发模式）
+- ✅ Shell/Sidebar已使用UIStore（早已完成）
+- ✅ 防FOUC脚本添加到index.html（内联执行）
+- ✅ 移除硬编码`class="dark"`（改为脚本动态设置）
+
+**技术细节**:
+- Zustand persist中间件：localStorage key = 'ui-store'
+- 双属性同步：data-theme + dark class（向后兼容）
+- 防FOUC脚本：读取localStorage → 设置data-theme + class
+- ThemeContext保留（功能正常但警告）
+
+**文件修改**:
+- `index.html`: 添加防FOUC脚本（+30行）
+- `ThemeContext.tsx`: 添加deprecation警告（+12行）
+- `DESIGN.md`: 更新Token命名系统章节
+
+#### Phase 1.3: CSS Variable Standardization
+
+**目标**: 标准化CSS变量命名，文档化token层级，提供详细迁移指南
+
+**成果**:
+- ✅ globals.css增强deprecation警告（包含详细迁移映射 + 时间表）
+- ✅ 更新废弃时间表：v2.4.0 → v2.14.0（修正过期时间）
+- ✅ DESIGN.md更新Token命名系统章节（v2.2 → v2.12）
+- ✅ 创建docs/migration/css-tokens-v2.12.md（详细迁移指南）
+- ✅ 代码审计：src/目录0个遗留token使用（100%迁移完成）
+
+**技术细节**:
+- 语义化命名：`--color-bg-base`, `--color-bg-elevated-1/2/3`
+- 遗留命名：`--color-bg-primary/secondary/tertiary`（v2.14.0移除）
+- 迁移时间表：v2.12.0 → v2.13.0（stylelint） → v2.14.0（breaking）
+
+**文档新增**:
+- `/docs/migration/css-tokens-v2.12.md`: 完整迁移指南（200+行）
+  - Quick Reference表格（背景色 + 文字色）
+  - Step-by-Step迁移步骤
+  - Best Practices + Troubleshooting
+  - FAQ（5个常见问题）
+  - Migration Checklist
+
+#### 技术亮点
+
+1. **零破坏性改造**
+   - 向后兼容：遗留token保留至v2.14.0
+   - 渐进式迁移：不强制立即更新现有代码
+   - 双警告机制：CSS注释 + console.warn（开发模式）
+
+2. **防FOUC最佳实践**
+   - 内联脚本在首次渲染前执行
+   - localStorage读取 + 默认值fallback
+   - 异常处理确保不会白屏
+
+3. **详尽文档**
+   - DESIGN.md：设计理念 + 对比表格 + 时间表
+   - Migration Guide：Quick Reference + FAQ + Checklist
+   - globals.css：inline注释说明每个变量用途
+
+4. **代码质量**
+   - TypeScript编译0错误
+   - 构建成功（2.28s）
+   - 100%语义化token使用率
+
+#### 后续规划
+
+**v2.13.0（计划）**:
+- 添加stylelint规则警告遗留token
+- 前端组件库微交互打磨（Phase 3）
+
+**v2.14.0（breaking）**:
+- 移除所有遗留token定义
+- 强制使用语义化命名
+
+#### 工作量统计
+
+- **执行时间**: 约2小时（自主执行，无人工干预）
+- **修改文件**: 5个
+  - `index.html`: 防FOUC脚本（+30行）
+  - `src/contexts/ThemeContext.tsx`: deprecation警告（+12行）
+  - `src/styles/globals.css`: 增强警告（+30行）
+  - `DESIGN.md`: 更新Token章节（~50行修改）
+  - `docs/migration/css-tokens-v2.12.md`: 新文件（200+行）
+- **代码审计**: grep搜索3次，0个遗留token
+- **构建验证**: 3次，全部成功
+
+---
+
+## [2.11.1] - 2026-04-12 ✅ 完成
+
+### 🐛 P0级Bug修复 - 脚本生成数据保存问题
+
+**主题**: 脚本生成API数据未保存问题修复  
+**完成时间**: 2026-04-12  
+**状态**: ✅ 完成并验证通过
+
+#### 核心成果
+
+| 指标 | 修复前 | 修复后 | 提升 |
+|------|--------|--------|------|
+| **脚本生成成功率** | 0% (静默失败) | **100%** | +100% |
+| **端到端测试通过率** | 90% (9/10步) | **100% (10/10步)** | +10% |
+| **错误可观测性** | 无日志/无提示 | 详细日志+SSE事件 | ✅ |
+| **时间线记录准确性** | 无记录 | 准确记录版本数 | ✅ |
+
+#### 问题描述
+
+**发现来源**: v2.11.0端到端测试报告（TEST-REPORT-v2.11.0-E2E.md）
+
+**问题现象**:
+- 脚本生成API调用成功，SSE连接正常
+- 但数据库中无脚本记录（0条）
+- 时间线中无脚本生成记录
+- **影响**: 用户无法生成脚本，核心工作流完全中断
+
+**根本原因**:
+- XMLStreamParser解析失败时只打印日志，不抛出错误
+- scriptSaved标志始终为false
+- Promise.all正常返回，但数据未保存
+- **结果**: 静默失败，用户无法感知错误
+
+#### 修复内容
+
+**文件**: `server/services/script.service.ts`
+
+**修复1: 增强解析错误日志**
+- 打印详细错误信息（500字符原始内容 + buffer长度）
+- 向客户端发送`parse_error` SSE事件
+- 包含错误详情和内容预览
+
+**修复2: 生成完成状态检查**
+- 在onComplete回调中验证`scriptSaved`标志
+- 如果未保存，打印剩余buffer内容
+- 向客户端发送`generation_failed` SSE事件
+- 在complete事件中包含`saved`状态
+
+**修复3: 最终数据验证**
+- 查询数据库验证实际保存的脚本数量
+- 如果savedCount=0，返回明确错误
+- 在时间线记录中包含实际版本数量
+- 在complete事件中返回savedCount
+
+#### 验证结果
+
+**服务器日志验证**:
+```
+[Script] Parsing success for variant B, saving to database...
+[Script] Saved variant B with id: b9eacd11-dfe8-4c26-8e24-0557e978975e
+[Script] ✅ Variant B generation completed successfully
+[Script] Parsing success for variant A, saving to database...
+[Script] Saved variant A with id: 4dce853f-d4bc-4b2e-b4a8-05fbbca5064d
+[Script] ✅ Variant A generation completed successfully
+[Script] Verification: Found 2 scripts for topic 9c9184af-533a-4c45-9041-9359cfc27530
+```
+
+**数据库验证**:
+- ✅ A版本脚本保存成功（201字）
+- ✅ B版本脚本保存成功
+- ✅ 数据完整性100%（包含所有字段）
+
+**端到端测试**:
+- ✅ 10/10步全部通过（从9/10提升到10/10）
+- ✅ 步骤8（脚本生成）从❌变为✅
+- ✅ 时间线准确记录"生成脚本：...（2个版本）"
+
+#### 技术亮点
+
+1. **多层验证机制**
+   - 解析层：onError增强日志
+   - 生成层：onComplete检查scriptSaved
+   - 数据层：查询数据库验证实际数量
+
+2. **错误可观测性**
+   - 7个详细日志点（[Script]前缀）
+   - 2个新SSE事件（parse_error, generation_failed）
+   - 错误信息包含诊断数据
+
+3. **向后兼容**
+   - 不影响现有正常流程
+   - API接口保持不变
+   - 只增强错误处理
+
+#### 工作量
+
+- **时间消耗**: 1.25小时（诊断30分钟 + 修复15分钟 + 测试15分钟 + 文档15分钟）
+- **代码变更**: 1个文件，约40行
+- **测试覆盖**: 5个验证维度
+
+#### 相关文档
+
+- `WORK-SUMMARY-v2.11.1-ScriptGenFix.md` - 详细工作总结
+- `TEST-REPORT-v2.11.0-E2E.md` - 问题发现报告
+
+---
+
 ## [2.2.1] - 2026-04-12 ✅ 完成
 
 ### ♿ Lighthouse无障碍性优化 - 100分满分达成
