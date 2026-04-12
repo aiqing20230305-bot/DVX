@@ -47,7 +47,7 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
         'relative border rounded-lg p-4 transition-all duration-200 group focus-visible-card',
         selected
           ? 'shadow-md'
-          : 'hover:shadow-sm',
+          : 'hover:shadow-sm hover:-translate-y-0.5',
         focused && 'ring-2 ring-primary ring-offset-2',
         onToggleSelect ? 'cursor-pointer' : ''
       ].join(' ')}
@@ -88,6 +88,7 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
             e.stopPropagation()
             onCommentClick(insight.id)
           }}
+          aria-label={`查看${commentCount}条评论`}
           className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition-all duration-200 hover:scale-105"
           style={{
             backgroundColor: 'var(--color-info-bg)',
@@ -95,7 +96,7 @@ export const InsightCard = React.memo(function InsightCard({ insight, selected =
             border: '1px solid var(--color-info-border)'
           }}
         >
-          <MessageCircle size={12} />
+          <MessageCircle size={12} aria-hidden="true" />
           <span>{commentCount}</span>
         </button>
       )}
