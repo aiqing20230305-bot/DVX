@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express'
 import { insightRepo } from '../db/repositories/insight.repo.js'
-import { generateInsightsStream } from '../services/insight.service.js'
+import { generateInsightsStream, regenerateInsightStream } from '../services/insight.service.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { requireProjectMember } from '../middleware/permission.middleware.js'
 import { logRepo } from '../db/repositories/log.repo.js'
@@ -315,6 +315,44 @@ router.delete('/batch', authMiddleware, async (req: Request, res: Response) => {
 
     insightRepo.deleteMany(ids)
     res.json({ success: true, count: ids.length })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    res.status(500).json({ error: message })
+  }
+})
+
+/**
+ * v2.34.0: Regenerate a single insight with variant
+ * POST /:id/regenerate
+ */
+router.post('/:id/regenerate', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string
+    const { variant } = req.body as { variant?: 'creative' | 'conservative' | 'data-driven' }
+
+    // Get insight to check permission
+    const insight = insightRepo.findById(id)
+    if (!insight) {
+      res.status(404).json({ error: '洞察不存在' })
+      return
+    }
+
+    // Check permission
+    const userId = (req as any).userId
+    if (!userId) {
+      res.status(401).json({ error: '未登录' })
+      return
+    }
+
+    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
+    const hasPermission = projectMemberRepo.hasRole(insight.project_id, userId, 'editor')
+    if (!hasPermission) {
+      res.status(403).json({ error: '权限不足，需要editor权限' })
+      return
+    }
+
+    // Stream regeneration
+    await regenerateInsightStream(id, variant || 'default', res)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     res.status(500).json({ error: message })

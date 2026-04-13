@@ -107,6 +107,11 @@ export interface Insight {
   confidence: 'high' | 'medium' | 'low'
   actionable: boolean
   selected: boolean
+  quality_score_credibility?: number | null
+  quality_score_novelty?: number | null
+  quality_score_actionability?: number | null
+  quality_score_overall?: number | null
+  quality_metadata?: string | null
   created_at: number
   updated_at: number
 }
