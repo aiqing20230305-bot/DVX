@@ -1,5 +1,6 @@
 import React from 'react'
 import { FileText } from 'lucide-react'
+import * as ReactWindow from 'react-window'
 import { TopicCard } from './TopicCard.js'
 import { TopicCard as TopicCardType } from '../../types/index.js'
 import { SkeletonList } from '../shared/Skeleton.js'
@@ -102,22 +103,43 @@ export function TopicGrid({
     return <div className="text-center py-16" style={{ color: 'var(--color-text-tertiary)' }}>未生成任何选题</div>
   }
 
-  return (
-    <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none" role="listbox" aria-activedescendant={focusedId || undefined}>
-      {topics.map((t, index) => (
-        <li key={t.id} role="listitem">
+  // Row renderer for virtual scrolling
+  const Row = React.memo(({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const topic = topics[index]
+    if (!topic) return null
+
+    return (
+      <div style={style}>
+        <div className="px-1 py-2.5">
           <TopicCard
-            topic={t}
-            selected={selectedIds.has(t.id)}
+            topic={topic}
+            selected={selectedIds.has(topic.id)}
             focused={index === focusIndex}
             onToggleSelect={onToggleSelect}
             onPriorityChange={onPriorityChange}
             onCommentClick={onCommentClick}
-            commentCount={getCommentCount ? getCommentCount('topic', t.id) : 0}
-            data-keyboard-focus={t.id}
+            commentCount={getCommentCount ? getCommentCount('topic', topic.id) : 0}
+            data-keyboard-focus={topic.id}
           />
-        </li>
-      ))}
-    </ul>
+        </div>
+      </div>
+    )
+  })
+
+  // Calculate list height (viewport height - approximate header height)
+  const listHeight = Math.max(600, window.innerHeight - 280)
+
+  return (
+    <ReactWindow.FixedSizeList
+      height={listHeight}
+      itemCount={topics.length}
+      itemSize={260}
+      width="100%"
+      overscanCount={5}
+      role="listbox"
+      aria-activedescendant={focusedId || undefined}
+    >
+      {Row}
+    </ReactWindow.FixedSizeList>
   )
 }

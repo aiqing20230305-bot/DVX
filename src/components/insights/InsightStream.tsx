@@ -1,5 +1,6 @@
 import React from 'react'
 import { Zap, ArrowRight } from 'lucide-react'
+import * as ReactWindow from 'react-window'
 import { StreamingText } from '../shared/StreamingText.js'
 import { InsightCard } from './InsightCard.js'
 import { SkeletonList } from '../shared/Skeleton.js'
@@ -111,28 +112,53 @@ export function InsightStream({ status, insights, selectedIds, streamBuffer, onT
     )
   }
 
-  // Success
+  // Success - with virtual scrolling for performance
+  if (insights.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-16" style={{ color: 'var(--color-text-tertiary)' }}>未生成任何洞察</div>
+      </div>
+    )
+  }
+
+  // Row renderer for virtual scrolling
+  const Row = React.memo(({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const insight = insights[index]
+    if (!insight) return null
+
+    return (
+      <div style={style}>
+        <div className="px-1 py-2.5">
+          <InsightCard
+            insight={insight}
+            selected={selectedIds.has(insight.id)}
+            focused={index === focusIndex}
+            onToggleSelect={onToggleSelect}
+            onCommentClick={onCommentClick}
+            commentCount={getCommentCount?.('insight', insight.id) || 0}
+            data-keyboard-focus={insight.id}
+          />
+        </div>
+      </div>
+    )
+  })
+
+  // Calculate list height (viewport height - approximate header height)
+  const listHeight = Math.max(600, window.innerHeight - 280)
+
   return (
     <div className="space-y-4">
-      {insights.length === 0 ? (
-        <div className="text-center py-16" style={{ color: 'var(--color-text-tertiary)' }}>未生成任何洞察</div>
-      ) : (
-        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none" role="listbox" aria-activedescendant={focusedId || undefined}>
-          {insights.map((insight, index) => (
-            <li key={insight.id} role="listitem">
-              <InsightCard
-                insight={insight}
-                selected={selectedIds.has(insight.id)}
-                focused={index === focusIndex}
-                onToggleSelect={onToggleSelect}
-                onCommentClick={onCommentClick}
-                commentCount={getCommentCount?.('insight', insight.id) || 0}
-                data-keyboard-focus={insight.id}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ReactWindow.FixedSizeList
+        height={listHeight}
+        itemCount={insights.length}
+        itemSize={240}
+        width="100%"
+        overscanCount={5}
+        role="listbox"
+        aria-activedescendant={focusedId || undefined}
+      >
+        {Row}
+      </ReactWindow.FixedSizeList>
     </div>
   )
 }

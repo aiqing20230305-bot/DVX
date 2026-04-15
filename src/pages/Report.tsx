@@ -22,6 +22,11 @@ export function Report() {
 
   const activeProject = projects.find(p => p.id === activeProjectId)
 
+  // v2.11.0 Phase 3.2: WCAG 2.4.2 - Set unique page title
+  useEffect(() => {
+    document.title = '报告导出 · 超级洞察'
+  }, [])
+
   // Initialize token from localStorage (client-side only)
   useEffect(() => {
     if (typeof window !== 'undefined') {

@@ -16,12 +16,16 @@ import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
 import { CommentPanel } from '../components/comments/CommentPanel.js'
+import { ExportOptionsModal, ExportFormat, ExportOptions } from '../components/shared/ExportOptionsModal.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { useDebounce } from '../hooks/useDebounce.js'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation.js'
 import { TopicCard } from '../types/index.js'
 import { exportTopicsToExcel } from '../utils/export.utils.js'
+import { exportTopicsToPDF } from '../utils/pdf-export-enhanced.js'
+import { exportTopicsToWord } from '../utils/word-export.js'
+import { exportTopicsToPPT } from '../utils/ppt-export.js'
 import { toast } from '../store/toast.store.js'
 import { persistFilters } from '../utils/storage.js'
 
@@ -40,8 +44,15 @@ export function Topics() {
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const [commentPanelOpen, setCommentPanelOpen] = useState(false)
   const [selectedTopicId, setSelectedTopicId] = useState<string>('')
+  const [exportModalOpen, setExportModalOpen] = useState(false)
   const { insights, selectedIds: insightSelectedIds, setInsights } = useInsightStore()
   const { getCommentCount } = useCommentStore()
+
+  // v2.11.0 Phase 3.2: WCAG 2.4.2 - Set unique page title
+  useEffect(() => {
+    document.title = '选题策划 · 超级洞察'
+  }, [])
+
   const {
     topics, selectedIds, status,
     setTopics, addTopic, toggleSelection, selectAll, clearSelection, updatePriority,
@@ -144,29 +155,63 @@ export function Topics() {
     await topicApi.update(id, { selected: isSelected }).catch(console.error)
   }
 
+  // v2.32.0 Phase 4: 使用ExportOptionsModal替代window.prompt
   const handleExport = () => {
     if (topics.length === 0) {
       toast.error('没有可导出的数据')
       return
     }
+    setExportModalOpen(true)
+  }
 
+  // 执行导出
+  const handleExportExecute = async (format: ExportFormat, options: ExportOptions) => {
     try {
+      // Step 1: 如果有已选数据，提示用户选择导出范围
+      let dataToExport = topics
       if (selectedCount > 0) {
         const exportSelected = window.confirm(
           `检测到您选择了 ${selectedCount} 个选题。\n\n点击"确定"仅导出已选数据\n点击"取消"导出全部数据`
         )
-        const dataToExport = exportSelected
+        dataToExport = exportSelected
           ? topics.filter(t => selectedIds.has(t.id))
           : topics
+      }
 
-        exportTopicsToExcel(dataToExport)
-        toast.success('导出成功', `已导出 ${dataToExport.length} 个选题`)
+      // Step 2: 根据格式执行导出
+      if (format === 'pdf') {
+        await exportTopicsToPDF(dataToExport, {
+          title: options.title || '选题报告',
+          theme: options.theme || 'light',
+          includeTimestamp: options.includeTimestamp !== false,
+          author: options.author || '超级洞察',
+          showPageNumbers: options.showPageNumbers !== false
+        })
+        toast.success('导出成功', `已导出 ${dataToExport.length} 个选题为PDF`)
+      } else if (format === 'word') {
+        await exportTopicsToWord(dataToExport, {
+          title: options.title || '选题报告',
+          template: options.template || 'default',
+          includeTimestamp: options.includeTimestamp !== false,
+          author: options.author || '超级洞察'
+        })
+        toast.success('导出成功', `已导出 ${dataToExport.length} 个选题为Word`)
+      } else if (format === 'ppt') {
+        await exportTopicsToPPT(dataToExport, {
+          title: options.title || '选题报告',
+          aspectRatio: options.aspectRatio || '16:9',
+          includeTimestamp: options.includeTimestamp !== false,
+          author: options.author || '超级洞察',
+          theme: options.theme || 'light'
+        })
+        toast.success('导出成功', `已导出 ${dataToExport.length} 个选题为PPT`)
       } else {
-        exportTopicsToExcel(topics)
-        toast.success('导出成功', `已导出 ${topics.length} 个选题`)
+        await exportTopicsToExcel(dataToExport)
+        toast.success('导出成功', `已导出 ${dataToExport.length} 个选题为Excel`)
       }
     } catch (err) {
       toast.error('导出失败', err instanceof Error ? err.message : String(err))
+      throw err // Re-throw to let Modal handle loading state
     }
   }
 
@@ -246,7 +291,8 @@ export function Topics() {
     }
   }
 
-  const handleBatchExportSelected = () => {
+  // v2.32.0 Phase 3: 增加PPT导出选项
+  const handleBatchExportSelected = async () => {
     const count = selectedIds.size
     if (count === 0) {
       toast.error('请先选择要导出的选题')
@@ -254,9 +300,57 @@ export function Topics() {
     }
 
     try {
+      // 选择导出格式
+      const formatChoice = window.prompt(
+        '选择导出格式:\n\n1 = Excel (.xlsx)\n2 = PDF (.pdf)\n3 = Word (.docx)\n4 = PPT (.pptx)\n\n请输入数字 (1-4):',
+        '1'
+      )
+
+      if (!formatChoice || !['1', '2', '3', '4'].includes(formatChoice)) {
+        toast.error('已取消导出')
+        return
+      }
+
+      const formatMap: Record<string, string> = {
+        '1': 'excel',
+        '2': 'pdf',
+        '3': 'word',
+        '4': 'ppt'
+      }
+      const format = formatMap[formatChoice]
+
       const selectedItems = topics.filter(t => selectedIds.has(t.id))
-      exportTopicsToExcel(selectedItems)
-      toast.success('导出成功', `已导出 ${count} 个选题`)
+
+      if (format === 'pdf') {
+        await exportTopicsToPDF(selectedItems, {
+          title: '选题报告',
+          theme: 'light',
+          includeTimestamp: true,
+          author: '超级洞察',
+          showPageNumbers: true
+        })
+        toast.success('导出成功', `已导出 ${count} 个选题为PDF`)
+      } else if (format === 'word') {
+        await exportTopicsToWord(selectedItems, {
+          title: '选题报告',
+          template: 'default',
+          includeTimestamp: true,
+          author: '超级洞察'
+        })
+        toast.success('导出成功', `已导出 ${count} 个选题为Word`)
+      } else if (format === 'ppt') {
+        await exportTopicsToPPT(selectedItems, {
+          title: '选题报告',
+          aspectRatio: '16:9',
+          includeTimestamp: true,
+          author: '超级洞察',
+          theme: 'light'
+        })
+        toast.success('导出成功', `已导出 ${count} 个选题为PPT`)
+      } else {
+        await exportTopicsToExcel(selectedItems)
+        toast.success('导出成功', `已导出 ${count} 个选题为Excel`)
+      }
     } catch (err) {
       toast.error('导出失败', err instanceof Error ? err.message : String(err))
     }
@@ -672,6 +766,15 @@ export function Topics() {
         onClose={() => setShortcutsHelpOpen(false)}
         shortcuts={keyboardShortcuts}
         title="选题页面快捷键"
+      />
+
+      {/* Export Options Modal */}
+      <ExportOptionsModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        onExport={handleExportExecute}
+        itemCount={topics.length}
+        itemType="选题"
       />
 
       {/* Comment Panel */}

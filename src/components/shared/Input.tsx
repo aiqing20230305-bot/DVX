@@ -123,7 +123,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             />
           )}
 
-          {/* Input (设计系统v2.1 - 明亮主题) */}
+          {/* Input (设计系统v2.1 - 明亮主题, v2.10.0 Phase 4 - 焦点可见性增强) */}
           <input
             ref={ref}
             disabled={disabled}
@@ -131,7 +131,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               w-full ${paddingClasses.left} ${paddingClasses.right} ${sizeClasses[size]}
               ${borderless ? 'border-none border-b rounded-none px-1' : 'border rounded-md'}
               ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-              focus:outline-none focus:ring-1
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
               transition-all duration-100
               ${className}
             `}
@@ -140,7 +140,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               borderColor: borderColor,
               color: textColor,
               ...(isFocused && !borderless
-                ? { boxShadow: `0 0 0 1px ${borderColor}` }
+                ? {
+                    boxShadow: error
+                      ? `0 0 0 3px rgba(220, 38, 38, 0.2)` // 错误状态红色光晕
+                      : success
+                        ? `0 0 0 3px rgba(5, 150, 105, 0.2)` // 成功状态绿色光晕
+                        : `0 0 0 3px rgba(94, 106, 210, 0.2)` // 正常状态品牌色光晕
+                  }
                 : {})
             }}
             onFocus={(e) => {

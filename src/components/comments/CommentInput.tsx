@@ -149,9 +149,10 @@ export function CommentInput({
           {onCancel && (
             <button
               onClick={onCancel}
+              aria-label="取消回复"
               className="text-gray-500 hover:text-gray-300 transition-colors"
             >
-              <X size={16} />
+              <X size={16} aria-hidden="true" />
             </button>
           )}
         </div>
@@ -165,6 +166,8 @@ export function CommentInput({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          aria-label="评论内容"
+          aria-describedby="char-count"
           className="w-full px-4 py-3 pr-12 bg-gray-800/50 border border-gray-700 rounded-lg
                      text-sm text-gray-200 placeholder-gray-500 resize-none min-h-[80px] max-h-[200px]
                      focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20
@@ -176,12 +179,13 @@ export function CommentInput({
         <button
           onClick={handleSubmit}
           disabled={!content.trim() || submitting}
+          aria-label={submitting ? '发送中' : '发送评论'}
           className="absolute right-3 bottom-3 p-2 rounded-lg bg-blue-600 text-white
                      hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed
                      transition-colors"
           title="发送 (Cmd+Enter)"
         >
-          <Send size={16} />
+          <Send size={16} aria-hidden="true" />
         </button>
       </div>
 
@@ -221,7 +225,12 @@ export function CommentInput({
       {/* Helper text */}
       <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
         <span>提示：输入 @ 提及成员，Cmd+Enter 发送</span>
-        <span className={content.length > 900 ? 'text-yellow-500' : ''}>
+        <span
+          id="char-count"
+          className={content.length > 900 ? 'text-yellow-500' : ''}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {content.length} / 1000
         </span>
       </div>

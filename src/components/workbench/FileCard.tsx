@@ -109,19 +109,21 @@ export function FileCard({ file, onDelete, progress }: FileCardProps) {
           {file.status === 'ready' && parsedData && (
             <button
               onClick={() => setShowPreview(!showPreview)}
+              aria-label={showPreview ? '隐藏预览' : '查看解析结果'}
               className="p-1.5 rounded-lg text-[#646A73] hover:text-[#1F2329] hover:bg-[#DEE0E3] transition-colors"
               title={showPreview ? '隐藏预览' : '查看解析结果'}
             >
-              {showPreview ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+              {showPreview ? <ChevronUp size={15} aria-hidden="true" /> : <ChevronDown size={15} aria-hidden="true" />}
             </button>
           )}
           {onDelete && (
             <button
               onClick={() => onDelete(file.id)}
+              aria-label={`删除文件: ${file.file_name}`}
               className="p-1.5 rounded-lg text-[#8F959E] hover:text-red-400 hover:bg-red-900/20 transition-colors"
               title="删除文件"
             >
-              <Trash2 size={15} />
+              <Trash2 size={15} aria-hidden="true" />
             </button>
           )}
         </div>

@@ -148,19 +148,15 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
         onDragLeave={handleDragLeave}
         onClick={() => !disabled && inputRef.current?.click()}
         className={[
-          'relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 cursor-pointer',
-          disabled ? 'opacity-50 cursor-not-allowed' : ''
+          'relative rounded-xl p-12 text-center transition-all duration-200 cursor-pointer',
+          disabled ? 'opacity-50 cursor-not-allowed' : '',
+          isDragOver ? 'dropzone-dash-animated' : 'border-2 border-dashed'
         ].join(' ')}
         style={{
-          borderColor: isDragOver ? 'var(--color-primary)' : 'var(--color-border-light)',
-          backgroundColor: isDragOver ? 'rgba(94, 106, 210, 0.05)' : 'var(--color-bg-elevated-1)',
-          backgroundImage: isDragOver
-            ? 'linear-gradient(135deg, rgba(94, 106, 210, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%)'
-            : 'none',
-          ...(isDragOver && {
-            borderImage: 'linear-gradient(135deg, var(--color-primary), #06B6D4) 1',
-            borderImageSlice: 1
-          })
+          borderColor: isDragOver ? 'transparent' : 'var(--color-border-light)',
+          backgroundColor: isDragOver
+            ? 'rgba(94, 106, 210, 0.05)'
+            : 'var(--color-bg-elevated-1)'
         }}
       >
         <input

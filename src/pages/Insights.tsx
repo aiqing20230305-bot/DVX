@@ -13,12 +13,16 @@ import { BatchToolbar } from '../components/shared/BatchToolbar.js'
 import { ConfirmDialog } from '../components/shared/ConfirmDialog.js'
 import { KeyboardShortcutsHelp } from '../components/shared/KeyboardShortcutsHelp.js'
 import { CommentPanel } from '../components/comments/CommentPanel.js'
+import { ExportOptionsModal, ExportFormat, ExportOptions } from '../components/shared/ExportOptionsModal.js'
 import { useSSEStream } from '../hooks/useSSEStream.js'
 import { usePageKeyboardShortcuts, PageKeyboardShortcut } from '../hooks/usePageKeyboardShortcuts.js'
 import { useDebounce } from '../hooks/useDebounce.js'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation.js'
 import { Insight } from '../types/index.js'
 import { exportInsightsToExcel } from '../utils/export.utils.js'
+import { exportInsightsToPDF } from '../utils/pdf-export-enhanced.js'
+import { exportInsightsToWord } from '../utils/word-export.js'
+import { exportInsightsToPPT } from '../utils/ppt-export.js'
 import { toast } from '../store/toast.store.js'
 import { persistFilters } from '../utils/storage.js'
 
@@ -34,6 +38,7 @@ export function Insights() {
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const [commentPanelOpen, setCommentPanelOpen] = useState(false)
   const [selectedInsightId, setSelectedInsightId] = useState<string>('')
+  const [exportModalOpen, setExportModalOpen] = useState(false)
   const {
     insights, selectedIds, status, streamBuffer,
     setInsights, addInsight, toggleSelection, selectAll, clearSelection,
@@ -41,6 +46,11 @@ export function Insights() {
   } = useInsightStore()
 
   const { getCommentCount } = useCommentStore()
+
+  // v2.11.0 Phase 3.2: WCAG 2.4.2 - Set unique page title
+  useEffect(() => {
+    document.title = '洞察生成 · 超级洞察'
+  }, [])
 
   const { start: startStream, status: sseStatus } = useSSEStream<Insight & { message?: string }>({
     onEvent: (event, data) => {
@@ -119,30 +129,63 @@ export function Insights() {
     navigate('/topics')
   }
 
+  // v2.32.0 Phase 4: 使用ExportOptionsModal替代window.prompt
   const handleExport = () => {
     if (insights.length === 0) {
       toast.error('没有可导出的数据')
       return
     }
+    setExportModalOpen(true)
+  }
 
+  // 执行导出
+  const handleExportExecute = async (format: ExportFormat, options: ExportOptions) => {
     try {
-      // 如果有已选数据，提示用户选择导出范围
+      // Step 1: 如果有已选数据，提示用户选择导出范围
+      let dataToExport = insights
       if (selectedCount > 0) {
         const exportSelected = window.confirm(
           `检测到您选择了 ${selectedCount} 条洞察。\n\n点击"确定"仅导出已选数据\n点击"取消"导出全部数据`
         )
-        const dataToExport = exportSelected
+        dataToExport = exportSelected
           ? insights.filter(i => selectedIds.has(i.id))
           : insights
+      }
 
-        exportInsightsToExcel(dataToExport)
-        toast.success('导出成功', `已导出 ${dataToExport.length} 条洞察`)
+      // Step 2: 根据格式执行导出
+      if (format === 'pdf') {
+        await exportInsightsToPDF(dataToExport, {
+          title: options.title || '洞察报告',
+          theme: options.theme || 'light',
+          includeTimestamp: options.includeTimestamp !== false,
+          author: options.author || '超级洞察',
+          showPageNumbers: options.showPageNumbers !== false
+        })
+        toast.success('导出成功', `已导出 ${dataToExport.length} 条洞察为PDF`)
+      } else if (format === 'word') {
+        await exportInsightsToWord(dataToExport, {
+          title: options.title || '洞察报告',
+          template: options.template || 'default',
+          includeTimestamp: options.includeTimestamp !== false,
+          author: options.author || '超级洞察'
+        })
+        toast.success('导出成功', `已导出 ${dataToExport.length} 条洞察为Word`)
+      } else if (format === 'ppt') {
+        await exportInsightsToPPT(dataToExport, {
+          title: options.title || '洞察报告',
+          aspectRatio: options.aspectRatio || '16:9',
+          includeTimestamp: options.includeTimestamp !== false,
+          author: options.author || '超级洞察',
+          theme: options.theme || 'light'
+        })
+        toast.success('导出成功', `已导出 ${dataToExport.length} 条洞察为PPT`)
       } else {
-        exportInsightsToExcel(insights)
-        toast.success('导出成功', `已导出 ${insights.length} 条洞察`)
+        await exportInsightsToExcel(dataToExport)
+        toast.success('导出成功', `已导出 ${dataToExport.length} 条洞察为Excel`)
       }
     } catch (err) {
       toast.error('导出失败', err instanceof Error ? err.message : String(err))
+      throw err // Re-throw to let Modal handle loading state
     }
   }
 
@@ -188,16 +231,66 @@ export function Insights() {
     }
   }
 
-  const handleBatchExportSelected = () => {
+  // v2.32.0 Phase 3: 增加格式选择（Excel/PDF/Word/PPT）
+  const handleBatchExportSelected = async () => {
     if (selectedCount === 0) {
       toast.error('请先选择要导出的洞察')
       return
     }
 
     try {
+      // Step 1: 选择导出格式
+      const formatChoice = window.prompt(
+        '选择导出格式:\n\n1 = Excel (.xlsx)\n2 = PDF (.pdf)\n3 = Word (.docx)\n4 = PPT (.pptx)\n\n请输入数字 (1-4):',
+        '1'
+      )
+
+      if (!formatChoice || !['1', '2', '3', '4'].includes(formatChoice)) {
+        toast.error('已取消导出')
+        return
+      }
+
+      const formatMap: Record<string, string> = {
+        '1': 'excel',
+        '2': 'pdf',
+        '3': 'word',
+        '4': 'ppt'
+      }
+      const format = formatMap[formatChoice]
+
+      // Step 2: 执行导出
       const selectedItems = insights.filter(i => selectedIds.has(i.id))
-      exportInsightsToExcel(selectedItems)
-      toast.success('导出成功', `已导出 ${selectedCount} 条洞察`)
+
+      if (format === 'pdf') {
+        await exportInsightsToPDF(selectedItems, {
+          title: '洞察报告',
+          theme: 'light',
+          includeTimestamp: true,
+          author: '超级洞察',
+          showPageNumbers: true
+        })
+        toast.success('导出成功', `已导出 ${selectedCount} 条洞察为PDF`)
+      } else if (format === 'word') {
+        await exportInsightsToWord(selectedItems, {
+          title: '洞察报告',
+          template: 'default',
+          includeTimestamp: true,
+          author: '超级洞察'
+        })
+        toast.success('导出成功', `已导出 ${selectedCount} 条洞察为Word`)
+      } else if (format === 'ppt') {
+        await exportInsightsToPPT(selectedItems, {
+          title: '洞察报告',
+          aspectRatio: '16:9',
+          includeTimestamp: true,
+          author: '超级洞察',
+          theme: 'light'
+        })
+        toast.success('导出成功', `已导出 ${selectedCount} 条洞察为PPT`)
+      } else {
+        await exportInsightsToExcel(selectedItems)
+        toast.success('导出成功', `已导出 ${selectedCount} 条洞察为Excel`)
+      }
     } catch (err) {
       toast.error('导出失败', err instanceof Error ? err.message : String(err))
     }
@@ -434,6 +527,15 @@ export function Insights() {
         onClose={() => setShortcutsHelpOpen(false)}
         shortcuts={keyboardShortcuts}
         title="洞察页面快捷键"
+      />
+
+      {/* Export Options Modal */}
+      <ExportOptionsModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        onExport={handleExportExecute}
+        itemCount={insights.length}
+        itemType="洞察"
       />
 
       {/* Comment Panel */}

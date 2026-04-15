@@ -19,14 +19,15 @@ export function Login() {
   const validate = () => {
     const newErrors: Record<string, string> = {}
 
+    // v2.11.0 Phase 3.2: WCAG 3.3.3 - Provide specific, actionable error messages
     if (!formData.email) {
-      newErrors.email = '请输入邮箱'
+      newErrors.email = '请输入邮箱地址'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '邮箱格式不正确'
+      newErrors.email = '请输入有效的邮箱地址，格式如：example@company.com'
     }
 
     if (!formData.password) {
-      newErrors.password = '请输入密码'
+      newErrors.password = '请输入登录密码'
     }
 
     setErrors(newErrors)
@@ -64,45 +65,59 @@ export function Login() {
         <div className="bg-[#1A1A1A] border border-[#333333] rounded-lg p-8">
           <h2 className="text-2xl font-semibold text-white mb-6">登录</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-[#FFFFFF] mb-2">
-                邮箱
+              <label htmlFor="login-email" className="block text-sm font-medium text-[#FFFFFF] mb-2">
+                邮箱 <span className="text-red-400" aria-label="必填项">*</span>
               </label>
               <Input
+                id="login-email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="请输入邮箱"
+                required
+                aria-required="true"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
                 className={errors.email ? 'border-red-500' : ''}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p id="email-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.email}
+                </p>
               )}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-[#FFFFFF] mb-2">
-                密码
+              <label htmlFor="login-password" className="block text-sm font-medium text-[#FFFFFF] mb-2">
+                密码 <span className="text-red-400" aria-label="必填项">*</span>
               </label>
               <Input
+                id="login-password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="请输入密码"
+                required
+                aria-required="true"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? 'password-error' : undefined}
                 className={errors.password ? 'border-red-500' : ''}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.password}
+                </p>
               )}
             </div>
 
             {/* Remember & Forgot Password */}
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-[#A3A3A3] hover:text-white cursor-pointer">
-                <input type="checkbox" className="rounded" />
+              <label htmlFor="remember-me" className="flex items-center gap-2 text-sm text-[#A3A3A3] hover:text-white cursor-pointer">
+                <input id="remember-me" type="checkbox" className="rounded" />
                 记住我
               </label>
               <a href="#" className="text-sm text-[#5E6AD2] hover:text-[#8B85FF]">

@@ -47,10 +47,18 @@ CREATE TABLE IF NOT EXISTS insights (
   confidence TEXT NOT NULL DEFAULT 'medium',
   actionable INTEGER NOT NULL DEFAULT 1,
   selected INTEGER NOT NULL DEFAULT 0,
+  quality_score_credibility INTEGER DEFAULT NULL,
+  quality_score_novelty INTEGER DEFAULT NULL,
+  quality_score_actionability INTEGER DEFAULT NULL,
+  quality_score_overall INTEGER DEFAULT NULL,
+  quality_metadata TEXT DEFAULT NULL,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 );
+
+-- v2.34.0: 索引优化 - 按质量评分排序
+CREATE INDEX IF NOT EXISTS idx_insights_quality ON insights(quality_score_overall DESC);
 
 CREATE TABLE IF NOT EXISTS topics (
   id TEXT PRIMARY KEY,

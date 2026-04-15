@@ -12,6 +12,11 @@ export interface InsightRow {
   confidence: string
   actionable: number
   selected: number
+  quality_score_credibility: number | null
+  quality_score_novelty: number | null
+  quality_score_actionability: number | null
+  quality_score_overall: number | null
+  quality_metadata: string | null
   created_at: number
   updated_at: number
 }
@@ -60,7 +65,13 @@ export const insightRepo = {
       summary: data.summary, evidence: JSON.stringify(data.evidence),
       metric: data.metric ? JSON.stringify(data.metric) : null,
       confidence: data.confidence, actionable: data.actionable ? 1 : 0,
-      selected: 0, created_at: now, updated_at: now
+      selected: 0,
+      quality_score_credibility: null,
+      quality_score_novelty: null,
+      quality_score_actionability: null,
+      quality_score_overall: null,
+      quality_metadata: null,
+      created_at: now, updated_at: now
     }
   },
 
@@ -119,7 +130,13 @@ export const insightRepo = {
           summary: data.summary, evidence: JSON.stringify(data.evidence),
           metric: data.metric ? JSON.stringify(data.metric) : null,
           confidence: data.confidence, actionable: data.actionable ? 1 : 0,
-          selected: 0, created_at: now, updated_at: now
+          selected: 0,
+          quality_score_credibility: null,
+          quality_score_novelty: null,
+          quality_score_actionability: null,
+          quality_score_overall: null,
+          quality_metadata: null,
+          created_at: now, updated_at: now
         })
       }
       return results
@@ -127,5 +144,37 @@ export const insightRepo = {
 
     // Execute transaction
     return insertMany(dataList.map(data => ({ projectId, data })))
+  },
+
+  /**
+   * v2.34.0: Update quality score for an insight
+   */
+  updateQualityScore(id: string, score: {
+    credibility: number
+    novelty: number
+    actionability: number
+    overall: number
+    metadata: { credibilityReason: string; noveltyReason: string; actionabilityReason: string }
+  }): void {
+    const db = getDb()
+    const now = Date.now()
+    db.prepare(`
+      UPDATE insights
+      SET quality_score_credibility = ?,
+          quality_score_novelty = ?,
+          quality_score_actionability = ?,
+          quality_score_overall = ?,
+          quality_metadata = ?,
+          updated_at = ?
+      WHERE id = ?
+    `).run(
+      score.credibility,
+      score.novelty,
+      score.actionability,
+      score.overall,
+      JSON.stringify(score.metadata),
+      now,
+      id
+    )
   }
 }

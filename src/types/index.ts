@@ -107,6 +107,11 @@ export interface Insight {
   confidence: 'high' | 'medium' | 'low'
   actionable: boolean
   selected: boolean
+  quality_score_credibility?: number | null
+  quality_score_novelty?: number | null
+  quality_score_actionability?: number | null
+  quality_score_overall?: number | null
+  quality_metadata?: string | null
   created_at: number
   updated_at: number
 }
@@ -144,6 +149,48 @@ export interface Script {
   word_count: number
   created_at: number
   updated_at: number
+}
+
+export interface TemplateSegment {
+  type: string
+  timing: string
+  content: string
+  direction: string
+  duration?: number
+}
+
+export interface ScriptTemplate {
+  id: string
+  name: string
+  description: string | null
+  category: 'emotion' | 'rational' | 'harvest' | 'custom'
+  platform: 'douyin' | 'kuaishou' | 'xiaohongshu'
+  segments: TemplateSegment[]
+  tags: string[]
+  created_by: string | null
+  project_id: string | null
+  source_script_id: string | null
+  usage_count: number
+  created_at: number
+  updated_at: number
+}
+
+export interface TemplateVariables {
+  [key: string]: string | number
+}
+
+export interface TemplateQueryParams {
+  project_id?: string | null
+  category?: string
+  platform?: string
+  search?: string
+  limit?: number
+  offset?: number
+}
+
+export interface TemplateStats {
+  totalCount: number
+  byCategory: Array<{ category: string; count: number }>
 }
 
 export interface KBItem {

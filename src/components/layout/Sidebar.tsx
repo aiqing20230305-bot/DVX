@@ -4,7 +4,7 @@ import {
   Database, Lightbulb, FileText, PenTool, BookOpen,
   ChevronLeft, ChevronRight, Plus, Zap,
   ChevronDown, Check, Trash2, ArrowLeft, FolderOpen,
-  User, LogOut, GitBranch, Settings
+  User, LogOut, GitBranch, Settings, Layout, Bell
 } from 'lucide-react'
 import { useUIStore } from '../../store/ui.store.js'
 import { useProjectStore } from '../../store/project.store.js'
@@ -21,6 +21,7 @@ const navItems = [
   { to: '/insights', label: '洞察引擎', icon: Lightbulb },
   { to: '/topics', label: '选题策划', icon: FileText },
   { to: '/scripts', label: '脚本创作', icon: PenTool },
+  { to: '/templates', label: '脚本模板', icon: Layout },
   { to: '/report', label: '战略报告', icon: Zap, divider: true },
   // 协作功能
   { to: '/kb', label: '知识库', icon: BookOpen, divider: true },
@@ -312,6 +313,25 @@ export function Sidebar() {
                     }}
                   >
                     <div className="p-2">
+                      <button
+                        onClick={() => {
+                          setUserDropdown(false)
+                          navigate('/account/settings')
+                        }}
+                        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-colors text-sm"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--color-text-primary)';
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated-2)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'var(--color-text-secondary)';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <Bell size={16} />
+                        通知设置
+                      </button>
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-colors text-sm"

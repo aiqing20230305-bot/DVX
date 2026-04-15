@@ -71,5 +71,16 @@ export function useTheme() {
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
+
+  // v2.12.0: Warn developers in development mode
+  if (import.meta.env.DEV) {
+    console.warn(
+      '[ThemeContext] This context is deprecated since v2.2.0. Use useUIStore() instead.\n' +
+      'Migration: import { useUIStore } from "@/store/ui.store"\n' +
+      'See src/contexts/ThemeContext.tsx for full migration guide.\n' +
+      'This context will be removed in v2.14.0.'
+    )
+  }
+
   return context
 }

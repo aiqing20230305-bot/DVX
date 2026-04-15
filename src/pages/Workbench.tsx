@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, lazy, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Database, RefreshCw, ArrowRight, AlertCircle, Film, Link, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
 import { useProjectStore } from '../store/project.store.js'
@@ -6,10 +6,12 @@ import { DropZone } from '../components/workbench/DropZone.js'
 import { FileCard } from '../components/workbench/FileCard.js'
 import { FileCardSkeletonList } from '../components/workbench/FileCardSkeleton.js'
 import { AutoGeneratePanel } from '../components/workbench/AutoGeneratePanel.js'
-import { ProjectStatsPanel } from '../components/workbench/ProjectStatsPanel.js'
-import { DataChartsPanel } from '../components/workbench/DataChartsPanel.js'
 import { Button } from '../components/shared/Button.js'
 import { Input } from '../components/shared/Input.js'
+
+// v2.31.0 Phase 2: Lazy load chart components (reduce initial bundle size)
+const ProjectStatsPanel = lazy(() => import('../components/workbench/ProjectStatsPanel.js').then(m => ({ default: m.ProjectStatsPanel })))
+const DataChartsPanel = lazy(() => import('../components/workbench/DataChartsPanel.js').then(m => ({ default: m.DataChartsPanel })))
 import { uploadApi, videoApi } from '../api/upload.api.js'
 import { useFileUpload } from '../hooks/useFileUpload.js'
 import { UploadedFile } from '../types/index.js'
@@ -31,6 +33,11 @@ export function Workbench() {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
   const activeProject = projects.find(p => p.id === activeProjectId)
+
+  // v2.11.0 Phase 3.2: WCAG 2.4.2 - Set unique page title
+  useEffect(() => {
+    document.title = '数据上传 · 超级洞察'
+  }, [])
 
   // Group files by type
   const fileGroups = {
@@ -248,11 +255,39 @@ export function Workbench() {
         </div>
       )}
 
-      {/* Project stats panel */}
-      {activeProjectId && <ProjectStatsPanel />}
+      {/* Project stats panel - lazy loaded (v2.31.0 Phase 2) */}
+      {activeProjectId && (
+        <Suspense fallback={
+          <div className="rounded-lg border p-6 mb-8" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              加载统计面板...
+            </div>
+          </div>
+        }>
+          <ProjectStatsPanel />
+        </Suspense>
+      )}
 
-      {/* Data charts panel */}
-      {activeProjectId && <DataChartsPanel />}
+      {/* Data charts panel - lazy loaded (v2.31.0 Phase 2) */}
+      {activeProjectId && (
+        <Suspense fallback={
+          <div className="rounded-lg border p-6 mb-8" style={{
+            backgroundColor: 'var(--color-bg-elevated-1)',
+            borderColor: 'var(--color-border)'
+          }}>
+            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              加载图表...
+            </div>
+          </div>
+        }>
+          <DataChartsPanel />
+        </Suspense>
+      )}
 
       {/* Drop zone */}
       <div className="mb-8">

@@ -1,5 +1,6 @@
 import { Router, Response } from 'express'
-import { notificationRepo } from '../db/repositories/notification.repo.js'
+import { notificationRepo, NotificationWithSender } from '../db/repositories/notification.repo.js'
+import { userRepo } from '../db/repositories/user.repo.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import { AuthRequest } from '../middleware/permission.middleware.js'
 
@@ -34,7 +35,26 @@ router.get('/api/notifications', authMiddleware, async (req: AuthRequest, res: R
 
     const notifications = notificationRepo.findByUser(userId, filters)
 
-    res.json({ notifications, total: notifications.length })
+    // v2.24.0: 添加作者信息（评论通知）
+    const notificationsWithSender: NotificationWithSender[] = notifications.map(notification => {
+      // 如果是评论通知（mention/reply）且有author_id，添加作者信息
+      if (notification.author_id && ['mention', 'reply'].includes(notification.type)) {
+        const author = userRepo.findById(notification.author_id)
+        if (author) {
+          return {
+            ...notification,
+            sender: {
+              id: author.id,
+              email: author.email,
+              name: author.name
+            }
+          }
+        }
+      }
+      return notification
+    })
+
+    res.json({ notifications: notificationsWithSender, total: notificationsWithSender.length })
   } catch (error) {
     console.error('获取通知列表失败:', error)
     res.status(500).json({ error: '服务器错误', message: '获取通知列表失败' })

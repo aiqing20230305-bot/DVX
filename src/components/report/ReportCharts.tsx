@@ -14,12 +14,21 @@ interface ChartProps {
  * 洞察分布饼图
  */
 export function InsightDistributionChart({ data, width = 400, height = 300 }: ChartProps) {
+  // v2.11.0 Phase 3.2: WCAG 1.1.1 - Generate text alternative for chart
+  const chartDescription = data.length > 0
+    ? `洞察类型分布：${data.map(d => `${d.name} ${d.value}个`).join('，')}`
+    : '暂无洞察数据'
+
   return (
-    <div style={{ width, height, background: '#1A1A1A', padding: '20px', borderRadius: '8px' }}>
+    <div
+      style={{ width, height, background: '#1A1A1A', padding: '20px', borderRadius: '8px' }}
+      role="img"
+      aria-label={chartDescription}
+    >
       <h3 style={{ color: '#FFFFFF', fontSize: '16px', marginBottom: '10px', textAlign: 'center' }}>
         洞察类型分布
       </h3>
-      <ResponsiveContainer width="100%" height="85%">
+      <ResponsiveContainer width="100%" height="85%" aria-hidden="true">
         <PieChart>
           <Pie
             data={data}
@@ -51,12 +60,21 @@ export function InsightDistributionChart({ data, width = 400, height = 300 }: Ch
  * 选题优先级柱状图
  */
 export function TopicPriorityChart({ data, width = 400, height = 300 }: ChartProps) {
+  // v2.11.0 Phase 3.2: WCAG 1.1.1 - Generate text alternative for chart
+  const chartDescription = data.length > 0
+    ? `选题优先级分布：${data.map(d => `${d.name} ${d.value}个`).join('，')}`
+    : '暂无选题数据'
+
   return (
-    <div style={{ width, height, background: '#1A1A1A', padding: '20px', borderRadius: '8px' }}>
+    <div
+      style={{ width, height, background: '#1A1A1A', padding: '20px', borderRadius: '8px' }}
+      role="img"
+      aria-label={chartDescription}
+    >
       <h3 style={{ color: '#FFFFFF', fontSize: '16px', marginBottom: '10px', textAlign: 'center' }}>
         选题优先级分布
       </h3>
-      <ResponsiveContainer width="100%" height="85%">
+      <ResponsiveContainer width="100%" height="85%" aria-hidden="true">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
           <XAxis dataKey="name" stroke="#A3A3A3" />
@@ -81,12 +99,21 @@ interface TimelineChartProps {
 }
 
 export function TimelineActivityChart({ data, width = 600, height = 300 }: TimelineChartProps) {
+  // v2.11.0 Phase 3.2: WCAG 1.1.1 - Generate text alternative for chart
+  const chartDescription = data.length > 0
+    ? `最近7天活动趋势：${data.map(d => `${d.date} ${d.count}次操作`).join('，')}`
+    : '暂无活动数据'
+
   return (
-    <div style={{ width, height, background: '#1A1A1A', padding: '20px', borderRadius: '8px' }}>
+    <div
+      style={{ width, height, background: '#1A1A1A', padding: '20px', borderRadius: '8px' }}
+      role="img"
+      aria-label={chartDescription}
+    >
       <h3 style={{ color: '#FFFFFF', fontSize: '16px', marginBottom: '10px', textAlign: 'center' }}>
         最近7天活动趋势
       </h3>
-      <ResponsiveContainer width="100%" height="85%">
+      <ResponsiveContainer width="100%" height="85%" aria-hidden="true">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
           <XAxis dataKey="date" stroke="#A3A3A3" />
