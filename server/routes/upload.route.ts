@@ -6,6 +6,7 @@ import { parseExcel } from '../services/parser/excel.parser.js'
 import { parsePDF } from '../services/parser/pdf.parser.js'
 import { parseImage } from '../services/parser/image.parser.js'
 import { parseVideo } from '../services/parser/video.parser.js'
+import { parseWord } from '../services/parser/word-parser.js'
 import { resolve } from 'path'
 import { config } from '../config.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
@@ -99,6 +100,9 @@ router.post('/', authMiddleware, requireProjectMember('editor'), uploadMiddlewar
       } else if (mime.startsWith('image/') || ['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
         console.log('[upload] 调用图片解析器...')
         parsedData = await parseImage(filePath)
+      } else if (mime.includes('word') || mime.includes('document') || ext === 'doc' || ext === 'docx') {
+        console.log('[upload] 调用Word解析器...')
+        parsedData = await parseWord(filePath)
       } else {
         throw new Error(`Unsupported type: ${mime} (${ext})`)
       }

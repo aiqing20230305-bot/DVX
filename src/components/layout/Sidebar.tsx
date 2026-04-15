@@ -23,7 +23,6 @@ const navItems = [
   { to: '/scripts', label: '脚本创作', icon: PenTool },
   { to: '/report', label: '战略报告', icon: Zap, divider: true },
   // 协作功能
-  { to: '/approvals', label: '审批管理', icon: GitBranch },
   { to: '/kb', label: '知识库', icon: BookOpen, divider: true },
   // 项目管理
   { to: '/settings', label: '项目设置', icon: Settings },
@@ -409,21 +408,12 @@ export function Sidebar() {
                 onChange={e => setNewProjectName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleCreateProject()}
                 placeholder="例如：618大促内容战略"
-                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm transition-all"
                 style={{
                   backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)'
                 }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-primary)';
-                  e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-border)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                autoFocus
               />
             </div>
             <div>
@@ -433,19 +423,11 @@ export function Sidebar() {
                 onChange={e => setNewProjectDesc(e.target.value)}
                 placeholder="简短描述项目目标（可选）"
                 rows={3}
-                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm resize-none"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 text-sm resize-none transition-all"
                 style={{
                   backgroundColor: 'var(--color-bg-elevated-2)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-primary)';
-                  e.currentTarget.style.boxShadow = '0 0 0 1px var(--color-primary)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-border)';
-                  e.currentTarget.style.boxShadow = 'none';
                 }}
               />
             </div>

@@ -1,0 +1,179 @@
+{
+  "workbench": {
+    "title": "数据上传",
+    "subtitle": "上传市场数据、产品信息和特性数据",
+    "dropzone": {
+      "title": "拖拽文件到这里",
+      "subtitle": "或点击上传",
+      "hint": "支持 Excel (.xlsx), CSV (.csv), PDF (.pdf)",
+      "uploading": "上传中...",
+      "success": "上传成功"
+    },
+    "fileList": {
+      "title": "已上传文件",
+      "empty": "还没有上传任何文件",
+      "parsing": "解析中...",
+      "parsed": "已解析",
+      "failed": "解析失败"
+    },
+    "stats": {
+      "totalFiles": "文件总数",
+      "totalInsights": "洞察总数",
+      "totalTopics": "选题总数",
+      "totalScripts": "脚本总数"
+    }
+  },
+  "insights": {
+    "title": "洞察生成",
+    "subtitle": "基于上传数据生成AI洞察",
+    "generate": {
+      "button": "生成洞察",
+      "streaming": "正在生成洞察...",
+      "stage": {
+        "parsing": "数据解析",
+        "analyzing": "生成洞察",
+        "waiting": "待处理"
+      }
+    },
+    "list": {
+      "empty": "还没有生成任何洞察",
+      "filter": {
+        "all": "全部",
+        "dataInsight": "数据洞察",
+        "userInsight": "用户洞察",
+        "marketInsight": "市场洞察"
+      },
+      "confidence": "置信度",
+      "comments": "评论"
+    },
+    "batch": {
+      "selected": "已选择 {{count}} 项",
+      "generate": "批量生成选题",
+      "delete": "批量删除"
+    }
+  },
+  "topics": {
+    "title": "选题策划",
+    "subtitle": "基于洞察生成选题方向",
+    "generate": {
+      "button": "生成选题",
+      "streaming": "正在生成选题...",
+      "progress": "进度"
+    },
+    "list": {
+      "empty": "还没有生成任何选题",
+      "platform": {
+        "douyin": "抖音",
+        "xiaohongshu": "小红书",
+        "kuaishou": "快手"
+      },
+      "priority": {
+        "high": "高优先级",
+        "medium": "中优先级",
+        "low": "低优先级"
+      }
+    },
+    "batch": {
+      "selected": "已选择 {{count}} 项",
+      "generate": "批量生成脚本",
+      "delete": "批量删除"
+    }
+  },
+  "scripts": {
+    "title": "脚本创作",
+    "subtitle": "基于选题生成视频脚本",
+    "generate": {
+      "button": "生成脚本",
+      "streaming": "正在生成脚本...",
+      "product": "产品"
+    },
+    "abVariant": {
+      "title": "A/B 版本对比",
+      "versionA": "版本 A",
+      "versionB": "版本 B",
+      "diff": "差异高亮"
+    },
+    "approval": {
+      "pending": "审批中",
+      "approved": "已通过",
+      "rejected": "已拒绝",
+      "submit": "提交审批",
+      "review": "审批"
+    },
+    "batch": {
+      "selected": "已选择 {{count}} 项",
+      "export": "批量导出",
+      "delete": "批量删除"
+    }
+  },
+  "report": {
+    "title": "报告导出",
+    "subtitle": "生成并导出内容策略报告",
+    "generate": {
+      "button": "生成报告",
+      "generating": "正在生成报告...",
+      "success": "报告生成成功"
+    },
+    "preview": {
+      "title": "报告预览",
+      "loading": "加载预览中...",
+      "zoom": "缩放"
+    },
+    "export": {
+      "title": "导出选项",
+      "pdf": "PDF 格式",
+      "pptx": "PPT 格式",
+      "html": "HTML 格式",
+      "description": {
+        "pdf": "适合打印和正式汇报",
+        "pptx": "适合演示和编辑",
+        "html": "适合在线分享"
+      }
+    },
+    "share": {
+      "title": "分享",
+      "copyLink": "复制链接",
+      "qrCode": "二维码",
+      "linkCopied": "链接已复制到剪贴板"
+    }
+  },
+  "projects": {
+    "title": "项目管理",
+    "create": "创建项目",
+    "template": {
+      "title": "选择模板",
+      "fmcg": "快消品",
+      "beauty": "美妆",
+      "tech": "科技数码",
+      "custom": "自定义"
+    },
+    "list": {
+      "empty": "还没有创建任何项目",
+      "active": "进行中",
+      "archived": "已归档"
+    }
+  },
+  "login": {
+    "title": "登录",
+    "email": "邮箱",
+    "password": "密码",
+    "submit": "登录",
+    "noAccount": "还没有账号？",
+    "register": "注册"
+  },
+  "register": {
+    "title": "注册",
+    "name": "姓名",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "submit": "注册",
+    "hasAccount": "已有账号？",
+    "login": "登录",
+    "passwordStrength": {
+      "weak": "弱",
+      "medium": "中等",
+      "strong": "强"
+    }
+  }
+}

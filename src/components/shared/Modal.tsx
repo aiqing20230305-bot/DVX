@@ -23,24 +23,28 @@ export function Modal({ open, onClose, title, children, size = 'md', footer }: M
   const previousFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
+    if (!open) return
+
+    // Save current focused element
+    previousFocusRef.current = document.activeElement as HTMLElement
+
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
-    if (open) {
-      // Save current focused element
-      previousFocusRef.current = document.activeElement as HTMLElement
 
-      document.addEventListener('keydown', handler)
-      document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', handler)
+    document.body.style.overflow = 'hidden'
 
-      // Move focus to first interactive element in modal
-      setTimeout(() => {
-        const firstInteractive = modalRef.current?.querySelector<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-        firstInteractive?.focus()
-      }, 100)
-    }
+    // Move focus to first INPUT/TEXTAREA (not button) in modal
+    setTimeout(() => {
+      const firstInput = modalRef.current?.querySelector<HTMLElement>(
+        'input, textarea'
+      )
+      if (firstInput) {
+        firstInput.focus()
+      }
+    }, 100)
+
     return () => {
       document.removeEventListener('keydown', handler)
       document.body.style.overflow = ''
@@ -50,7 +54,7 @@ export function Modal({ open, onClose, title, children, size = 'md', footer }: M
         previousFocusRef.current.focus()
       }
     }
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 

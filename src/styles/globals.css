@@ -800,3 +800,11 @@ body {
 .ai-badge-new {
   animation: ai-badge-pulse 2s ease-in-out infinite;
 }
+
+/* Input focus styles - prevent inline event handlers */
+input:focus, 
+textarea:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary) !important;
+}
+

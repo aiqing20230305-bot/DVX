@@ -17,7 +17,7 @@ interface UIStore {
 export const useUIStore = create<UIStore>()(
   persist(
     (set) => ({
-      theme: 'dark',
+      theme: 'light',
       sidebarCollapsed: false,
       activeStep: 'workbench',
 

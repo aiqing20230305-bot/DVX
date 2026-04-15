@@ -11,11 +11,11 @@ interface ScriptEditorProps {
 }
 
 const segmentConfig: Record<string, { label: string; color: string; bgColor: string; description: string }> = {
-  hook: { label: '开场钩子', color: 'text-[#5B8EFF]', bgColor: 'bg-[#0D3DB8]/20 border-[#1E4FD9]/40', description: '3秒内抓住眼球' },
-  problem: { label: '痛点描述', color: 'text-red-400', bgColor: 'bg-red-900/20 border-red-700/40', description: '引发共鸣' },
-  solution: { label: '产品展示', color: 'text-emerald-400', bgColor: 'bg-emerald-900/20 border-emerald-700/40', description: '展示价值' },
-  proof: { label: '信任背书', color: 'text-amber-400', bgColor: 'bg-amber-900/20 border-amber-700/40', description: '数据证明' },
-  cta: { label: '行动号召', color: 'text-orange-400', bgColor: 'bg-orange-900/20 border-orange-700/40', description: '促进转化' },
+  hook: { label: '开场钩子', color: 'text-[#5E6AD2]', bgColor: 'bg-[#5E6AD2]/10 border-[#5E6AD2]/30', description: '3秒内抓住眼球' },
+  problem: { label: '痛点描述', color: 'text-red-500', bgColor: 'bg-red-50 border-red-200', description: '引发共鸣' },
+  solution: { label: '产品展示', color: 'text-emerald-600', bgColor: 'bg-emerald-50 border-emerald-200', description: '展示价值' },
+  proof: { label: '信任背书', color: 'text-[#7B85DB]', bgColor: 'bg-[#7B85DB]/10 border-[#7B85DB]/30', description: '数据证明' },
+  cta: { label: '行动号召', color: 'text-[#4A55B8]', bgColor: 'bg-[#4A55B8]/10 border-[#4A55B8]/30', description: '促进转化' },
 }
 
 export function ScriptEditor({ script, onSave, onCommentClick, commentCount = 0 }: ScriptEditorProps) {
@@ -51,23 +51,29 @@ export function ScriptEditor({ script, onSave, onCommentClick, commentCount = 0 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className={`
-            text-sm font-bold px-3 py-1 rounded-full
-            ${script.variant === 'A' ? 'bg-[#0D3DB8]/50 text-[#5B8EFF]' : 'bg-purple-900/50 text-purple-300'}
+            text-sm font-semibold px-3 py-1 rounded-full
+            ${script.variant === 'A' ? 'bg-[#5E6AD2]/10 text-[#5E6AD2] border border-[#5E6AD2]/30' : 'bg-[#7B85DB]/10 text-[#7B85DB] border border-[#7B85DB]/30'}
           `}>
             {script.variant} 版本
           </span>
-          <span className="text-xs text-[#8F959E]">{script.word_count} 字</span>
+          <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{script.word_count} 字</span>
         </div>
         <div className="flex items-center gap-2">
           {onCommentClick && (
             <button
               onClick={() => onCommentClick(script.id)}
-              className="flex items-center gap-1.5 text-xs text-[#8F959E] hover:text-[#3370FF] transition-colors px-2 py-1 rounded"
+              className="flex items-center gap-1.5 text-xs transition-colors px-2 py-1 rounded"
+              style={{ color: 'var(--color-text-tertiary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
             >
               <MessageCircle size={14} />
               <span>评论</span>
               {commentCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[#3370FF]/10 text-[#3370FF] font-medium">
+                <span className="ml-1 px-1.5 py-0.5 rounded-full font-medium" style={{
+                  backgroundColor: 'rgba(94, 106, 210, 0.1)',
+                  color: 'var(--color-primary)'
+                }}>
                   {commentCount}
                 </span>
               )}

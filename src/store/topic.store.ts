@@ -25,8 +25,15 @@ export const useTopicStore = create<TopicStore>((set) => ({
   error: null,
 
   setTopics: (topics) => {
-    const selectedIds = new Set(topics.filter(t => t.selected).map(t => t.id))
-    set({ topics, selectedIds })
+    set(state => {
+      // Preserve existing selectedIds (user's manual selections in UI)
+      // Only initialize from database `selected` field if selectedIds is empty
+      const selectedIds = state.selectedIds.size > 0
+        ? state.selectedIds
+        : new Set(topics.filter(t => t.selected).map(t => t.id))
+
+      return { topics, selectedIds }
+    })
   },
 
   addTopic: (topic) => {
@@ -65,11 +72,20 @@ export const useTopicStore = create<TopicStore>((set) => ({
       })
       if (!res.ok) throw new Error('批量更新失败')
 
-      set(state => ({
-        topics: state.topics.map(t =>
+      set(state => {
+        // Update topics array
+        const updatedTopics = state.topics.map(t =>
           ids.includes(t.id) ? { ...t, selected } : t
         )
-      }))
+
+        // Sync selectedIds with the updated selected field
+        const updatedSelectedIds = new Set(updatedTopics.filter(t => t.selected).map(t => t.id))
+
+        return {
+          topics: updatedTopics,
+          selectedIds: updatedSelectedIds
+        }
+      })
     } catch (err) {
       console.error('Batch update failed:', err)
       throw err

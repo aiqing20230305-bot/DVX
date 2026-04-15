@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express'
 import { topicRepo } from '../db/repositories/topic.repo.js'
 import { generateTopicsStream } from '../services/topic.service.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
-import { requireProjectMember } from '../middleware/permission.middleware.js'
+import { requireProjectMember, checkPermission } from '../middleware/permission.middleware.js'
 import { logRepo } from '../db/repositories/log.repo.js'
 import { importUploadMiddleware } from '../middleware/upload.middleware.js'
 import { parseExcelFile, validateTopicData, generateTopicTemplate } from '../utils/excel-parser.js'
@@ -188,9 +188,7 @@ router.patch('/batch', authMiddleware, async (req: Request, res: Response) => {
         return
       }
 
-      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-      const hasPermission = projectMemberRepo.hasRole(firstTopic.project_id, userId, 'editor')
-      if (!hasPermission) {
+      if (!checkPermission(firstTopic.project_id, userId, 'editor')) {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }
@@ -290,9 +288,7 @@ router.delete('/batch', authMiddleware, async (req: Request, res: Response) => {
         return
       }
 
-      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-      const hasPermission = projectMemberRepo.hasRole(firstTopic.project_id, userId, 'editor')
-      if (!hasPermission) {
+      if (!checkPermission(firstTopic.project_id, userId, 'editor')) {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }
@@ -332,9 +328,7 @@ router.patch('/batch-priority', authMiddleware, async (req: Request, res: Respon
         return
       }
 
-      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-      const hasPermission = projectMemberRepo.hasRole(firstTopic.project_id, userId, 'editor')
-      if (!hasPermission) {
+      if (!checkPermission(firstTopic.project_id, userId, 'editor')) {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }
@@ -388,9 +382,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
       return
     }
 
-    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-    const hasPermission = projectMemberRepo.hasRole(topic.project_id, userId, 'editor')
-    if (!hasPermission) {
+    if (!checkPermission(topic.project_id, userId, 'editor')) {
       res.status(403).json({ error: '权限不足，需要editor权限' })
       return
     }

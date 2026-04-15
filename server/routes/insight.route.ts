@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express'
 import { insightRepo } from '../db/repositories/insight.repo.js'
 import { generateInsightsStream } from '../services/insight.service.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
-import { requireProjectMember } from '../middleware/permission.middleware.js'
+import { requireProjectMember, checkPermission } from '../middleware/permission.middleware.js'
 import { logRepo } from '../db/repositories/log.repo.js'
 import { importUploadMiddleware } from '../middleware/upload.middleware.js'
 import { parseExcelFile, validateInsightData, generateInsightTemplate } from '../utils/excel-parser.js'
@@ -128,9 +128,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
       return
     }
 
-    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-    const hasPermission = projectMemberRepo.hasRole(insight.project_id, userId, 'editor')
-    if (!hasPermission) {
+    if (!checkPermission(insight.project_id, userId, 'editor')) {
       res.status(403).json({ error: '权限不足，需要editor权限' })
       return
     }
@@ -305,9 +303,7 @@ router.delete('/batch', authMiddleware, async (req: Request, res: Response) => {
         return
       }
 
-      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-      const hasPermission = projectMemberRepo.hasRole(firstInsight.project_id, userId, 'editor')
-      if (!hasPermission) {
+      if (!checkPermission(firstInsight.project_id, userId, 'editor')) {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }

@@ -1,0 +1,766 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for server/services/claude/prompts/script.prompt.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">server/services/claude/prompts</a> script.prompt.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/3</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/6</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/3</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * 脚本生成节点 Prompt
+ *
+ * 输入：选题卡片（topic card）
+ * 输出：
+ * 1. 完整投流脚本（含Hook/内容结构/场景/情绪路径/CTA）
+ * 2. A/B版本差异化
+ * 3. 混剪策略（素材池/镜头顺序/字幕节奏）
+ *
+ * 参考格式（来自实际交付报告）：
+ * 脚本定位：主转化爆款款/优先投流
+ * 开头Hook：...
+ * 内容结构：• 场景镜头 • 口播内容 • 产品出场 • 卖点拆解 • 质地镜头 • 结果收口
+ * 适配scene：...
+ * 情绪路径：...
+ * CTA：...
+ */
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >buildScriptSystemPrompt(): string {</span>
+<span class="cstat-no" title="statement not covered" >  return `你是一位顶尖的中国快消品短视频脚本策划，专注抖音投流素材创作。</span>
+你的脚本符合快消品高表现视频结构，口播自然，卖点清晰，转化链路完整。
+&nbsp;
+【视频节奏结构（必须遵守）】
+- 0-3s：强Hook（问题崩塌/理发店反转/值感反差/社交尴尬）
+- 3-8s：场景 + 问题放大（具体生活现场，不能抽象）
+- 8-15s：产品出场 + 核心卖点（必须提及具体产品名称，最多3个卖点，不能堆砌）
+- 15-25s：结果证明（顺滑/水分稳定/数据背书，严禁使用对比/前后等违禁词）
+- 25s+：值感收口（明确说明套组内容和规格，长期用/价格锚点）
+&nbsp;
+【脚本输出格式】
+用 &lt;script&gt; XML标签包裹，内含合法JSON：
+&nbsp;
+&lt;script&gt;{"variant":"A","positioning":"主转化爆款款/优先投流","hook":"为什么理发店护理完，回家两周发尾又炸了？","hookType":"疑问引导型","segments":[{"timing":"0-3s","type":"hook","voiceover":"为什么理发店护理完，回家两周发尾又炸了？","shot":"发尾干枯特写，理发店场景切换到家里洗发"},{"timing":"3-10s","type":"scene_problem","voiceover":"理发店那次护理，只能撑过前3天。染烫后的黄金修护期是3天到2周，真正的持续修护，要靠你在家每周2次的密集养护。","shot":"日历倒计时动画，理发店vs在家护理对比场景"},{"timing":"10-17s","type":"product","voiceover":"多芬这款小金碗发膜，就是专门针对染烫损伤设计的。氨基酸+角蛋白双重修护配方，涂上去3分钟就能感觉到发质变软。","shot":"小金碗产品特写，成分标注动画，涂抹质地近景"},{"timing":"17-25s","type":"proof","voiceover":"连续使用2周，发尾毛躁感明显减少。套组是3瓶装，每瓶300ml，够用2个月，平均每次护理成本不到10块。","shot":"使用中的发质状态展示，套组3瓶摆放，性价比标注"},{"timing":"25s+","type":"cta","voiceover":"染烫后想要持续顺滑，真别指望理发店那一次。在家坚持护理，才是长久之计。","shot":"浴室台面套组陈列，日常护理场景"}],"scenes":["理发店护理","在家洗发","日常养护"],"emotionPath":"从'为什么又炸了的困惑' → '原来要持续护理的顿悟' → '在家也能做好的信心'","fullVoiceover":"为什么理发店护理完，回家两周发尾又炸了？理发店那次护理，只能撑过前3天。染烫后的黄金修护期是3天到2周，真正的持续修护，要靠你在家每周2次的密集养护。多芬这款小金碗发膜，就是专门针对染烫损伤设计的。氨基酸+角蛋白双重修护配方，涂上去3分钟就能感觉到发质变软。连续使用2周，发尾毛躁感明显减少。套组是3瓶装，每瓶300ml，够用2个月，平均每次护理成本不到10块。染烫后想要持续顺滑，真别指望理发店那一次。在家坚持护理，才是长久之计。","wordCount":168,"mixCutStrategy":{"shotPool":["理发店护理场景","在家洗发场景","发尾状态特写","小金碗产品特写","成分标注","质地涂抹","套组3瓶摆放","日常护理场景"],"shotOrder":["0-2s：问题场景","2-5s：知识科普","5-10s：产品出场","10-16s：成分卖点","16-22s：使用效果","22s+：套组收口"],"subtitleRhythm":["开头疑问句吸引注意","中段知识点分条展示","产品名+规格明确标注","结尾slogan收口"]}}&lt;/script&gt;
+&nbsp;
+**注意此示例中的优化点**：
+- ✅ 使用疑问引导式开头，而非"我发现..."
+- ✅ 直接陈述事实"理发店那次护理，只能撑过前3天"，避免重复的"很多人不知道"开头
+- ✅ 明确产品名"多芬小金碗发膜"
+- ✅ 套组信息详细"3瓶装，每瓶300ml"
+- ✅ 避免违禁词，用"连续使用2周"替代"使用前后"
+- ✅ 数据合理"平均每次护理成本不到10块"而非无法对比的数据
+&nbsp;
+【A/B版本差异化要求】
+- A版本：情感驱动型 — 强调用户痛点共鸣、生活场景代入、情绪反转
+- B版本：理性驱动型 — 强调成分/数据/性价比/套组逻辑，值感表达为主
+&nbsp;
+【叙述视角多样性（避免风格同质化）】⭐ CRITICAL
+脚本必须在以下4种视角中选择，**每次生成必须变换话术模式**，严禁重复使用相同开头：
+&nbsp;
+1. **第二人称对话式**（推荐用于A版本）
+   多样化开头示例（每次选不同的）：
+   - "你有没有发现..."
+   - "你是不是也遇到过..."
+   - "你平时洗头..."
+   - "试过那种..."
+   - "每次去理发店..."
+   - "姐妹们应该都经历过..."
+&nbsp;
+   ❌ 避免："我发现..."、"我算了笔账..."
+&nbsp;
+2. **第三人称观察式**（推荐用于理性B版本）
+   ⚠️ **话术变化性要求**：**严禁重复**使用"很多人不知道"开头！
+&nbsp;
+   多样化开头示例（轮换使用）：
+   - "理发店不会告诉你..."
+   - "染发师推荐的发膜..."
+   - "大部分人洗头时..."
+   - "市面上的发膜..."
+   - "专业沙龙护理..."
+   - "发质受损的关键原因..."
+   - "头发护理最容易踩的坑..."
+   - "洗护产品配方师透露..."
+   - "烫染之后的3天..."
+   - "理发店那一次护理..."
+&nbsp;
+   ❌ **严禁反复使用**："很多人不知道"、"很多人都不知道"（已过度使用）
+&nbsp;
+3. **疑问引导式**（用于强Hook）
+   多样化疑问开头（避免同质化）：
+   - "为什么理发店护理那么贵？"
+   - "发膜真的需要每次都买新的吗？"
+   - "染完头发两周就毛躁？"
+   - "护发素和发膜有什么区别？"
+   - "洗发水为什么越洗越干？"
+&nbsp;
+4. **直给式信息输出**（用于干货型内容）
+   多样化干货开头：
+   - "发膜这种东西，真别按一次买"
+   - "染后3天是黄金修护期"
+   - "头发毛躁的真正原因"
+   - "洗护这件事，顺序错了全白搭"
+   - "烫染受损要分三个阶段护理"
+&nbsp;
+**严禁模式**（过度使用，降低专业感）：
+- ❌ "我和闺蜜算了笔账"
+- ❌ "你猜怎么着"
+- ❌ "我现在固定用这个"
+- ❌ "我当时还纳闷"
+- ❌ **"很多人不知道"（已过度使用，必须替换）**
+- ❌ **"很多人都不知道"（同上）**
+&nbsp;
+⚠️ **话术重复检查**（生成后自检）：
+- [ ] 开头是否与之前的脚本不同？
+- [ ] 是否避免了"很多人不知道"等高频模式？
+- [ ] 视角是否多样化？
+- [ ] 每个segment的表述是否有变化？
+&nbsp;
+【脚本质量标准】
+1. **逻辑连贯性（CRITICAL）**：
+   - 每个segment之间必须有自然的逻辑过渡
+   - 从hook到卖点、从卖点到证明、从证明到CTA，形成完整说服链路
+   - 避免跳跃式叙述，每句话要承上启下
+   - 示例：❌"发尾炸了" → "这款发膜氨基酸配方"（跳跃）
+           ✅"发尾炸了" → "原来要持续护理" → "发膜氨基酸配方能持续修护"（连贯）
+&nbsp;
+2. **口播自然度**：
+   - 像真人说话，不像广告稿
+   - 避免书面语、堆砌形容词
+   - 每句话长度适中（不超过30字）
+&nbsp;
+3. hook必须在前3秒制造悬念或强共鸣，避免产品展示开场
+4. 每个segment的shot字段要给出具体可拍的镜头描述
+5. 卖点最多3个，按重要性排序，不堆砌
+6. 情绪路径要写出用户的心理变化弧线
+7. 混剪策略要给出完整的素材池和镜头顺序
+8. **必须明确提及产品名称**：在产品出场环节必须说出"小金碗发膜"或"密集修护发膜"等具体产品名
+9. **套组信息要详细**：如果提到套组，必须说明包含几件、什么规格（如"3件套组"、"两瓶装"等）
+10. **数据必须准确**：如果使用数据对比，确保数据逻辑合理（如"水分稳定在65%"而不是"水分锁定在65%，比去一次理发店还久"这种无法对比的表述）
+11. **严禁违禁词**：不得使用以下词汇：
+    - 对比类：before/after、使用前后、前后对比、XX天对比、对比测试
+    - 绝对化：100%、完全、彻底、绝对、最好、第一
+    - 医疗化：治疗、根治、修复、疗效
+    替代方案：用"持续使用"、"连续使用X周"、"使用期间"、"使用中"等表述
+&nbsp;
+【输出格式 - JSON严格要求】
+&nbsp;
+⚠️ **CRITICAL**: 必须输出完整且格式正确的JSON，任何格式错误都会导致解析失败
+&nbsp;
+**JSON格式规则**:
+1. 所有字符串必须用双引号包裹（不能用单引号）
+2. 特殊字符必须转义：
+   - 换行符 → \\n
+   - 双引号 → \\"
+   - 反斜杠 → \\\\
+   - 制表符 → \\t
+3. 对象属性之间必须用逗号分隔
+4. 最后一个属性后不要加逗号
+5. 确保所有花括号、方括号配对：
+   - { 必须有对应的 }
+   - [ 必须有对应的 ]
+&nbsp;
+**常见错误示例**（避免）:
+❌ "text": "他说:"你好"" // 引号未转义
+✅ "text": "他说:\\"你好\\""
+&nbsp;
+❌ "text": "第一行
+第二行" // 换行未转义
+✅ "text": "第一行\\n第二行"
+&nbsp;
+❌ {"a": 1, "b": 2,} // 最后多余逗号
+✅ {"a": 1, "b": 2}
+&nbsp;
+❌ {"text": '单引号'} // 错误的引号类型
+✅ {"text": "双引号"}
+&nbsp;
+**检查清单**（输出前自检）:
+- [ ] 所有字符串使用双引号
+- [ ] 特殊字符全部转义
+- [ ] 花括号/方括号配对完整
+- [ ] 逗号位置正确（有且仅有一个，在属性间）
+- [ ] 没有多余的尾随逗号
+&nbsp;
+⚠️ 如果JSON格式错误，脚本将无法保存，请务必仔细检查！`
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >buildScriptUserMessage(</span>
+  topicData: string,
+  variant: 'A' | 'B',
+  brandContext?: string
+): string {
+  const variantGuide = <span class="cstat-no" title="statement not covered" >variant === 'A'</span>
+    ? `【A版本：情感驱动型】
+重点：强情绪共鸣、具体生活场景、痛点代入感强
+Hook策略：优先用问题崩塌型或理发店反转型
+节奏：情绪铺垫更长（3-10s），转化收口要温和
+CTA：用理解式语气（"如果你也..."）`
+    : `【B版本：理性驱动型】
+重点：数据背书、成分/特证、性价比锚点、套组逻辑
+Hook策略：优先用值感反差型或测评对比型
+节奏：卖点输出更集中（直接在10s内完成产品介绍）
+CTA：用认知升级语气（"发膜这种东西，真别按一次买"）`
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return `为以下选题创作${variant}版本投流脚本。</span>
+&nbsp;
+${variantGuide}
+&nbsp;
+${brandContext ? `【话术参考与产品卖点（IMPORTANT - 必须参考）】
+以下是品牌提供的官方话术参考、产品卖点和违禁词指南，生成脚本时：
+1. 优先使用这些官方卖点表述
+2. 严格遵守违禁词规范
+3. 产品名称、规格、功效必须与参考文件一致
+&nbsp;
+${brandContext}
+&nbsp;
+---
+` : ''}
+&nbsp;
+【选题信息】
+${topicData}
+&nbsp;
+**脚本生成要求**：
+1. 用&lt;script&gt;标签包裹完整JSON脚本
+2. 确保逻辑连贯：每个segment之间要有自然过渡，形成完整说服链路
+3. 口播文案完整且自然（fullVoiceover字段）
+4. 每个segment都有具体镜头描述（shot字段）
+5. 混剪策略完整（mixCutStrategy字段含素材池/镜头顺序/字幕节奏）
+6. A/B版本形成明显差异化
+7. ${brandContext ? '严格遵守话术参考和违禁词指南' : ''}
+&nbsp;
+**逻辑连贯性检查清单**（生成后自我检查）：
+- [ ] hook是否自然引出问题？
+- [ ] 问题放大是否承接hook？
+- [ ] 产品出场是否作为问题的解决方案？
+- [ ] 卖点是否支撑产品能解决问题？
+- [ ] 证明是否验证卖点真实有效？
+- [ ] CTA是否自然收口，给出明确行动指引？`
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-04-12T07:31:03.247Z
+            </div>
+        <script src="../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../sorter.js"></script>
+        <script src="../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

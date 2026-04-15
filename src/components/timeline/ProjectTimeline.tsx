@@ -30,13 +30,13 @@ const actionIcons: Record<string, React.FC<{ size?: number; className?: string }
 }
 
 const actionColors: Record<string, string> = {
-  create: 'text-emerald-400 bg-emerald-900/20',
-  upload: 'text-blue-400 bg-blue-900/20',
-  parse: 'text-green-400 bg-green-900/20',
-  insight: 'text-yellow-400 bg-yellow-900/20',
-  topic: 'text-purple-400 bg-purple-900/20',
-  script: 'text-pink-400 bg-pink-900/20',
-  report: 'text-[#5B8EFF] bg-[#0D3DB8]/20',
+  create: 'text-[#5E6AD2] bg-[#5E6AD2]/10',
+  upload: 'text-[#5E6AD2] bg-[#5E6AD2]/10',
+  parse: 'text-[#7B85DB] bg-[#7B85DB]/10',
+  insight: 'text-[#4A55B8] bg-[#4A55B8]/10',
+  topic: 'text-[#7B85DB] bg-[#7B85DB]/10',
+  script: 'text-[#5E6AD2] bg-[#5E6AD2]/10',
+  report: 'text-[#4A55B8] bg-[#4A55B8]/10',
 }
 
 const actionLabels: Record<string, string> = {

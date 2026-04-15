@@ -1,0 +1,42 @@
+{
+  "sidebar": {
+    "workbench": "数据上传",
+    "insights": "洞察生成",
+    "topics": "选题策划",
+    "scripts": "脚本创作",
+    "report": "报告导出",
+    "projects": "项目管理",
+    "settings": "设置",
+    "help": "帮助",
+    "logout": "退出登录"
+  },
+  "modal": {
+    "close": "关闭对话框"
+  },
+  "badge": {
+    "new": "新",
+    "hot": "热门",
+    "recommended": "推荐"
+  },
+  "emptyState": {
+    "default": "暂无内容",
+    "noResults": "没有找到匹配的结果",
+    "tryAgain": "请尝试其他搜索条件"
+  },
+  "loadingSpinner": {
+    "loading": "加载中..."
+  },
+  "toast": {
+    "success": "操作成功",
+    "error": "操作失败",
+    "warning": "警告",
+    "info": "提示"
+  },
+  "feedback": {
+    "button": "反馈",
+    "title": "用户反馈",
+    "placeholder": "请描述您遇到的问题或建议...",
+    "submit": "提交反馈",
+    "success": "反馈已提交，感谢您的反馈！"
+  }
+}

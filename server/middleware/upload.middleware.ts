@@ -26,11 +26,15 @@ const allowedMimeTypes = new Set([
   'video/mp4',
   'video/quicktime',
   'video/webm',
+  // Word documents
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+  'application/msword', // .doc
 ])
 
 const allowedExtensions = new Set([
   '.xlsx', '.xls', '.csv', '.pdf', '.jpg', '.jpeg', '.png', '.webp',
   '.mp4', '.mov', '.webm',
+  '.doc', '.docx', // Word documents
 ])
 
 export const uploadMiddleware = multer({
@@ -41,7 +45,7 @@ export const uploadMiddleware = multer({
     if (allowedMimeTypes.has(file.mimetype) || allowedExtensions.has(ext)) {
       cb(null, true)
     } else {
-      cb(new Error(`不支持的文件类型：${file.mimetype}（${ext}）。支持：Excel、CSV、PDF、JPG、PNG、WebP、MP4、MOV、WebM`))
+      cb(new Error(`不支持的文件类型：${file.mimetype}（${ext}）。支持：Excel、CSV、PDF、Word、JPG、PNG、WebP、MP4、MOV、WebM`))
     }
   }
 })

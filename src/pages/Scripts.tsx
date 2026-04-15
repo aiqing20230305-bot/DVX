@@ -260,7 +260,7 @@ export function Scripts() {
     }
   }, [activeProjectId, token])
 
-  const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id) || t.selected)
+  const selectedTopics = topics.filter(t => topicSelectedIds.has(t.id))
   const selectedCount = selectedIds.size
 
   // Sort options

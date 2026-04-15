@@ -3,7 +3,7 @@ import { scriptRepo, ScriptData } from '../db/repositories/script.repo.js'
 import { generateScriptsStream, generateScriptsBatchStream, extractProductList, extractProductListWithDetails } from '../services/script.service.js'
 import { productRepo } from '../db/repositories/product.repo.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
-import { requireProjectMember } from '../middleware/permission.middleware.js'
+import { requireProjectMember, checkPermission } from '../middleware/permission.middleware.js'
 
 const router = Router()
 
@@ -150,9 +150,7 @@ router.get('/topic/:topicId', authMiddleware, async (req: Request, res: Response
       return
     }
 
-    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-    const hasPermission = projectMemberRepo.hasRole(topic.project_id, userId, 'viewer')
-    if (!hasPermission) {
+    if (!checkPermission(topic.project_id, userId, 'viewer')) {
       res.status(403).json({ error: '权限不足，需要viewer权限' })
       return
     }
@@ -202,9 +200,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
       return
     }
 
-    const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-    const hasPermission = projectMemberRepo.hasRole(script.project_id, userId, 'editor')
-    if (!hasPermission) {
+    if (!checkPermission(script.project_id, userId, 'editor')) {
       res.status(403).json({ error: '权限不足，需要editor权限' })
       return
     }
@@ -239,9 +235,7 @@ router.delete('/batch', authMiddleware, async (req: Request, res: Response) => {
         return
       }
 
-      const { projectMemberRepo } = await import('../db/repositories/project-member.repo.js')
-      const hasPermission = projectMemberRepo.hasRole(firstScript.project_id, userId, 'editor')
-      if (!hasPermission) {
+      if (!checkPermission(firstScript.project_id, userId, 'editor')) {
         res.status(403).json({ error: '权限不足，需要editor权限' })
         return
       }

@@ -125,3 +125,23 @@ export const requireProjectEditor = () => requireProjectMember('editor')
  * 允许所有项目成员（viewer/editor/owner）访问
  */
 export const requireProjectViewer = () => requireProjectMember('viewer')
+
+/**
+ * 手动权限检查辅助函数（用于不能使用中间件的场景）
+ *
+ * 在开发环境下自动绕过权限检查
+ *
+ * @param projectId - 项目ID
+ * @param userId - 用户ID
+ * @param minRole - 最低要求角色
+ * @returns true 如果有权限或在开发环境
+ */
+export function checkPermission(projectId: string, userId: string, minRole: 'viewer' | 'editor' | 'owner'): boolean {
+  // Development mode: always bypass
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[Permission] Development mode - bypassing manual permission check (${minRole})`)
+    return true
+  }
+
+  return projectMemberRepo.hasRole(projectId, userId, minRole)
+}

@@ -1,0 +1,42 @@
+{
+  "sidebar": {
+    "workbench": "Data Upload",
+    "insights": "Insights",
+    "topics": "Topics",
+    "scripts": "Scripts",
+    "report": "Report",
+    "projects": "Projects",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Logout"
+  },
+  "modal": {
+    "close": "Close dialog"
+  },
+  "badge": {
+    "new": "New",
+    "hot": "Hot",
+    "recommended": "Recommended"
+  },
+  "emptyState": {
+    "default": "No content",
+    "noResults": "No matching results found",
+    "tryAgain": "Please try other search criteria"
+  },
+  "loadingSpinner": {
+    "loading": "Loading..."
+  },
+  "toast": {
+    "success": "Operation successful",
+    "error": "Operation failed",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "feedback": {
+    "button": "Feedback",
+    "title": "User Feedback",
+    "placeholder": "Please describe your issue or suggestion...",
+    "submit": "Submit Feedback",
+    "success": "Feedback submitted. Thank you!"
+  }
+}

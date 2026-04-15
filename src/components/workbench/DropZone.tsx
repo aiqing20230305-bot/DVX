@@ -22,6 +22,9 @@ function getFileIcon(file: File) {
   if (file.type === 'application/pdf') {
     return <FileText size={20} className="text-red-400" />
   }
+  if (file.type.includes('word') || file.type.includes('document') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+    return <FileText size={20} className="text-blue-400" />
+  }
   if (file.type.startsWith('video/')) {
     return <Film size={20} className="text-purple-400" />
   }
@@ -164,7 +167,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
           ref={inputRef}
           type="file"
           multiple
-          accept=".xlsx,.xls,.csv,.pdf,.jpg,.jpeg,.png,.webp,.mp4,.mov,.webm"
+          accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.mp4,.mov,.webm"
           className="hidden"
           onChange={e => handleFiles(e.target.files)}
           disabled={disabled}
@@ -191,7 +194,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
               或点击选择文件
             </p>
             <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-              支持 Excel、CSV、PDF、图片、视频 · 最大 50MB
+              支持 Excel、CSV、PDF、Word、图片、视频 · 最大 50MB
             </p>
           </div>
 
@@ -199,7 +202,7 @@ export function DropZone({ onFiles, disabled = false, uploading = false, uploads
           <div className="flex flex-wrap gap-2 mt-2 justify-center">
             {[
               { icon: <FileSpreadsheet size={14} />, label: 'Excel/CSV', color: '#037754', bg: 'rgba(5, 150, 105, 0.1)' },
-              { icon: <FileText size={14} />, label: 'PDF', color: '#BB2020', bg: 'rgba(220, 38, 38, 0.1)' },
+              { icon: <FileText size={14} />, label: 'PDF/Word', color: '#BB2020', bg: 'rgba(220, 38, 38, 0.1)' },
               { icon: <Image size={14} />, label: '图片', color: '#1F54C7', bg: 'rgba(37, 99, 235, 0.1)' },
               { icon: <Film size={14} />, label: '视频', color: '#4F5AB2', bg: 'rgba(94, 106, 210, 0.1)' },
             ].map(({ icon, label, color, bg }) => (

@@ -29,7 +29,6 @@ const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase.js').then(m => ({
 const Projects = lazy(() => import('./pages/Projects.js').then(m => ({ default: m.Projects })))
 const ProjectDashboard = lazy(() => import('./pages/ProjectDashboard.js').then(m => ({ default: m.ProjectDashboard })))
 const ProjectSettings = lazy(() => import('./pages/ProjectSettings.js'))
-const Approvals = lazy(() => import('./pages/Approvals.js'))
 const Notifications = lazy(() => import('./pages/Notifications.js').then(m => ({ default: m.Notifications })))
 const TestingSessions = lazy(() => import('./pages/Testing/TestingSessions.js').then(m => ({ default: m.TestingSessions })))
 const SessionDetail = lazy(() => import('./pages/Testing/SessionDetail.js').then(m => ({ default: m.SessionDetail })))
@@ -119,7 +118,6 @@ export function App() {
                       <Route path="/scripts" element={<Scripts />} />
                       <Route path="/report" element={<Report />} />
                       <Route path="/kb" element={<KnowledgeBase />} />
-                      <Route path="/approvals" element={<Approvals />} />
                       <Route path="/notifications" element={<Notifications />} />
                       <Route path="/settings" element={<ProjectSettings />} />
                       <Route path="/testing" element={<TestingSessions />} />
